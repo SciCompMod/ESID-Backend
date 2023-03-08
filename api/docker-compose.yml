@@ -1,0 +1,57 @@
+services:
+  worker:
+    build:
+      context: ./src/worker
+      dockerfile: Dockerfile
+    restart: always
+    networks:
+      - backnet
+    depends_on:
+      - redis
+    volumes:
+      - ./src/worker:/worker
+    env_file:
+      - .docker-env
+  api:
+    build: ./src/api
+    restart: always
+    networks:
+      - backnet
+    env_file:
+      - .docker-env
+    volumes:
+      - ./src/api/:/api
+      - ${PWD}/input:/api/input/
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+  redis:
+    restart: always
+    image: redis
+    volumes:
+      - redis_data:/var/lib/redis/data
+    networks:
+      - backnet
+  db:
+    restart: always
+    image: postgres:latest
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - .docker-env
+    networks:
+      - backnet
+    ports:
+      - 5433:5432
+
+networks:
+  backnet:
+
+volumes:
+  input:
+  output:
+  postgres_data:
+  redis_data:

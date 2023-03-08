@@ -1,0 +1,950 @@
+openapi: 3.0.0
+info:
+  title: Pandemos
+  description: >-
+    API for visualization of Infection Models
+  version: "1"
+security:
+  - bearerAuth: []
+servers:
+  - url: 'https://api.example.com/api/v0'
+  - url: 'http://localhost:8080/'
+paths:
+  /scenarios/:
+    get:
+      tags:
+        - Simulations
+      operationId: listScenarios
+      responses:
+        '200':
+          description: list all Scenarios
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdList'
+    post:
+      tags:
+        - Simulations
+      operationId: createSimulations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewScenario'
+      responses:
+        '200':
+          description: create a new Scenario
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ID'
+  /scenarios/{scenario_id}/:
+    get:
+      tags:
+        - Simulations
+      operationId: getScenario
+      parameters:
+        - in: path
+          name: scenario_id
+          required: True
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: return the account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Scenario'
+    delete:
+      tags:
+        - Simulations
+      operationId: deleteScenario
+      parameters:
+        - in: path
+          name: scenario_id
+          required: True
+          schema:
+            type: string
+            format: uuid
+      description: deletes the Scenario and all its runs
+      responses:
+        '202':
+          description: scenario deleted
+  /scenarios/{scenario_id}/simulations/:
+    post:
+      tags:
+        - Simulations
+      operationId: triggerSimulationRun
+      parameters:
+          - in: path
+            name: scenario_id
+            required: True
+            schema:
+              type: string
+              format: uuid
+      requestBody: 
+        content: 
+          application/zip:
+            schema: 
+              type: string
+              format: binary
+      responses:
+        '201':
+          description: return the account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ID'
+  /scenarios/{scenario_id}/simulations/{runid}/:
+    get:
+      tags:
+        - Simulations
+      operationId: getSimulationRunStatus
+      parameters:
+        - in: path
+          name: scenario_id
+          required: True
+          schema:
+            type: string
+            format: uuid
+        - in: path
+          name: runid
+          required: True
+          schema:
+            type: string
+            format: uuid
+          
+      responses:
+        '200':
+          description: return the simulation run status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimulationRunStatus'
+    delete:
+      tags:
+        - Simulations
+      operationId: deleteSimulationRun
+      parameters:
+        - in: path
+          name: scenario_id
+          required: True
+          schema:
+            type: string
+            format: uuid
+        - in: path
+          name: runid
+          required: True
+          schema:
+            type: string
+            format: uuid
+      description: deletes the run
+      responses:
+        '202':
+          description: run deleted
+  /scenarios/{scenario_id}/simulations/{runid}/infectiondata/:
+    get:
+      tags:
+        - Simulations
+      operationId: getInfectionData
+      parameters:
+        - in: path
+          name: scenario_id
+          required: True
+          schema: 
+            type: string
+            format: uuid
+        - in: path
+          name: runid
+          required: True
+          schema: 
+            type: string
+            format: uuid
+        - in: query
+          required: false
+          name: node
+          schema:
+            type: string
+        - in: query
+          required: false
+          name: startDate
+          schema:
+            type: string
+        - in: query
+          required: false
+          name: endDate
+          schema:
+            type: string
+        - in: query
+          required: false
+          name: compartments
+          description: Compartment Aggregation
+          schema:
+            type: string
+        - in: query
+          required: false
+          name: aggregation_flag
+          schema: 
+            type: boolean
+        - in: query
+          required: false
+          name: groups
+          schema:
+            type: array
+            items: 
+              type: string
+      responses:
+        '200':
+          description: return the account
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Infectiondata'
+                
+  /scenarios/{scenario_id}/simulations/{runid}/gridcells/:
+    get:
+      tags:
+        - Simulations
+      operationId: listGridcells
+      parameters:
+        - in: path
+          name: scenario_id
+          required: True
+          schema: 
+            type: string
+            format: uuid
+        - in: path
+          name: runid
+          required: True
+          schema: 
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: return the account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdList'
+  /scenarios/{scenario_id}/simulations/{runid}/movements/:
+    get:
+      tags:
+        - Simulations
+      operationId: listMovments
+      parameters:
+        - in: path
+          name: scenario_id
+          required: True
+          schema: 
+            type: string
+            format: uuid
+        - in: path
+          name: runid
+          required: True
+          schema: 
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: return the account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdList'
+
+  /interventions/:
+    get:
+      tags:
+        - Interventions
+      operationId: listInterventions
+      responses:
+        '200':
+          description: return the list of available interventions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdList'
+    post:
+      tags:
+        - Interventions
+      operationId: createIntervention
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewIntervention'
+      responses:
+        '201':
+          description: Intervention created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ID'
+
+
+  /interventions/{intervention_id}/:
+    get:
+      tags:
+        - Interventions
+      operationId: getIntervention
+      parameters:
+        - in: path
+          name: intervention_id
+          required: True
+          schema:
+            format: uuid
+            type: string
+      responses:
+        '200':
+          description: return the Node
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Intervention'
+    delete:
+      tags:
+        - Interventions
+      operationId: deleteIntervention
+      parameters:
+        - in: path
+          name: intervention_id
+          required: True
+          schema:
+            format: uuid
+            type: string
+      description: deletes the Intervention if it is not referenced in any list
+      responses:
+        '202':
+          description: Node deleted
+  /models/:
+    get:
+      tags:
+        - Models
+      operationId: listModels
+      responses:
+        '200':
+          description: return the list of Models
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdList'
+    post:
+      tags:
+        - Models
+      operationId: createModel
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewModel'
+      responses:
+        '200':
+          description: create a new Model
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ID'
+
+  /models/{model_id}/:
+    get:
+      tags:
+        - Models
+      operationId: getModel
+      parameters:
+        - in: path
+          name: model_id
+          required: True
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: return the list of Models
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Model'
+    delete:
+      tags:
+        - Models
+      operationId: deleteModel
+      parameters:
+        - in: path
+          name: model_id
+          required: True
+          schema:
+            type: string
+            format: uuid
+      description: deletes the model if it is not referenced in any scenario
+      responses:
+        '202':
+          description: Model deleted
+
+  /nodes/:
+    get:
+      tags:
+        - Nodes
+      operationId: listNodes
+      responses:
+        '200':
+          description: return the account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdList'
+    post:
+      tags:
+        - Nodes
+      operationId: createNode
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewNode'
+      responses:
+        '201':
+          description: node created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ID'
+
+
+  /nodes/{node_id}/:
+    get:
+      tags:
+        - Nodes
+      operationId: getNode
+      parameters:
+        - in: path
+          name: node_id
+          required: True
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: return the Node
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Node'
+    delete:
+      tags:
+        - Nodes
+      operationId: deleteNode
+      parameters:
+        - in: path
+          name: node_id
+          required: True
+          schema:
+            type: string
+            format: uuid
+      description: deletes the node if it is not referenced in any list
+      responses:
+        '202':
+          description: Node deleted
+  /nodelists/:
+    get:
+      tags:
+        - Nodes
+      operationId: getNodeLists
+      responses:
+        '200':
+          description: return all defined nodelists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdList'
+    post:
+      tags:
+        - Nodes
+      operationId: createNodeList
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewNodeList'
+      responses:
+        '201':
+          description: node list created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ID'
+  /nodelists/{node_id}/:
+    get:
+      tags:
+        - Nodes
+      operationId: getNodeList
+      parameters:
+        - in: path
+          name: node_id
+          required: True
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: return the Node
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NodeList'
+    delete:
+      tags:
+        - Nodes
+      operationId: deleteNodeList
+      parameters:
+        - in: path
+          name: node_id
+          required: True
+          schema:
+            type: string
+            format: uuid
+      description: deletes the node list
+      responses:
+        '202':
+          description: NodeList deleted
+  
+  /movements/:
+    get:
+      tags:
+        - Movements
+      operationId: listMovements
+      responses:
+        '200':
+          description: return the account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdList'
+                
+  
+  /groups/:
+    get:
+      tags:
+        - Groups
+      operationId: listGroups
+      responses:
+        '200':
+          description: return the list of existing groups
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdList'
+    post:
+      tags:
+        - Groups
+      operationId: createGroup
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewGroup'
+      responses:
+        '201':
+          description: node created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ID'
+
+
+  /groups/{group_id}/:
+    get:
+      tags:
+        - Groups
+      operationId: getGroup
+      parameters:
+        - in: path
+          name: group_id
+          required: True
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: return the Group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+    delete:
+      tags:
+        - Groups
+      operationId: deleteGroup
+      parameters:
+        - in: path
+          name: group_id
+          required: True
+          schema:
+            type: string
+            format: uuid
+      description: deletes the Group if it is not referenced in any list
+      responses:
+        '202':
+          description: Group deleted
+
+  /aggregations/:
+    get:
+      tags:
+        - Aggregations
+      operationId: listAggregations
+      responses:
+        '200':
+          description: return the list of existing aggregations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdList'
+    post:
+      tags:
+        - Aggregations
+      operationId: createAggregations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewAggregation'
+      responses:
+        '201':
+          description: aggregation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ID'
+
+
+  /aggregations/{aggregations_id}/:
+    get:
+      tags:
+        - Aggregations
+      operationId: getAggregations
+      parameters:
+        - in: path
+          name: aggregations_id
+          required: True
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: return the Group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Aggregation'
+    delete:
+      tags:
+        - Aggregations
+      operationId: deleteAggregation
+      parameters:
+        - in: path
+          name: aggregations_id
+          required: True
+          schema:
+            type: string
+            format: uuid
+      description: deletes the Group if it is not referenced in any list
+      responses:
+        '202':
+          description: Group deleted
+
+  /parameterdefinitions/:
+    get:
+      tags:
+        - ParameterDefinitions
+      operationId: listParameterDefinitions
+      responses:
+        '200':
+          description: return the list of existing Parameter Definitions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdList'
+    post:
+      tags:
+        - ParameterDefinitions
+      operationId: createParameterDefinition
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewParameterDefinition'
+      responses:
+        '201':
+          description: node created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ID'
+
+
+  /parameterdefinitions/{parameter_id}/:
+    get:
+      tags:
+        - ParameterDefinitions
+      operationId: getParameterDefinition
+      parameters:
+        - in: path
+          name: parameter_id
+          required: True
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: return the Group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParameterDefinition'
+    delete:
+      tags:
+        - ParameterDefinitions
+      operationId: deleteParameterDefinition
+      parameters:
+        - in: path
+          name: parameter_id
+          required: True
+          schema:
+            type: string
+            format: uuid
+      description: deletes the Group if it is not referenced in any list
+      responses:
+        '202':
+          description: Group deleted
+
+components:
+  securitySchemes:
+    bearerAuth: # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+  
+    ID:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          format: uuid
+
+    Named:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+
+
+
+    IdList:
+      type: array
+      items: 
+        type: string
+        format: uuid
+
+    NewScenario:
+      allOf:
+        - $ref: '#/components/schemas/Named'
+        - type: object
+          properties:
+            modelId:
+              type: string
+              format: uuid
+            modelParameters:
+              type: array
+              items: 
+                 $ref: '#/components/schemas/ParameterValue'
+            nodeListId:
+              type: string
+              format: uuid
+            linkedInterventions:
+              type: array
+              items:
+                 $ref: '#/components/schemas/ID'
+
+
+    Scenario:
+      allOf:
+        - $ref: '#/components/schemas/ID'
+        - $ref: '#/components/schemas/NewScenario'
+        
+
+    NewGroup:
+      allOf:
+        - $ref: '#/components/schemas/Named'
+        - type: object
+          properties:
+            category:
+              type: string
+
+    Group:
+      allOf:
+        - $ref: '#/components/schemas/NewGroup'
+        - $ref: '#/components/schemas/ID'
+    
+    NewAggregation:
+      allOf:
+        - $ref: '#/components/schemas/CompartmentAggregation'
+        
+    Aggregation: 
+      allOf: 
+        - $ref: '#/components/schemas/NewAggregation'
+        - $ref: '#/components/schemas/ID'
+        
+    NewParameterDefinition:
+      allOf:
+        - $ref: '#/components/schemas/Named'
+
+    ParameterDefinition:
+      allOf:
+        - $ref: '#/components/schemas/NewParameterDefinition'
+        - $ref: '#/components/schemas/ID'
+          
+    ParameterValueRange:
+      type: object
+      properties:
+        groupId:
+          type: string
+        valueMinInclusiv:
+          type: number
+        valueMaxExclusiv:
+          type: number
+
+    ParameterValue:
+      type: object
+      required:
+        - parameterId
+      properties:
+        parameterId:
+          type: string
+          format: uuid
+        groups:
+          type: array
+          items:
+             $ref: '#/components/schemas/ParameterValueRange'
+        categories:
+          type: array
+          items:
+             $ref: '#/components/schemas/ParameterValueRange'
+
+
+    NewModel:
+      allOf:
+        - $ref: '#/components/schemas/Named'
+        - type: object
+          required:
+            - groups
+            - parameterDefinitions
+            - compartments
+          properties:
+            aggregations:
+              type: array
+              items:
+                 $ref: '#/components/schemas/IdList'
+            compartments:
+              type: array
+              items:
+                 $ref: '#/components/schemas/Compartment'
+            groups:
+              type: array
+              items:
+                 $ref: '#/components/schemas/IdList'
+            parameterDefinitions:
+              type: array
+              items:
+                 $ref: '#/components/schemas/IdList'
+    Model:
+      allOf:
+        - $ref: '#/components/schemas/NewModel'
+        - $ref: '#/components/schemas/ID'
+    NewNode:
+      allOf:
+        - $ref: '#/components/schemas/Named'
+    Node:
+      allOf:
+        - $ref: '#/components/schemas/NewNode'
+        - $ref: '#/components/schemas/ID'
+        - type: object
+          properties:
+            AGS:
+              type: string
+          
+
+    NewIntervention:
+      allOf:
+        - $ref: '#/components/schemas/Named'
+
+    Intervention:
+      allOf:
+        - $ref: '#/components/schemas/NewNode'
+        - $ref: '#/components/schemas/ID'
+  
+    NewNodeList:
+      allOf:
+        - $ref: '#/components/schemas/Named'
+        - type: object
+          properties:
+            nodeIds:
+              type: array
+              items:
+                 $ref: '#/components/schemas/IdList'
+    Compartment:
+      allOf:
+        - $ref: '#/components/schemas/Named'
+        - type: object
+          properties:
+            tags:
+              type: array
+              items:
+                type: string
+
+    CompartmentAggregation:
+      allOf:
+        - $ref: '#/components/schemas/Named'
+        - type: object
+          properties:
+            tags:
+              type: array
+              items:
+                type: string
+    
+    Infectiondata: 
+      type: object 
+      properties: 
+        timestamp: 
+          type: string
+          format: timestamp
+        node: 
+          type: string
+          format: uuid
+        value: 
+          type: number
+          format: integer
+          example: 1
+    NodeList:
+      allOf:
+        - $ref: '#/components/schemas/NewNodeList'
+        - $ref: '#/components/schemas/ID'
+
+    SimulationRunStatus:
+      type: string
+      enum: [TRIGGERED, COMPLETED]
+
+    Movement:
+      type: object
+
+    Restriction:
+      allOf:
+        - $ref: '#/components/schemas/Named'
