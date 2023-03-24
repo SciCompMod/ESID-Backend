@@ -3,6 +3,7 @@ from app.models.group import Group
 from app.models.id import ID
 from uuid import uuid4
 from app.db.tasks import create_new_group, get_all_group, get_group_by_id, delete_group_by_id
+from app.models.error_models import IdNotAvailable
 
 
 class GroupsController:
@@ -26,5 +27,7 @@ class GroupsController:
     def delete_group(self, group_id):
         if delete_group_by_id(group_id):
             return group_id
-        return {"message": f"Group with id: {group_id} not found!", "status": 404}
+        response = IdNotAvailable(message=f"Group with id: {group_id} not found!",
+                                  status=404)
+        return response
     

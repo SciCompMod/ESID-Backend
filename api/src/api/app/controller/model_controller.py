@@ -12,6 +12,7 @@ from app.models.parameter_definition import ParameterDefinition as Model_Paramet
 from app.db.models import Tag
 # from app.db.tasks import (create_new_node, get_all_nodes, _get_node_by_id,
 # _delete_node_by_id)
+from app.models.error_models import IdNotAvailable
 
 
 class ModelsController:
@@ -41,4 +42,5 @@ class ModelsController:
     def delete_model_by_id(self, model_id):
         if tasks._delete_model_by_id(model_id):
             return model_id
-        return {"message": f"Node with id: {model_id} not found!", "status": 404}
+        response = IdNotAvailable(message = f"Node with id: {model_id} not found!", status= 404)
+        return response

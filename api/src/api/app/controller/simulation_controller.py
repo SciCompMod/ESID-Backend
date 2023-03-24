@@ -12,6 +12,7 @@ from app.utils.utility import _get_input_directory, _create_empty_directory, _cr
 import os
 import aiofiles
 import pandas as pd
+from app.models.error_models import IdNotAvailable
 
 
 class SimulationController:
@@ -34,31 +35,36 @@ class SimulationController:
 
     def delete_scenario_by_id(self, scenario_id):
         tasks.delete_scenario_by_id(scenario_id)
-        return {"message": f"Scenario with id: {scenario_id} deleted"}
+        return {"message": f"Scenario with id: {scenario_id} deleted", "status": 200}
 
     def get_simulation_run_status(self, scenario_id, runid):
         if tasks.check_scenario(scenario_id, runid):
             return {"TRIGGERED"}
         else:
-            {"message": f"Scenario with id: {scenario_id} not found!", "status": 404}
+            response = IdNotAvailable(message=f"Scenario with id: {scenario_id} not found!", status= 404)
+            return response
 
     def get_infection_data(self, scenario_id, runid, location, start_date, end_date, compartments):
         if tasks.check_scenario(scenario_id, runid):
             return [str(uuid4())]
         else:
-            {"message": f"Scenario with id: {scenario_id} not found!", "status": 404}
+            response = IdNotAvailable(message=f"Scenario with id: {scenario_id} not found!", status= 404)
+            return response
 
     def get_gridcells(self, scenario_id, runid):
         if tasks.check_scenario(scenario_id):
             return [str(uuid4())]
         else:
-            {"message": f"Scenario with id: {scenario_id} not found!", "status": 404}
+            response = IdNotAvailable(message=f"Scenario with id: {scenario_id} not found!", status= 404)
+            return response
 
     def get_movements(self, scenario_id, runid):
         if tasks.check_scenario(scenario_id):
             return [str(uuid4())]
         else:
-            {"message": f"Scenario with id: {scenario_id} not found!", "status": 404}
+            response = IdNotAvailable(message=f"Scenario with id: {scenario_id} not found!", status= 404)
+            return response
+
 
     async def _read_zip_file(self, file: File):
         """A helper function to read the pdf file asynchronously

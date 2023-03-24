@@ -3,6 +3,7 @@ from app.models.new_parameter_definition import NewParameterDefinition
 from app.models.parameter_definition import ParameterDefinition
 from uuid import uuid4
 from app.db import tasks
+from app.models.error_models import IdNotAvailable
 
 class ParameterController:
     def create_parameter_definition(self, new_parameter_definition: NewParameterDefinition):
@@ -12,7 +13,8 @@ class ParameterController:
 
     def delete_parameter_definition_by_id(self, parameter_id):
         tasks.delete_parameter_definition_by_id(parameter_id)
-        return {"message": f"Node with id: {parameter_id} deleted"}
+        response = IdNotAvailable(message=f"Node with id: {parameter_id} deleted", status=404)
+        return response
 
     def get_parameter_definition_by_id(self, parameter_id):
         parameter_definition_info = tasks.get_parameter_definition_by_id(parameter_id)
@@ -24,4 +26,5 @@ class ParameterController:
             parameter_definition_ids = [parameter.id for parameter in parameter_definitions]
             return parameter_definition_ids
         except TypeError:
-            return {"No parameter definitions available"}
+            response = IdNotAvailable(message="No parameter definitions available", status= 404)
+            return response
