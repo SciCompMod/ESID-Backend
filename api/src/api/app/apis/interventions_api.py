@@ -30,7 +30,7 @@ router = APIRouter()
 # get_token_bearerAuth = HTTPBearer()
 
 @router.post(
-    "/interventions/",
+    "/interventions",
     responses={
         201: {"model": ID, "description": "Intervention created"},
     },
@@ -50,7 +50,7 @@ async def create_intervention(
 
 
 @router.delete(
-    "/interventions/{intervention_id}/",
+    "/interventions/{intervention_id}",
     responses={
         202: {"description": "Node deleted"},
     },
@@ -69,7 +69,7 @@ async def delete_intervention(
 
 
 @router.get(
-    "/interventions/{intervention_id}/",
+    "/interventions/{intervention_id}",
     responses={
         200: {"model": Intervention, "description": "return the Node"},
     },
@@ -86,7 +86,7 @@ async def get_intervention(
     return Intervention(name=intervention_info.name, description=intervention_info.description, id=intervention_info.id)
 
 @router.get(
-    "/interventions/",
+    "/interventions",
     responses={
         200: {"model": List[str], "description": "return the list of available interventions"},
     },

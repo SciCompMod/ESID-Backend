@@ -30,7 +30,7 @@ nodes_controller = NodesController()
 
 
 @router.post(
-    "/nodes/",
+    "/nodes",
     responses={
         201: {"model": ID, "description": "node created"},
     },
@@ -47,7 +47,7 @@ async def create_node(
 
 
 @router.post(
-    "/nodelists/",
+    "/nodelists",
     responses={
         201: {"model": ID, "description": "node list created"},
     },
@@ -64,7 +64,7 @@ async def create_node_list(
 
 
 @router.delete(
-    "/nodes/{node_id}/",
+    "/nodes/{node_id}",
     responses={
         202: {"description": "Node deleted"},
     },
@@ -82,7 +82,7 @@ async def delete_node(
 
 
 @router.delete(
-    "/nodelists/{nodelist_id}/",
+    "/nodelists/{nodelist_id}",
     responses={
         202: {"description": "NodeList deleted"},
     },
@@ -100,7 +100,7 @@ async def delete_node_list(
 
 
 @router.get(
-    "/nodes/{node_id}/",
+    "/nodes/{node_id}",
     responses={
         200: {"model": Node, "description": "return the Node"},
     },
@@ -117,7 +117,7 @@ async def get_node(
 
 
 @router.get(
-    "/nodelists/{nodelist_id}/",
+    "/nodelists/{nodelist_id}",
     responses={
         200: {"model": List[str], "description": "return the Node"},
     },
@@ -136,7 +136,7 @@ async def get_node_list(
 
 
 @router.get(
-    "/nodelists/",
+    "/nodelists",
     responses={
         200: {"model": NewNodeList, "description": "return all defined nodelists"},
     },
@@ -152,7 +152,7 @@ async def get_node_lists(
 
 
 @router.get(
-    "/nodes/",
+    "/nodes",
     responses={
         200: {"model": List[str], "description": "return the account"},
     },

@@ -27,7 +27,7 @@ router = APIRouter()
 model_controller = ModelsController()
 
 @router.post(
-    "/models/",
+    "/models",
     responses={
         200: {"model": ID, "description": "create a new Model"},
     },
@@ -44,7 +44,7 @@ async def create_model(
 
 
 @router.delete(
-    "/models/{model_id}/",
+    "/models/{model_id}",
     responses={
         202: {"description": "Model deleted"},
     },
@@ -62,7 +62,7 @@ async def delete_model(
 
 
 @router.get(
-    "/models/{model_id}/",
+    "/models/{model_id}",
     responses={
         200: {"model": Model, "description": "return the list of Models"},
     },
@@ -79,7 +79,7 @@ async def get_model(
 
 
 @router.get(
-    "/models/",
+    "/models",
     responses={
         200: {"model": List[str], "description": "return the list of Models"},
     },

@@ -23,7 +23,7 @@ router = APIRouter()
 
 
 @router.get(
-    "/movements/",
+    "/movements",
     responses={
         200: {"model": List[str], "description": "return the account"},
     },

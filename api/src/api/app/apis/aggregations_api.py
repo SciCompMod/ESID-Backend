@@ -29,7 +29,7 @@ aggregation_controller = AggregationsController()
 
 
 @router.post(
-    "/aggregations/",
+    "/aggregations",
     responses={
         201: {"model": ID, "description": "aggregation created"},
     },
@@ -47,7 +47,7 @@ async def create_aggregations(
 
 
 @router.delete(
-    "/aggregations/{aggregations_id}/",
+    "/aggregations/{aggregations_id}",
     responses={
         202: {"description": "Group deleted"},
     },
@@ -65,7 +65,7 @@ async def delete_aggregation(
 
 
 @router.get(
-    "/aggregations/{aggregations_id}/",
+    "/aggregations/{aggregations_id}",
     responses={
         200: {"model": Aggregation, "description": "return the Group"},
     },
@@ -82,7 +82,7 @@ async def get_aggregations(
 
 
 @router.get(
-    "/aggregations/",
+    "/aggregations",
     responses={
         200: {"model": List[str], "description": "return the list of existing aggregations"},
     },

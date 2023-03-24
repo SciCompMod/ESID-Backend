@@ -30,7 +30,7 @@ router = APIRouter()
 
 
 @router.post(
-    "/parameterdefinitions/",
+    "/parameterdefinitions",
     responses={
         201: {"model": ID, "description": "node created"},
     },
@@ -49,7 +49,7 @@ async def create_parameter_definition(
 
 
 @router.delete(
-    "/parameterdefinitions/{parameter_id}/",
+    "/parameterdefinitions/{parameter_id}",
     responses={
         202: {"description": "Group deleted"},
     },
@@ -68,7 +68,7 @@ async def delete_parameter_definition(
 
 
 @router.get(
-    "/parameterdefinitions/{parameter_id}/",
+    "/parameterdefinitions/{parameter_id}",
     responses={
         200: {"model": ParameterDefinition, "description": "return the Group"},
     },
@@ -86,7 +86,7 @@ async def get_parameter_definition(
 
 
 @router.get(
-    "/parameterdefinitions/",
+    "/parameterdefinitions",
     responses={
         200: {"model": List[str], "description": "return the list of existing Parameter Definitions"},
     },

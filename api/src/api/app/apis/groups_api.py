@@ -30,7 +30,7 @@ router = APIRouter()
 groups_controller = GroupsController()
 
 @router.post(
-    "/groups/",
+    "/groups",
     responses={
         201: {"model": ID, "description": "node created"},
     },
@@ -47,7 +47,7 @@ async def create_group(
 
 
 @router.delete(
-    "/groups/{group_id}/",
+    "/groups/{group_id}",
     responses={
         202: {"description": "Group deleted"},
     },
@@ -65,7 +65,7 @@ async def delete_group(
 
 
 @router.get(
-    "/groups/{group_id}/",
+    "/groups/{group_id}",
     responses={
         200: {"model": Group, "description": "return the Group"},
     },
@@ -82,7 +82,7 @@ async def get_group(
 
 
 @router.get(
-    "/groups/",
+    "/groups",
     responses={
         200: {"model": List[str], "description": "return the list of existing groups"},
     },
