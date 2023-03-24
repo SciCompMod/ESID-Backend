@@ -24,7 +24,7 @@ from security_api import get_token_bearerAuth
 from uuid import uuid4
 
 from app.db.tasks import create_new_group, get_all_group
-from app.controller import GroupsController
+from app.controller.groups_controller import GroupsController
 
 router = APIRouter()
 groups_controller = GroupsController()
