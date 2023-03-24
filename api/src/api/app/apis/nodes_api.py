@@ -130,8 +130,6 @@ async def get_node_list(
         get_token_bearerAuth
     ),
 ) -> List[str]:
-    print("Node api")
-    print("*" *100)
     return nodes_controller.get_nodelist_by_id(nodelist_id=nodelist_id)
 
 

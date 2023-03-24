@@ -410,9 +410,6 @@ def create_new_scenario(id: str, name: str, description: str, model_id: str, nod
                     id=p_group.group_id, value_min_inclusiv=p_group.value_min_inclusiv, value_max_exclusiv=p_group.value_max_exclusiv)
 
                 # adds group object to CategoryParameterValueRange table
-                print("+"*100)
-                print(data_obj.id, data_obj.value_max_exclusiv,
-                      data_obj.value_min_inclusiv)
                 create_data_object(data_obj)
                 category_list.append(data_obj)
 

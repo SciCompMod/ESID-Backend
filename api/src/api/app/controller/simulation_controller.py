@@ -72,7 +72,6 @@ class SimulationController:
             input_directory = os.path.join(_get_input_directory(), fname)
             _create_empty_directory(input_directory)
             filepath = os.path.join(input_directory, zip_filename)
-            print(filepath)
             async with aiofiles.open(
                 filepath, "wb"
             ) as out_file:
