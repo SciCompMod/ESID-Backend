@@ -1,0 +1,282 @@
+@startuml
+hide <<Path>> circle
+hide <<Response>> circle
+hide <<Parameter>> circle
+hide empty methods
+hide empty fields
+set namespaceSeparator none
+
+class "ID" {
+  {field} id : string
+}
+
+class "Named" {
+  {field} name : string {O}
+  {field} description : string {O}
+}
+
+class "IdList.1" {
+  {field} value : string
+}
+
+class "IdList" {
+}
+
+class "NewScenario.1" {
+  {field} modelId : string {O}
+  {field} nodeListId : string {O}
+}
+
+class "NewScenario" {
+}
+
+class "Scenario" {
+}
+
+class "Group.1" {
+  {field} id : string {O}
+  {field} category : string {O}
+}
+
+class "Group" {
+}
+
+class "ParameterDefinition" {
+}
+
+class "ParameterValueRange" {
+  {field} groupId : string {O}
+  {field} valueMinInclusiv : decimal {O}
+  {field} valueMaxExclusiv : decimal {O}
+}
+
+class "ParameterValue" {
+  {field} parameterId : string {O}
+}
+
+class "NewModel.1" {
+}
+
+class "NewModel" {
+}
+
+class "Model" {
+}
+
+class "NewNode" {
+}
+
+class "Node" {
+}
+
+class "NewNodeList" {
+}
+
+class "NodeList" {
+}
+
+enum "SimulationRunStatus" {
+  TRIGGERED
+  COMPLETED
+}
+
+class "Movement" {
+}
+
+class "Restriction" {
+}
+
+class "GET /scenarios/" <<Path>> {
+}
+
+class "POST /scenarios/" <<Path>> {
+}
+
+class "GET /scenarios/{id}/" <<Path>> {
+}
+
+class "DELETE /scenarios/{id}/" <<Path>> {
+}
+
+class "DELETE /scenarios/{id}/ 202" <<Response>> {
+}
+
+class "POST /scenarios/{id}/simulations/" <<Path>> {
+}
+
+class "GET /scenarios/{id}/simulations/{runid}/" <<Path>> {
+}
+
+class "DELETE /scenarios/{id}/simulations/{runid}/" <<Path>> {
+}
+
+class "DELETE /scenarios/{id}/simulations/{runid}/ 202" <<Response>> {
+}
+
+class "GET /scenarios/{id}/simulations/{runid}/infectiondata/" <<Path>> {
+}
+
+class "GET /scenarios/{id}/simulations/{runid}/gridcells/" <<Path>> {
+}
+
+class "GET /scenarios/{id}/simulations/{runid}/movements/" <<Path>> {
+}
+
+class "GET /restrictions/" <<Path>> {
+}
+
+class "GET /models/" <<Path>> {
+}
+
+class "POST /models/" <<Path>> {
+}
+
+class "GET /models/{id}/" <<Path>> {
+}
+
+class "DELETE /models/{id}/" <<Path>> {
+}
+
+class "DELETE /models/{id}/ 202" <<Response>> {
+}
+
+class "GET /nodes/" <<Path>> {
+}
+
+class "POST /nodes/" <<Path>> {
+}
+
+class "GET /nodes/{id}/" <<Path>> {
+}
+
+class "DELETE /nodes/{id}/" <<Path>> {
+}
+
+class "DELETE /nodes/{id}/ 202" <<Response>> {
+}
+
+class "GET /nodelists/" <<Path>> {
+}
+
+class "POST /nodelists/" <<Path>> {
+}
+
+class "GET /nodelists/{id}/" <<Path>> {
+}
+
+class "DELETE /nodelists/{id}/" <<Path>> {
+}
+
+class "DELETE /nodelists/{id}/ 202" <<Response>> {
+}
+
+class "GET /movements/" <<Path>> {
+}
+
+"IdList" --> "*" "IdList.1"
+
+"NewScenario.1" --> "*" "ParameterValue"  :  "modelParameters"
+
+"NewScenario" --> "1" "Named"
+
+"NewScenario" --> "1" "NewScenario.1"
+
+"Scenario" --> "1" "ID"
+
+"Scenario" --> "1" "NewScenario"
+
+"Group" --> "1" "Named"
+
+"Group" --> "1" "Group.1"
+
+"ParameterDefinition" --> "1" "Named"
+
+"ParameterDefinition" --> "1" "ID"
+
+"ParameterValue" --> "*" "ParameterValueRange"  :  "groups"
+
+"ParameterValue" --> "*" "ParameterValueRange"  :  "categories"
+
+"NewModel.1" --> "*" "Group"  :  "groups"
+
+"NewModel.1" --> "*" "ParameterDefinition"  :  "parameters"
+
+"NewModel" --> "1" "Named"
+
+"NewModel" --> "1" "NewModel.1"
+
+"Model" --> "1" "NewModel"
+
+"Model" --> "1" "ID"
+
+"NewNode" --> "1" "Named"
+
+"Node" --> "1" "NewNode"
+
+"Node" --> "1" "ID"
+
+"NewNodeList" --> "0..1" "IDList"  :  "nodeIds"
+
+"NodeList" --> "1" "NewNodeList"
+
+"NodeList" --> "1" "ID"
+
+"Restriction" --> "1" "Named"
+
+"GET /scenarios/" ..> "1" "IdList"  :  "200"
+
+"POST /scenarios/" ..> "1" "ID"  :  "200"
+
+"POST /scenarios/" --> "1" "NewScenario"
+
+"GET /scenarios/{id}/" ..> "1" "Scenario"  :  "200"
+
+"DELETE /scenarios/{id}/" ..> "1" "DELETE /scenarios/{id}/ 202"  :  "202"
+
+"POST /scenarios/{id}/simulations/" ..> "1" "ID"  :  "201"
+
+"GET /scenarios/{id}/simulations/{runid}/" ..> "1" "SimulationRunStatus"  :  "200"
+
+"DELETE /scenarios/{id}/simulations/{runid}/" ..> "1" "DELETE /scenarios/{id}/simulations/{runid}/ 202"  :  "202"
+
+"GET /scenarios/{id}/simulations/{runid}/infectiondata/" ..> "1" "IdList"  :  "200"
+
+"GET /scenarios/{id}/simulations/{runid}/gridcells/" ..> "1" "IdList"  :  "200"
+
+"GET /scenarios/{id}/simulations/{runid}/movements/" ..> "1" "IdList"  :  "200"
+
+"GET /restrictions/" ..> "1" "IdList"  :  "200"
+
+"GET /models/" ..> "1" "IdList"  :  "200"
+
+"POST /models/" ..> "1" "ID"  :  "200"
+
+"POST /models/" --> "1" "NewModel"
+
+"GET /models/{id}/" ..> "1" "Model"  :  "200"
+
+"DELETE /models/{id}/" ..> "1" "DELETE /models/{id}/ 202"  :  "202"
+
+"GET /nodes/" ..> "1" "IdList"  :  "200"
+
+"POST /nodes/" ..> "1" "ID"  :  "201"
+
+"POST /nodes/" --> "1" "NewNode"
+
+"GET /nodes/{id}/" ..> "1" "Node"  :  "200"
+
+"DELETE /nodes/{id}/" ..> "1" "DELETE /nodes/{id}/ 202"  :  "202"
+
+"GET /nodelists/" ..> "1" "NewNodeList"  :  "200"
+
+"POST /nodelists/" ..> "1" "ID"  :  "201"
+
+"POST /nodelists/" --> "1" "IdList"
+
+"GET /nodelists/{id}/" ..> "1" "IdList"  :  "200"
+
+"DELETE /nodelists/{id}/" ..> "1" "DELETE /nodelists/{id}/ 202"  :  "202"
+
+"GET /movements/" ..> "1" "IdList"  :  "200"
+
+@enduml

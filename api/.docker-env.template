@@ -1,0 +1,11 @@
+CELERY_BROKER_URL=redis://redis:6379
+CELERY_RESULT_BACKEND=redis://redis:6379
+worker_hijack_root_logger=False
+RUNTIME_ENV=docker
+SECRET_KEY=supersecret
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_SERVER=db
+POSTGRES_PORT=5432
+POSTGRES_DB=postgres
+POSTGRES_HOST_AUTH_METHOD=trust
