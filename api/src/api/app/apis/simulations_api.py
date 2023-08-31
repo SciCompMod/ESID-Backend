@@ -45,7 +45,6 @@ async def create_simulations(
     new_scenario: NewScenario = Body(None, description=""),
     token_bearerAuth: TokenModel = Security(get_token_bearerAuth),
 ) -> ID:
-    print("running simulation")
     return simulation_controller.create_new_scenarios(new_scenario)
 
 
