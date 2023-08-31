@@ -1,27 +1,46 @@
-from app.db import get_session
-from app.db.models import (Group, CompartmentAggregation, Compartment, Intervention, ParameterDefinition, Node, NodeList, Model, Aggregation, Tag, RunSimulations,
-                           ParameterValue, GroupParameterValueRange, CategoryParameterValueRange, Scenario, InfectionData)
-from app.models.model import Model as Model_Model
-from app.models.compartment import Compartment as Model_Compartment
-from app.models.aggregation import Aggregation as Model_Aggregation
-from app.models.tag import Tag as Model_Tag
-from app.models.group import Group as Model_Group
-from app.models.node_list import NodeList as NodeListAPI
-from app.models.scenario import Scenario as ModelScenario
-from app.models.parameter_value import ParameterValue as ModelParameterValue
-from app.models.parameter_value_range import ParameterValueRange as ModelParamaterValueRange
-
-from sqlmodel import select
 from typing import List
-from fastapi import HTTPException
 from uuid import uuid4
+
+from app.db import get_session
+from app.db.models import (
+    Aggregation,
+    CategoryParameterValueRange,
+    CompartmentAggregation,
+    Group,
+    GroupParameterValueRange,
+    InfectionData,
+    Intervention,
+    Migration,
+    Model,
+    Movements,
+    Node,
+    NodeList,
+    ParameterDefinition,
+    ParameterValue,
+    RunSimulations,
+    Scenario,
+    Tag,
+)
+from app.models.aggregation import Aggregation as Model_Aggregation
+from app.models.compartment import Compartment as Model_Compartment
+from app.models.model import Model as Model_Model
+from app.models.node_list import NodeList as NodeListAPI
+from app.models.parameter_value import ParameterValue as ModelParameterValue
+from app.models.parameter_value_range import (
+    ParameterValueRange as ModelParamaterValueRange,
+)
+from app.models.scenario import Scenario as ModelScenario
+from app.models.tag import Tag as Model_Tag
+from app.utils.constants import MovementFilter
+from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
+from sqlmodel import select
+
 # Groups
 
 
 def create_new_group(name: str, description: str, category: str, id: str):
-    data_obj = Group(name=name, description=description,
-                     category=category, id=id)
+    data_obj = Group(name=name, description=description, category=category, id=id)
     with next(get_session()) as session:
         session.add(data_obj)
         session.commit()
@@ -51,6 +70,7 @@ def delete_group_by_id(id: str):
             session.delete(group)
             session.commit()
             return id
+
 
 # Interventions
 
@@ -86,6 +106,7 @@ def delete_intervention_by_id(id: str):
         session.delete(intervention)
         session.commit()
 
+
 # ParameterDefinitions
 
 
@@ -107,8 +128,7 @@ def get_all_parameter_definitions():
 def get_parameter_definition_by_id(id: str):
     statement = select(ParameterDefinition).where(ParameterDefinition.id == id)
     with next(get_session()) as session:
-        query_results: ParameterDefinition = session.exec(
-            statement).one_or_none()
+        query_results: ParameterDefinition = session.exec(statement).one_or_none()
     if query_results:
         return query_results
 
@@ -122,10 +142,10 @@ def delete_parameter_definition_by_id(id: str):
         session.commit()
 
 
-def create_new_aggregation(id: str, name: str, description: str, tags:List):
+def create_new_aggregation(id: str, name: str, description: str, tags: List):
     all_tags = []
     for tag in tags:
-        tag_id= str(uuid4())
+        tag_id = str(uuid4())
         # create_new_tag(tag_id, tag.name)
         all_tags.append(Tag(id=tag_id, name=tag.name))
     data_obj = Aggregation(name=name, description=description, id=id, tags=all_tags)
@@ -145,20 +165,21 @@ def get_all_aggregations():
 def get_aggregation_by_id(id: str):
     statement = select(Aggregation).where(Aggregation.id == id)
     with next(get_session()) as session:
-        query_results: Aggregation = session.exec(
-            statement).one_or_none()
+        query_results: Aggregation = session.exec(statement).one_or_none()
         if query_results:
             tags = []
             for tag in query_results.tags:
                 tags.append(Model_Tag(name=tag.name))
-            return Model_Aggregation(id=query_results.id,
-                                    name=query_results.name,
-                                    description=query_results.description,
-                                    tags=query_results.tags
-                                    )
+            return Model_Aggregation(
+                id=query_results.id,
+                name=query_results.name,
+                description=query_results.description,
+                tags=query_results.tags,
+            )
         else:
             raise HTTPException(
-                status_code=404, detail=f"Aggregation id <{id}> does not exists")
+                status_code=404, detail=f"Aggregation id <{id}> does not exists"
+            )
 
 
 def delete_aggregation_by_id(id: str):
@@ -202,6 +223,7 @@ def _delete_node_by_id(id: str):
         session.delete(node)
         session.commit()
 
+
 # nodelists
 
 
@@ -213,8 +235,7 @@ def create_node_list(name: str, description: str, nodeIds: list, id: str):
             list_of_nodes.append(node)
         else:
             raise ValueError(f"Node with id: '{node_id}' not found!")
-    data_obj = NodeList(name=name, description=description,
-                        nodes=list_of_nodes, id=id)
+    data_obj = NodeList(name=name, description=description, nodes=list_of_nodes, id=id)
     with next(get_session()) as session:
         session.add(data_obj)
         session.commit()
@@ -233,12 +254,12 @@ def _get_nodelist_by_id(id: str):
     with next(get_session()) as session:
         query_results: NodeList = session.exec(statement).one_or_none()
         if query_results:
-            result = NodeListAPI(name=query_results.name,
-                                 description=query_results.description,
-                                 id=query_results.id,
-                                 nodeIds=[
-                                     [node.id for node in query_results.nodes]]
-                                 )
+            result = NodeListAPI(
+                name=query_results.name,
+                description=query_results.description,
+                id=query_results.id,
+                nodeIds=[[node.id for node in query_results.nodes]],
+            )
             return result
 
 
@@ -259,7 +280,7 @@ def create_new_compartment(comp):
 
 
 def create_new_tag(id: str, name: str):
-    data_obj = Tag(id=id,name=name)
+    data_obj = Tag(id=id, name=name)
     with next(get_session()) as session:
         session.add(data_obj)
         session.commit()
@@ -273,9 +294,16 @@ def get_tags_by_ids(ids: list):
         return query_results
 
 
-
 # Models
-def create_new_model(id: str, name: str, description: str, compartment: list, groups: list, aggregation_ids: list, parameter_definitions: list):
+def create_new_model(
+    id: str,
+    name: str,
+    description: str,
+    compartment: list,
+    groups: list,
+    aggregation_ids: list,
+    parameter_definitions: list,
+):
     grs = []
     prds = []
     comps = []
@@ -297,7 +325,8 @@ def create_new_model(id: str, name: str, description: str, compartment: list, gr
         # check if the group id is present
         if not group:
             raise HTTPException(
-                status_code=404, detail=f"Group id {group_id[0]} does not exists")
+                status_code=404, detail=f"Group id {group_id[0]} does not exists"
+            )
         grs.append(group)
 
     for parameter_id in parameter_definitions:
@@ -305,11 +334,20 @@ def create_new_model(id: str, name: str, description: str, compartment: list, gr
         # check if the parameter id is present
         if not parameter_definition:
             raise HTTPException(
-                status_code=404, detail=f"Group id {parameter_definition[0]} does not exists")
+                status_code=404,
+                detail=f"Group id {parameter_definition[0]} does not exists",
+            )
         prds.append(parameter_definition)
 
-    data_obj = Model(id=id, name=name, description=description, compartments=comps,
-                     groups=grs, aggregations=list_of_aggregations, parameter_definitions=prds)
+    data_obj = Model(
+        id=id,
+        name=name,
+        description=description,
+        compartments=comps,
+        groups=grs,
+        aggregations=list_of_aggregations,
+        parameter_definitions=prds,
+    )
     with next(get_session()) as session:
         session.add(data_obj)
         session.commit()
@@ -332,7 +370,7 @@ def _get_model_by_id(id: str):
             grps = []
             prds = []
             comps = []
-            aggs=[]
+            aggs = []
 
             for agg in query_results.aggregations:
                 agg_id = agg.id
@@ -340,7 +378,8 @@ def _get_model_by_id(id: str):
 
             for comp in query_results.compartments:
                 comp = Model_Compartment(
-                    name=comp.name, description=comp.description, tags=[comp.tags])
+                    name=comp.name, description=comp.description, tags=[comp.tags]
+                )
                 comps.append(comp)
 
             for group in query_results.groups:
@@ -351,13 +390,20 @@ def _get_model_by_id(id: str):
                 prd = params.id
                 prds.append([prd])
 
-            model = Model_Model(id=query_results.id,
-                                name=query_results.name, description=query_results.description, aggregations=aggs,
-                                compartments=comps, groups=grps, parameterDefinitions=prds)
+            model = Model_Model(
+                id=query_results.id,
+                name=query_results.name,
+                description=query_results.description,
+                aggregations=aggs,
+                compartments=comps,
+                groups=grps,
+                parameterDefinitions=prds,
+            )
             return model
         else:
             raise HTTPException(
-                status_code=404, detail=f"Model id <{id}> does not exists")
+                status_code=404, detail=f"Model id <{id}> does not exists"
+            )
 
 
 def _delete_model_by_id(id: str):
@@ -368,6 +414,7 @@ def _delete_model_by_id(id: str):
         session.delete(node)
         session.commit()
 
+
 # scenarios
 
 
@@ -377,7 +424,15 @@ def create_data_object(data_obj):
         session.commit()
 
 
-def create_new_scenario(id: str, name: str, description: str, model_id: str, node_list_id: str, linked_interventions_ids: list, model_paramters: List[ParameterValue]):
+def create_new_scenario(
+    id: str,
+    name: str,
+    description: str,
+    model_id: str,
+    node_list_id: str,
+    linked_interventions_ids: list,
+    model_paramters: List[ParameterValue],
+):
     node_list = _get_nodelist_by_id(node_list_id)
 
     # verify if the interventions exists and add it to list
@@ -398,7 +453,10 @@ def create_new_scenario(id: str, name: str, description: str, model_id: str, nod
             # verify if group_id exists or not
             if group:
                 data_obj = GroupParameterValueRange(
-                    id=p_group.group_id, value_min_inclusiv=p_group.value_min_inclusiv, value_max_exclusiv=p_group.value_max_exclusiv)
+                    id=p_group.group_id,
+                    value_min_inclusiv=p_group.value_min_inclusiv,
+                    value_max_exclusiv=p_group.value_max_exclusiv,
+                )
 
                 # adds group object to GroupParameterValueRange table
                 create_data_object(data_obj)
@@ -407,9 +465,18 @@ def create_new_scenario(id: str, name: str, description: str, model_id: str, nod
             category = get_group_by_id(p_category.group_id)
             if category:
                 data_obj = CategoryParameterValueRange(
-                    id=p_group.group_id, value_min_inclusiv=p_group.value_min_inclusiv, value_max_exclusiv=p_group.value_max_exclusiv)
+                    id=p_group.group_id,
+                    value_min_inclusiv=p_group.value_min_inclusiv,
+                    value_max_exclusiv=p_group.value_max_exclusiv,
+                )
 
                 # adds group object to CategoryParameterValueRange table
+                print("+" * 100)
+                print(
+                    data_obj.id,
+                    data_obj.value_max_exclusiv,
+                    data_obj.value_min_inclusiv,
+                )
                 create_data_object(data_obj)
                 category_list.append(data_obj)
 
@@ -417,21 +484,139 @@ def create_new_scenario(id: str, name: str, description: str, model_id: str, nod
         parameter_obj = get_parameter_definition_by_id(parameter.parameter_id)
         if parameter_obj:
             model_parameter_obj = ParameterValue(
-                id=parameter.parameter_id, groups=group_list, categories=category_list)
+                id=parameter.parameter_id, groups=group_list, categories=category_list
+            )
             # adds group object to ParameterValue table
             create_data_object(model_parameter_obj)
             model_paramter_list.append(model_parameter_obj)
 
     if node_list:
-        scenario_data_obj = Scenario(id=id,
-                                     name=name,
-                                     description=description,
-                                     model_id=model_id,
-                                     node_list_id=node_list_id,
-                                     linked_interventions=list_of_linked_interventions,
-                                     parameter_values=model_paramter_list)
+        scenario_data_obj = Scenario(
+            id=id,
+            name=name,
+            description=description,
+            model_id=model_id,
+            node_list_id=node_list_id,
+            linked_interventions=list_of_linked_interventions,
+            parameter_values=model_paramter_list,
+        )
 
         create_data_object(scenario_data_obj)
+
+
+def get_migrations_for_node(
+    scenario_id,
+    run_id,
+    compartments,
+    node,
+    start_date,
+    end_date,
+    groups,
+):
+    statement = select(Migration).where(
+        Migration.scenario_id == scenario_id,
+        Migration.run_id == run_id,
+    )
+
+    if node:
+        statement = statement.where(
+            Migration.start_node == node or Migration.end_node == node
+        )
+    if start_date and end_date:
+        statement = statement.where(Migration.timestamp.between(start_date, end_date))
+    if compartments:
+        statement = statement.where(Migration.compartment_name.in_(compartments))
+    if groups:
+        statement = statement.where(Migration.group_id.in_(groups))
+
+    with next(get_session()) as session:
+        query_results: Migration = session.exec(statement).all()
+    if query_results:
+        return query_results
+
+
+def get_migrations(
+    scenario_id,
+    run_id,
+    start_node,
+    end_nodes,
+    start_date,
+    end_date,
+    compartments,
+    groups,
+):
+    statement = select(Migration).where(
+        Migration.scenario_id == scenario_id,
+        Migration.run_id == run_id,
+    )
+
+    if start_node:
+        statement = statement.where(Migration.start_node == start_node)
+    if end_nodes:
+        statement = statement.where(Migration.end_node.in_(end_nodes))
+    if start_date and end_date:
+        statement = statement.where(Migration.timestamp.between(start_date, end_date))
+    if compartments:
+        statement = statement.where(Migration.compartment_name.in_(compartments))
+    if groups:
+        statement = statement.where(Migration.group_id.in_(groups))
+
+    with next(get_session()) as session:
+        query_results: Migration = session.exec(statement).all()
+    if query_results:
+        return query_results
+
+
+def get_all_movements_for_cell(
+    scenario_id,
+    run_id,
+    cells,
+    start_date,
+    end_date,
+    compartments,
+    groups,
+    movement_filter,
+    travel_mode,
+    activity,
+    min_travel_time,
+    max_travel_time,
+):
+    statement = select(Movements).where(
+        Movements.scenario_id == scenario_id,
+        Movements.run_id == run_id,
+    )
+    if start_date and end_date:
+        statement = statement.where(Movements.timestamp.between(start_date, end_date))
+    if compartments:
+        statement = statement.where(Movements.compartment_name.in_(compartments))
+    if groups:
+        statement = statement.where(Movements.group_id.in_(groups))
+    if cells:
+        if movement_filter == MovementFilter.START:
+            statement = statement.where(Movements.start_cell.in_(cells))
+        elif movement_filter == MovementFilter.END:
+            statement = statement.where(Movements.end_cell.in_(cells))
+        elif movement_filter == MovementFilter.START_AND_END:
+            statement = statement.where(
+                Movements.start_cell.in_(cells) and Movements.end_cell.in_(cells)
+            )
+        else:
+            statement = statement.where(
+                Movements.start_cell.in_(cells) or Movements.end_cell.in_(cells)
+            )
+    if travel_mode:
+        statement = statement.where(Movements.travel_mode.in_(travel_mode))
+    if activity:
+        statement = statement.where(Movements.activity.in_(activity))
+    if min_travel_time and max_travel_time:
+        statement = statement.where(
+            Movements.timestamp.between(min_travel_time, max_travel_time)
+        )
+
+    with next(get_session()) as session:
+        query_results: Movements = session.exec(statement).all()
+    if query_results:
+        return query_results
 
 
 def get_all_scenarios():
@@ -457,16 +642,25 @@ def get_scenario_by_id(id: str):
                 for parameter_value in query_results.parameter_values:
                     for group in parameter_value.groups:
                         grp = ModelParamaterValueRange(
-                            groupId=group.id, valueMinInclusiv=group.value_min_inclusiv, valueMaxExclusiv=group.value_max_exclusiv)
+                            groupId=group.id,
+                            valueMinInclusiv=group.value_min_inclusiv,
+                            valueMaxExclusiv=group.value_max_exclusiv,
+                        )
                         groups.append(grp)
 
                     for category in parameter_value.categories:
                         cat = ModelParamaterValueRange(
-                            groupId=category.id, valueMinInclusiv=category.value_min_inclusiv, valueMaxExclusiv=category.value_max_exclusiv)
+                            groupId=category.id,
+                            valueMinInclusiv=category.value_min_inclusiv,
+                            valueMaxExclusiv=category.value_max_exclusiv,
+                        )
                         categories.append(cat)
 
                     par_val = ModelParameterValue(
-                        parameterId=parameter_value.id, groups=groups, categories=categories)
+                        parameterId=parameter_value.id,
+                        groups=groups,
+                        categories=categories,
+                    )
                     parameter_values.append(par_val)
 
                 for intervention in query_results.linked_interventions:
@@ -481,13 +675,14 @@ def get_scenario_by_id(id: str):
                     modelId=query_results.model_id,
                     modelParameters=parameter_values,
                     nodeListId=query_results.node_list_id,
-                    linkedInterventions=linked_interventions
+                    linkedInterventions=linked_interventions,
                 )
 
                 return scenario
-        except:
+        except:  # noqa: E722 TODO: resolve bare except
             raise HTTPException(
-                status_code=404, detail=f"Scenario id <{id}> does not exists")
+                status_code=404, detail=f"Scenario id <{id}> does not exists"
+            )
 
 
 def delete_scenario_by_id(id: str):
@@ -518,7 +713,9 @@ def create_run_simulations(run_id: str, scenario_id: str):
             session.commit()
     except IntegrityError:
         raise HTTPException(
-            status_code=404, detail=f"Key (scenario_id)=({scenario_id}) is not present in table <scenario>")
+            status_code=404,
+            detail=f"Key (scenario_id)=({scenario_id}) is not present in table <scenario>",
+        )
 
 
 def delete_simulations_run_by_id(id: str):
@@ -540,8 +737,18 @@ def create_new_infectiondata(timestamp: str, node: str, value: str):
 def create_multiple_infectiondata_from_dicts(infection_rows: List[dict]):
     data_objs = []
     for infection_row in infection_rows:
-        data_objs.append(InfectionData(id= str(uuid4()),**infection_row))
+        data_objs.append(InfectionData(id=str(uuid4()), **infection_row))
     with next(get_session()) as session:
         for data_obj in data_objs:
             session.add(data_obj)
         session.commit()
+
+
+def get_compartments_from_aggregation(compaggr_name):
+    statement = select(CompartmentAggregation).where(
+        CompartmentAggregation.name == compaggr_name
+    )
+    with next(get_session()) as session:
+        query_results: CompartmentAggregation = session.exec(statement).one()
+        if query_results:
+            return query_results.compartments
