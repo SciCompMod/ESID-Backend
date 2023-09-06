@@ -5,7 +5,7 @@ Source code repository for pandemos APIs.
 ### Setup the Project
 1. Clone the project:
 ```
-git clone git@github.com:coac-gmbh/pandemos-interface.git
+git clone git@github.com:DLR-SC/ESID-Backend.git
 ```
 2. Goto `pandemos-interface` directory.
 3. Run docker compose:
