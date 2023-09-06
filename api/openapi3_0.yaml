@@ -10,7 +10,7 @@ servers:
   - url: 'https://api.example.com/api/v0'
   - url: 'http://localhost:8080/'
 paths:
-  /scenarios/:
+  /scenarios:
     get:
       tags:
         - Simulations
@@ -38,7 +38,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ID'
-  /scenarios/{scenario_id}/:
+  /scenarios/{scenario_id}:
     get:
       tags:
         - Simulations
@@ -72,7 +72,7 @@ paths:
       responses:
         '202':
           description: scenario deleted
-  /scenarios/{scenario_id}/simulations/:
+  /scenarios/{scenario_id}/simulations:
     post:
       tags:
         - Simulations
@@ -97,7 +97,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ID'
-  /scenarios/{scenario_id}/simulations/{runid}/:
+  /scenarios/{scenario_id}/simulations/{runid}:
     get:
       tags:
         - Simulations
@@ -144,7 +144,7 @@ paths:
       responses:
         '202':
           description: run deleted
-  /scenarios/{scenario_id}/simulations/{runid}/infectiondata/:
+  /scenarios/{scenario_id}/simulations/{runid}/infectiondata:
     get:
       tags:
         - Simulations
@@ -204,8 +204,139 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Infectiondata'
+  
+  /scenarios/{scenario_id}/simulations/{runid}/migrations:
+    get:
+      tags: 
+        - Simulations
+      operationId: listNodeMigrations
+      parameters: 
+        - in: path
+          name: scenario_id
+          required: True
+          schema: 
+            type: string
+            format: uuid
+        - in: path
+          name: runid
+          required: True
+          schema: 
+            type: string
+            format: uuid
+        - in: query
+          required: false
+          name: startDate
+          schema:
+            type: string
+        - in: query
+          required: false
+          name: endDate
+          schema:
+            type: string
+        - in: query
+          required: false
+          name: compartments
+          description: Compartment Aggregation
+          schema:
+            type: string
+        - in: query
+          required: false
+          name: aggregation_flag
+          schema: 
+            type: boolean
+        - in: query
+          required: false
+          name: groups
+          schema:
+            type: array
+            items: 
+              type: string
+        - in: query
+          required: true
+          name: startNode
+          schema: 
+            type: string
+        - in: query
+          required: true
+          name: endNode
+          schema: 
+            type: array
+            items: 
+              type: string
+      responses:
+        '200':
+          description: return 
+          content: 
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/NodeMigrations'
                 
-  /scenarios/{scenario_id}/simulations/{runid}/gridcells/:
+  /scenarios/{scenario_id}/simulations/{runid}/topMigrations:
+    get:
+      tags: 
+        - Simulations
+      operationId: getTopMigrations
+      parameters: 
+        - in: path
+          name: scenario_id
+          required: True
+          schema: 
+            type: string
+            format: uuid
+        - in: path
+          name: runid
+          required: True
+          schema: 
+            type: string
+            format: uuid
+        - in: query
+          required: false
+          name: date
+          schema:
+            type: string
+        - in: query
+          required: false
+          name: compartments
+          description: Compartment Aggregation
+          schema:
+            type: string
+        - in: query
+          required: false
+          name: aggregation_flag
+          schema: 
+            type: boolean
+        - in: query
+          required: false
+          name: groups
+          schema:
+            type: array
+            items: 
+              type: string
+        - in: query
+          required: true
+          name: node
+          schema: 
+            type: string
+        - in: query
+          required: false
+          name: count
+          schema:
+            type: number
+            format: integer
+        - in: query
+          required: false
+          name: sort
+          schema: 
+            type: string
+      responses:
+        '200':
+          description: return 
+          content: 
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/IdList'
+        
+  /scenarios/{scenario_id}/simulations/{runid}/gridcells:
     get:
       tags:
         - Simulations
@@ -230,7 +361,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IdList'
-  /scenarios/{scenario_id}/simulations/{runid}/movements/:
+  /scenarios/{scenario_id}/simulations/{runid}/movements:
     get:
       tags:
         - Simulations
@@ -256,7 +387,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdList'
 
-  /interventions/:
+  /interventions:
     get:
       tags:
         - Interventions
@@ -286,7 +417,7 @@ paths:
                 $ref: '#/components/schemas/ID'
 
 
-  /interventions/{intervention_id}/:
+  /interventions/{intervention_id}:
     get:
       tags:
         - Interventions
@@ -320,7 +451,7 @@ paths:
       responses:
         '202':
           description: Node deleted
-  /models/:
+  /models:
     get:
       tags:
         - Models
@@ -349,7 +480,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ID'
 
-  /models/{model_id}/:
+  /models/{model_id}:
     get:
       tags:
         - Models
@@ -384,7 +515,7 @@ paths:
         '202':
           description: Model deleted
 
-  /nodes/:
+  /nodes:
     get:
       tags:
         - Nodes
@@ -414,7 +545,7 @@ paths:
                 $ref: '#/components/schemas/ID'
 
 
-  /nodes/{node_id}/:
+  /nodes/{node_id}:
     get:
       tags:
         - Nodes
@@ -448,7 +579,7 @@ paths:
       responses:
         '202':
           description: Node deleted
-  /nodelists/:
+  /nodelists:
     get:
       tags:
         - Nodes
@@ -476,7 +607,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ID'
-  /nodelists/{node_id}/:
+  /nodelists/{node_id}:
     get:
       tags:
         - Nodes
@@ -511,7 +642,7 @@ paths:
         '202':
           description: NodeList deleted
   
-  /movements/:
+  /movements:
     get:
       tags:
         - Movements
@@ -525,7 +656,7 @@ paths:
                 $ref: '#/components/schemas/IdList'
                 
   
-  /groups/:
+  /groups:
     get:
       tags:
         - Groups
@@ -555,7 +686,7 @@ paths:
                 $ref: '#/components/schemas/ID'
 
 
-  /groups/{group_id}/:
+  /groups/{group_id}:
     get:
       tags:
         - Groups
@@ -590,7 +721,7 @@ paths:
         '202':
           description: Group deleted
 
-  /aggregations/:
+  /aggregations:
     get:
       tags:
         - Aggregations
@@ -620,7 +751,7 @@ paths:
                 $ref: '#/components/schemas/ID'
 
 
-  /aggregations/{aggregations_id}/:
+  /aggregations/{aggregations_id}:
     get:
       tags:
         - Aggregations
@@ -655,7 +786,7 @@ paths:
         '202':
           description: Group deleted
 
-  /parameterdefinitions/:
+  /parameterdefinitions:
     get:
       tags:
         - ParameterDefinitions
@@ -685,7 +816,7 @@ paths:
                 $ref: '#/components/schemas/ID'
 
 
-  /parameterdefinitions/{parameter_id}/:
+  /parameterdefinitions/{parameter_id}:
     get:
       tags:
         - ParameterDefinitions
@@ -919,7 +1050,23 @@ components:
               type: array
               items:
                 type: string
-    
+                
+    NodeMigrations: 
+      type: array 
+      items: 
+        type: object
+        properties: 
+          timestamp: 
+            type: string
+          node:
+            type: string
+          incoming: 
+            type: number
+            format: integer
+          outgoing: 
+            type: number
+            format: integer
+        
     Infectiondata: 
       type: object 
       properties: 
