@@ -34,7 +34,7 @@ simulation_controller = SimulationController()
 
 
 @router.post(
-    "/scenarios/",
+    "/scenarios",
     responses={
         200: {"model": ID, "description": "create a new Scenario"},
     },
@@ -49,7 +49,7 @@ async def create_simulations(
 
 
 @router.delete(
-    "/scenarios/{scenario_id}/",
+    "/scenarios/{scenario_id}",
     responses={
         202: {"description": "scenario deleted"},
     },
@@ -65,7 +65,7 @@ async def delete_scenario(
 
 
 @router.delete(
-    "/scenarios/{scenario_id}/simulations/{runid}/",
+    "/scenarios/{scenario_id}/simulations/{runid}",
     responses={
         202: {"description": "run deleted"},
     },
@@ -81,7 +81,7 @@ async def delete_simulation_run(
 
 
 @router.get(
-    "/scenarios/{scenario_id}/simulations/{runid}/infectiondata/",
+    "/scenarios/{scenario_id}/simulations/{runid}/infectiondata",
     responses={
         200: {"model": List[str], "description": "return the account"},
     },
@@ -103,7 +103,7 @@ async def get_infection_data(
 
 
 @router.get(
-    "/scenarios/{scenario_id}/",
+    "/scenarios/{scenario_id}",
     responses={
         200: {"model": Scenario, "description": "return the account"},
     },
@@ -118,7 +118,7 @@ async def get_scenario(
 
 
 @router.get(
-    "/scenarios/{scenario_id}/simulations/{runid}/",
+    "/scenarios/{scenario_id}/simulations/{runid}",
     responses={
         200: {
             "model": SimulationRunStatus,
@@ -137,7 +137,7 @@ async def get_simulation_run_status(
 
 
 @router.get(
-    "/scenarios/{scenario_id}/simulations/{run_id}/migrations/",
+    "/scenarios/{scenario_id}/simulations/{run_id}/migrations",
     responses={
         200: {"model": List[NodeMigrationsInner], "description": "return"},
     },
@@ -170,7 +170,7 @@ async def list_node_migrations(
 
 
 @router.get(
-    "/scenarios/{scenario_id}/simulations/{run_id}/top_migrations/",
+    "/scenarios/{scenario_id}/simulations/{run_id}/top_migrations",
     responses={
         200: {"model": List[List], "description": "return the account"},
     },
@@ -205,7 +205,7 @@ async def get_top_migrations(
 
 
 @router.get(
-    "/scenarios/{scenario_id}/simulations/{run_id}/gridcells/",
+    "/scenarios/{scenario_id}/simulations/{run_id}/gridcells",
     responses={
         200: {"model": List[GridcellData], "description": "return the account"},
     },
@@ -248,7 +248,7 @@ async def list_gridcells(
 
 
 @router.get(
-    "/scenarios/{scenario_id}/simulations/{run_id}/movements/",
+    "/scenarios/{scenario_id}/simulations/{run_id}/movements",
     responses={
         200: {"model": List[MovementData], "description": "return the account"},
     },
@@ -291,7 +291,7 @@ async def list_movements(
 
 
 @router.get(
-    "/scenarios/",
+    "/scenarios",
     responses={
         200: {"model": List[str], "description": "list all Scenarios"},
     },
@@ -305,7 +305,7 @@ async def list_scenarios(
 
 
 @router.post(
-    "/scenarios/{scenario_id}/simulations/",
+    "/scenarios/{scenario_id}/simulations",
     responses={
         201: {"model": ID, "description": "return the account"},
     },
