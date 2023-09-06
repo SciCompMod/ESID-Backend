@@ -8,7 +8,10 @@ Source code repository for pandemos APIs.
 git clone git@github.com:DLR-SC/ESID-Backend.git
 ```
 2. Go to `api` directory.
-3. Run docker compose:
+3. Create `docker-env` and run docker compose:
+```
+cp .docker-env.template .docker-env
+```
 ```
 docker-compose up --build -d
 ```
