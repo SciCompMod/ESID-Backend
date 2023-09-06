@@ -120,10 +120,7 @@ async def get_scenario(
 @router.get(
     "/scenarios/{scenario_id}/simulations/{runid}",
     responses={
-        200: {
-            "model": SimulationRunStatus,
-            "description": "return the simulation run status",
-        },
+        200: {"model": SimulationRunStatus, "description": "return the simulation run status"},
     },
     tags=["Simulations"],
     response_model_by_alias=True,
