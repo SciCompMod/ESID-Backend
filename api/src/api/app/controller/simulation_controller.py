@@ -1,14 +1,16 @@
+import json
 import os
 import zipfile
 from typing import List
 from uuid import uuid4
+from datetime import datetime, timedelta
 
 import aiofiles
+import h5py
 import pandas as pd
 from app.db import tasks
 from app.models.gridcell_data import GridcellData
 from app.models.id import ID
-from app.models.infectiondata import Infectiondata
 from app.models.movement_data import MovementData
 from app.models.new_scenario import NewScenario
 from app.models.node_migrations_inner import NodeMigrationsInner
@@ -16,19 +18,20 @@ from app.utils.constants import MigrationSort
 from app.utils.utility import _create_empty_directory, _get_input_directory
 from fastapi import File, status
 from fastapi.exceptions import HTTPException
+from app.models.infectiondata import Infectiondata
 
 
 class SimulationController:
-    def create_new_scenarios(self, new_scenerio: NewScenario):
+    def create_new_scenarios(self, new_scenario: NewScenario):
         scenario_id = str(uuid4())
         tasks.create_new_scenario(
             scenario_id,
-            new_scenerio.name,
-            new_scenerio.description,
-            new_scenerio.model_id,
-            new_scenerio.node_list_id,
-            new_scenerio.linked_interventions,
-            new_scenerio.model_parameters,
+            new_scenario.name,
+            new_scenario.description,
+            new_scenario.model_id,
+            new_scenario.node_list_id,
+            new_scenario.linked_interventions,
+            new_scenario.model_parameters,
         )
         return ID(id=scenario_id)
 
@@ -274,10 +277,32 @@ class SimulationController:
         return cell_movements
 
     def get_infection_data(
-        self, scenario_id, runid, location, start_date, end_date, compartments
+        self, scenario_id, runid, node, start_date, end_date, compartments, groups
     ):
         if tasks.check_scenario(scenario_id, runid):
-            return [str(uuid4())]
+            infection_data_list = []      
+            # change start and end date to to datetime format and calculate the toal days between them
+            formatted_start_date = datetime.strptime(start_date, "%Y-%m-%d")
+            total_days = (datetime.strptime(end_date, "%Y-%m-%d") - formatted_start_date).days + 1
+            
+            for day in range(total_days):
+                infected_values = []
+                # get the range of date from start to end date
+                timestamp = str((formatted_start_date + timedelta(days=day)).timestamp())
+                # get infection data for list of groups in a node
+                for group in groups:
+                    infection_data = tasks.get_infection_data(timestamp, node, group)
+                    for data in infection_data:
+                        # get the value of the specified compartment
+                        infected_values.append(data.dict()[compartments])
+
+
+                total_value = sum(infected_values)
+                total_value = f"{total_value:.2f}"
+                # create the infection data object
+                infection_data_obj = Infectiondata(timestamp=timestamp, node=node, value=total_value)
+                infection_data_list.append(infection_data_obj)
+            return infection_data_list
         else:
             {"message": f"Scenario with id: {scenario_id} not found!", "status": 404}
 
@@ -315,29 +340,61 @@ class SimulationController:
         with zipfile.ZipFile(filepath, "r") as zip_ref:
             zip_ref.extractall(output_folder)
 
-        csv_paths = []
-        for csv_file in os.listdir(output_folder):
-            if csv_file.endswith(".csv"):
-                csv_path = os.path.join(output_folder, csv_file)
-                csv_paths.append(csv_path)
-        return csv_paths
+        h5_paths = []
+        for h5_file in os.listdir(os.path.join(output_folder, fname)):
+            if h5_file.endswith(".h5"):
+                h5_path = os.path.join(output_folder, fname, h5_file)
+                h5_paths.append(h5_path)
+        return h5_paths, os.path.join(output_folder, fname, "metadata.json")
 
     async def create_simulations(self, scenario_id, zip_file):
         run_id = str(uuid4())
         if zip_file is not None:
-            req_columns = Infectiondata().dict().keys()
-            csv_paths = await self._read_zip_file(zip_file)
-            for csv_path in csv_paths:
-                df = pd.read_csv(csv_path)
-                if all(elem in df.columns for elem in req_columns):
-                    infection_rows = df.to_dict("records")
-                    tasks.create_multiple_infectiondata_from_dicts(infection_rows)
-                else:
-                    raise Exception(
-                        f"The csv files do not contain required columns:{req_columns}"
-                    )
+            h5_paths, metadata_path = await self._read_zip_file(zip_file)
+            metadata = json.load(open(metadata_path))
+            start_date = metadata["startDay"]
+            tasks.create_groups(metadata["groupMapping"])
+            formatted_date = datetime.strptime(start_date, "%Y-%m-%d")
+            scenario_timestamp = datetime.strptime(start_date, "%Y-%m-%d").timestamp()
+            h5_paths = [x for x in h5_paths if "sum" not in x]
+            for h5_path in h5_paths:
+                h_file = h5py.File(h5_path, "r")
 
-        tasks.create_run_simulations(run_id=run_id, scenario_id=scenario_id)
+                rows = []
+                for node in h_file.keys():
+                    tasks.create_nodes(node)
+                    groups = list(h_file[node].keys())
+                    groups.remove("Time")
+                    groups.remove("Total")
+                    for group in groups:
+                        values = h_file[node][group][()]
+                        for i in range(len(values)):
+                            group_date = str((formatted_date + timedelta(days=i)).timestamp())
+                            values_list = list(values[i])
+                            if len(node) != 5:
+                                new_node = "0" + node
+                            else:
+                                new_node = node
+
+                            rows.append(
+                                {
+                                    "node": new_node,
+                                    "group": group,
+                                    "timestamp": group_date,
+                                    "MildInfections": values_list[0],
+                                    "Hospitalized": values_list[0],
+                                    "ICU": values_list[0],
+                                    "Dead": values_list[0]
+
+                                }
+                            )
+                df = pd.DataFrame(rows)
+                infection_rows = df.to_dict("records")
+                tasks.create_multiple_infectiondata_from_dicts(infection_rows)
+
+            tasks.create_run_simulations(
+                run_id=run_id, scenario_id=scenario_id, timestamp=scenario_timestamp
+            )
         return ID(id=run_id)
 
     def delete_simulations_run_by_id(self, run_id, scenario_id):
