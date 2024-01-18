@@ -1,8 +1,7 @@
 from datetime import datetime  # noqa: F401
 from typing import List, Optional
 
-from sqlmodel import Field, Relationship, SQLModel
-
+from sqlmodel import Field, Relationship, SQLModel, ARRAY, Float, Column
 
 class ModelGroupLink(SQLModel, table=True):
     group_id: Optional[str] = Field(
@@ -255,6 +254,18 @@ class ParameterValue(SQLModel, table=True):
     )
 
 
+class ScenarioRunSimulationsLink(SQLModel, table=True):
+    scenario_id: Optional[str] = Field(
+        default=None, foreign_key="scenario.id", primary_key=True, nullable=False
+    )
+    run_id: Optional[str] = Field(
+        default=None,
+        foreign_key="runsimulations.run_id",
+        primary_key=True,
+        nullable=False,
+    )
+
+
 class Scenario(SQLModel, table=True):
     id: Optional[str] = Field(default=None, primary_key=True, nullable=False)
     name: Optional[str] = Field(default=None)
@@ -267,6 +278,7 @@ class Scenario(SQLModel, table=True):
     parameter_values: List["ParameterValue"] = Relationship(
         back_populates="scenarios", link_model=ScenarioParameterValueLink
     )
+    runsimulations: List["RunSimulations"] = Relationship(back_populates="scenario")
 
 
 class Migration(SQLModel, table=True):
@@ -293,13 +305,23 @@ class Migration(SQLModel, table=True):
 class RunSimulations(SQLModel, table=True):
     scenario_id: Optional[str] = Field(foreign_key="scenario.id")
     run_id: Optional[str] = Field(default=None, primary_key=True, nullable=False)
+    scenario: Optional[Scenario] = Relationship(back_populates="runsimulations")
+    timestamp: Optional[str] = Field(default=None)
 
 
 class InfectionData(SQLModel, table=True):
     id: Optional[str] = Field(default=None, primary_key=True, nullable=False)
     timestamp: Optional[str] = Field(default=None)
     node: Optional[str] = Field(foreign_key="node.id")
-    value: Optional[float] = Field(default=None)
+    group: Optional[str] = Field(foreign_key="group.id")
+    MildInfections: Optional[float] = Field(default=None)
+    Hospitalized: Optional[float] = Field(default=None)
+    ICU: Optional[float] = Field(default=None)
+    Dead: Optional[float] = Field(default=None)
+
+
+    class Config:
+        arbitrary_types_allowed = True
 
 
 class Cell(SQLModel, table=True):
