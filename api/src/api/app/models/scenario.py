@@ -1,14 +1,15 @@
 # coding: utf-8
 
 from __future__ import annotations
-from datetime import date, datetime  # noqa: F401
 
 import re  # noqa: F401
+from datetime import date, datetime  # noqa: F401
 from typing import Any, Dict, List, Optional  # noqa: F401
 
-from pydantic import AnyUrl, BaseModel, EmailStr, Field, validator  # noqa: F401
 from app.models.id import ID
 from app.models.parameter_value import ParameterValue
+from app.models.scenario_runs_run_id_list_inner import ScenarioRunsRunIdListInner
+from pydantic import AnyUrl, BaseModel, EmailStr, Field, validator  # noqa: F401
 
 
 class Scenario(BaseModel):
@@ -31,8 +32,16 @@ class Scenario(BaseModel):
     name: Optional[str] = Field(alias="name", default=None)
     description: Optional[str] = Field(alias="description", default=None)
     model_id: Optional[str] = Field(alias="modelId", default=None)
-    model_parameters: Optional[List[ParameterValue]] = Field(alias="modelParameters", default=None)
+    model_parameters: Optional[List[ParameterValue]] = Field(
+        alias="modelParameters", default=None
+    )
     node_list_id: Optional[str] = Field(alias="nodeListId", default=None)
-    linked_interventions: Optional[List[ID]] = Field(alias="linkedInterventions", default=None)
+    linked_interventions: Optional[List[ID]] = Field(
+        alias="linkedInterventions", default=None
+    )
+    run_id_list: Optional[List[ScenarioRunsRunIdListInner]] = Field(
+        alias="run_id_list", default=None
+    )
+
 
 Scenario.update_forward_refs()
