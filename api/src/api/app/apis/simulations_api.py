@@ -11,7 +11,9 @@ from app.models.new_scenario import NewScenario
 from app.models.node_migrations_inner import NodeMigrationsInner
 from app.models.scenario import Scenario
 from app.models.simulation_run_status import SimulationRunStatus
+from app.models.infectiondata import Infectiondata
 from app.utils.constants import MigrationSort, MovementFilter
+
 from fastapi import (  # noqa: F401
     APIRouter,
     Body,
@@ -91,14 +93,16 @@ async def delete_simulation_run(
 async def get_infection_data(
     scenario_id: str = Path(None, description=""),
     runid: str = Path(None, description=""),
-    location: str = Query(None, description=""),
-    start_date: str = Query(None, description=""),
-    end_date: str = Query(None, description=""),
-    compartments: str = Query(None, description=""),
+    node: str = Query(None, description="", alias="node"),
+    start_date: str = Query(None, description="", alias="startDate"),
+    end_date: str = Query(None, description="", alias="endDate"),
+    compartments: str = Query(None, description="Compartment Aggregation", alias="compartments"),
+    aggregation_flag: bool = Query(None, description="", alias="aggregation_flag"),
+    groups: List[str] = Query(None, description="", alias="groups"),
     token_bearerAuth: TokenModel = Security(get_token_bearerAuth),
-) -> List[str]:
+) -> List[Infectiondata]:
     return simulation_controller.get_infection_data(
-        scenario_id, runid, location, start_date, end_date, compartments
+        scenario_id, runid, node, start_date, end_date, compartments, groups
     )
 
 
@@ -297,7 +301,7 @@ async def list_movements(
 )
 async def list_scenarios(
     token_bearerAuth: TokenModel = Security(get_token_bearerAuth),
-) -> List[str]:
+) -> List[ID]:
     return simulation_controller.get_all_scenarios()
 
 
