@@ -30,8 +30,10 @@ from app.models.parameter_value_range import (
     ParameterValueRange as ModelParamaterValueRange,
 )
 from app.models.scenario import Scenario as ModelScenario
+from app.models.scenario_runs_run_id_list_inner import ScenarioRunsRunIdListInner
 from app.models.tag import Tag as Model_Tag
 from app.utils.constants import MovementFilter
+from app.utils.defaultDict import County, age_groups
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import select
@@ -45,6 +47,14 @@ def create_new_group(name: str, description: str, category: str, id: str):
         session.add(data_obj)
         session.commit()
 
+def create_groups(group_maps):
+    # remove key "Total" from group maps 
+    del group_maps["Total"]
+    category = "age"
+    for group_id, group_name in group_maps.items():
+        grp_idx = group_name.split("_")[1]
+        des = age_groups[int(grp_idx)]
+        create_new_group(group_name, des, category, group_id)
 
 def get_all_group():
     statement = select(Group)
@@ -194,6 +204,24 @@ def delete_aggregation_by_id(id: str):
 # Nodes
 def create_new_node(name: str, description: str, id: str):
     data_obj = Node(name=name, description=description, id=id)
+    with next(get_session()) as session:
+        session.add(data_obj)
+        session.commit()
+
+def create_nodes(node_id: str):
+    node_county = County[int(node_id)]
+
+    # get name and description of node by splitting the string
+    splitted_county = node_county.split(",")
+    name = splitted_county[0]
+    if len(splitted_county) == 2:
+        description = splitted_county[1]
+    else:
+        description = ""
+    # add 0 to node id if the length of node id is not equal to 5
+    if len(node_id) != 5:
+        node_id = "0" + node_id
+    data_obj = Node(name=name, description=description, id=node_id)
     with next(get_session()) as session:
         session.add(data_obj)
         session.commit()
@@ -627,6 +655,14 @@ def get_all_scenarios():
         return query_results
 
 
+def get_scenario_obj(id: str):
+    statement = select(Scenario).where(Scenario.id == id)
+    with next(get_session()) as session:
+        query_results: Scenario = session.exec(statement).one()
+    if query_results:
+        return query_results
+
+
 def get_scenario_by_id(id: str):
     statement = select(Scenario).where(Scenario.id == id)
     with next(get_session()) as session:
@@ -638,7 +674,16 @@ def get_scenario_by_id(id: str):
                 categories = []
                 parameter_values = []
                 linked_interventions = []
+                run_id_list = []
 
+                run_simulations = query_results.runsimulations
+                for run_simulation in run_simulations:
+                    run_id_list.append(
+                        ScenarioRunsRunIdListInner(
+                            run_id=run_simulation.run_id,
+                            timestamp=run_simulation.timestamp,
+                        )
+                    )
                 for parameter_value in query_results.parameter_values:
                     for group in parameter_value.groups:
                         grp = ModelParamaterValueRange(
@@ -676,6 +721,7 @@ def get_scenario_by_id(id: str):
                     modelParameters=parameter_values,
                     nodeListId=query_results.node_list_id,
                     linkedInterventions=linked_interventions,
+                    run_id_list=run_id_list,
                 )
 
                 return scenario
@@ -705,8 +751,11 @@ def check_scenario(scenario_id: str, run_id: str):
         return False
 
 
-def create_run_simulations(run_id: str, scenario_id: str):
-    data_obj = RunSimulations(run_id=run_id, scenario_id=scenario_id)
+def create_run_simulations(run_id: str, scenario_id: str, timestamp: str):
+    scenario = get_scenario_obj(scenario_id)
+    data_obj = RunSimulations(
+        run_id=run_id, scenario_id=scenario_id, timestamp=timestamp, scenario=scenario
+    )
     try:
         with next(get_session()) as session:
             session.add(data_obj)
@@ -733,6 +782,12 @@ def create_new_infectiondata(timestamp: str, node: str, value: str):
         session.add(data_obj)
         session.commit()
 
+def get_infection_data(timestamp: str, node: str, group: str):
+    statement = select(InfectionData).where(InfectionData.timestamp==timestamp, InfectionData.node==node, InfectionData.group==group)
+    with next(get_session()) as session:
+        query_results: InfectionData = session.exec(statement).all()
+        if query_results:
+            return query_results
 
 def create_multiple_infectiondata_from_dicts(infection_rows: List[dict]):
     data_objs = []
