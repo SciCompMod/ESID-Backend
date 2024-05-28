@@ -172,6 +172,12 @@ def get_all_aggregations():
         return query_results
 
 
+def get_aggregation_for_model(id: str):
+    statement = select(Aggregation).where(Aggregation.id == id)
+    with next(get_session()) as session:
+        query_results: Aggregation = session.exec(statement).one_or_none()
+        return query_results
+
 def get_aggregation_by_id(id: str):
     statement = select(Aggregation).where(Aggregation.id == id)
     with next(get_session()) as session:
@@ -338,7 +344,7 @@ def create_new_model(
     # tags = []
     list_of_aggregations = []
     for agg_id in aggregation_ids:
-        agg = get_aggregation_by_id(agg_id[0])
+        agg = get_aggregation_for_model(agg_id[0])
         if agg:
             list_of_aggregations.append(agg)
         else:
