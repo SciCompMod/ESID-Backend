@@ -16,5 +16,6 @@ passlib==1.7.4
 PyJWT==2.5.0
 cryptography==39.0.0
 aiofiles==22.1.0
+numpy==1.26.4
 pandas==1.5.3
 h5py==3.10.0
