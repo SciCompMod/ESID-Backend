@@ -3,6 +3,10 @@ from typing import List, Optional
 
 from sqlmodel import Field, Relationship, SQLModel, ARRAY, Float, Column
 
+# class AuditBase(SQLModel, table=False):
+#     created_by: Optional[str] = Field(default=None)
+#     created_at: Optional[datetime] = Field(default=None)
+
 class ModelGroupLink(SQLModel, table=True):
     group_id: Optional[str] = Field(
         default=None, foreign_key="group.id", primary_key=True, nullable=False
@@ -279,6 +283,8 @@ class Scenario(SQLModel, table=True):
         back_populates="scenarios", link_model=ScenarioParameterValueLink
     )
     runsimulations: List["RunSimulations"] = Relationship(back_populates="scenario")
+    owner: Optional[str] = Field(default=None)
+    
 
 
 class Migration(SQLModel, table=True):
