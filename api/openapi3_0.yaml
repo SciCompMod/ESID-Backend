@@ -493,7 +493,7 @@ paths:
       operationId: deleteInterventionTemplate # fka: deleteIntervention
       parameters:
         - in: path
-          name: intervention_id
+          name: interventionTemplateId
           required: True
           schema:
             format: uuid
