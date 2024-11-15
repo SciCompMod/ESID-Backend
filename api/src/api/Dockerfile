@@ -16,5 +16,5 @@ RUN pip install --upgrade pip \
 
 COPY . /api
 
-EXPOSE 5000
-CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "5000","--reload"]
+EXPOSE 8000
+CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000","--reload"]
