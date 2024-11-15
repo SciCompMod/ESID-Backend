@@ -1155,7 +1155,9 @@ components:
             format: integer
         
     Infectiondata: 
-      type: object 
+      type: object
+      required:
+        - values
       properties: 
         date: 
           type: string
@@ -1166,9 +1168,12 @@ components:
         group:
           type: string
           format: uuid
-        compartmentOrAggregation:
+        compartment:
           type: string
-        percentiles: 
+          format: uuid
+        aggregation:
+          type: string
+        values: 
           type: object
           items:
             type: number
@@ -1177,8 +1182,9 @@ components:
         date: '2024-01-01'
         node: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
         group: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
-        compartmentOrAggregation: 'Compartment/Aggregation Name'
-        percentiles:
+        compartment: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
+        aggregation: 'aggergationName'
+        values:
           '25': 0
           '50': 0
           '75': 0
