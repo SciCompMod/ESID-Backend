@@ -971,13 +971,13 @@ components:
               description: List of intervention implementations used in this scenario
               items:
                  $ref: '#/components/schemas/InterventionImplementation'
-            dateSubmitted:
+            timestampSubmitted:
               type: string
-              format: date
+              format: date-time
               readOnly: true
-            dateSimulated:
+            timestampSimulated:
               type: string
-              format: date
+              format: date-time
               readOnly: true
         
 
