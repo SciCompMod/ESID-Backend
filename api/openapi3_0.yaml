@@ -1276,7 +1276,7 @@ components:
         node: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
         group: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
         compartment: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
-        aggregation: 'aggergationName'
+        aggregation: 'aggregationName'
         values:
           '25': 0
           '50': 0
