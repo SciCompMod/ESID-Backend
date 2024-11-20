@@ -940,18 +940,23 @@ paths:
                 $ref: '#/components/schemas/Error'
 ###############################################################################
   /parameterdefinitions:
-    get:
+#########################
+    get: ######################################################################
+      description: List all existing Parameter definitions.
       tags:
         - ParameterDefinitions
       operationId: listParameterDefinitions
       responses:
         '200':
-          description: return the list of existing Parameter Definitions
+          description: Returned list of parameter definitions.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IdList'
-    post:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReducedInfo'
+    post: #####################################################################
+      description: Create a new parameter definition.
       tags:
         - ParameterDefinitions
       operationId: createParameterDefinition
@@ -962,48 +967,55 @@ paths:
               $ref: '#/components/schemas/ParameterDefinition'
       responses:
         '201':
-          description: node created
+          description: Created parameter definition.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ID'
-
-
-  /parameterdefinitions/{parameter_id}:
-    get:
+###############################################################################
+  /parameterdefinitions/{parameterId}:
+########################################
+    get: ######################################################################
+      description: Get info on a specific parameter definition.
       tags:
         - ParameterDefinitions
       operationId: getParameterDefinition
       parameters:
         - in: path
-          name: parameter_id
+          name: parameterId
           required: True
           schema:
             type: string
             format: uuid
       responses:
         '200':
-          description: return the Group
+          description: Returned parameter definition info.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ParameterDefinition'
-    delete:
+    delete: ###################################################################
+      description: Delete a parameter definition.
       tags:
         - ParameterDefinitions
       operationId: deleteParameterDefinition
       parameters:
         - in: path
-          name: parameter_id
+          name: parameterId
           required: True
           schema:
             type: string
             format: uuid
-      description: deletes the Group if it is not referenced in any list
       responses:
-        '202':
-          description: Group deleted
-
+        '200':
+          description: Deleted parameter definition.
+        '409':
+          description: Preconditions not met. Error contains reason. May have additional properties referenced in error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+###############################################################################
 components:
   securitySchemes:
     bearerAuth: # arbitrary name for the security scheme
@@ -1043,7 +1055,6 @@ components:
       allOf:
         - $ref: '#/components/schemas/ID'
         - $ref: '#/components/schemas/Named'
-
 
     Tagged:
       type: object
@@ -1087,7 +1098,6 @@ components:
               type: string
               format: date-time
               readOnly: true
-        
 
     Group:
       allOf:
@@ -1213,8 +1223,7 @@ components:
           format: date
         coefficient:
           type: number
-          
-  
+
     Compartment:
       allOf:
         - $ref: '#/components/schemas/ID'
