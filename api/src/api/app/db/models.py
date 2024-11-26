@@ -283,7 +283,6 @@ class Scenario(SQLModel, table=True):
         back_populates="scenarios", link_model=ScenarioParameterValueLink
     )
     runsimulations: List["RunSimulations"] = Relationship(back_populates="scenario")
-    owner: Optional[str] = Field(default=None)
     
 
 

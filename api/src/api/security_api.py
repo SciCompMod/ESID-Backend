@@ -18,6 +18,12 @@ from services.auth import VerifyToken, User
 from core.config import REQUIRESAUTH
 from starlette.status import HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN
 
+
+class NotAuthorizedException(HTTPException):
+    """Exception for unauthorized access (e.g. when user does not have required role)"""
+    def __init__(self):
+        super().__init__(status_code=HTTP_403_FORBIDDEN, detail="Not authorized")
+
 async def realm_extractor(x_realm: str = Header("X-Realm")):
     """Extract realm information from request header"""
     if x_realm == "":
@@ -33,7 +39,7 @@ async def bearer_extractor(authorization: str = Header("Authorization")):
     if scheme.lower() != "bearer":
         raise HTTPException(
                 status_code=HTTP_401_UNAUTHORIZED,
-                detail="Not authenticated",
+                detail="Token is not Bearer",
                 headers={"WWW-Authenticate": "Bearer"},
             )
     return param
@@ -43,10 +49,14 @@ async def verify_token(
         x_realm: str = Depends(realm_extractor)) -> User:
     """Verify token and extract user information"""
 
+    # every lha has its own realm and users are associated with a specific realm (stored in X-Realm header)
+    # the signing key is different across realms, to decode we need to specify the certificate endpoint for PyJWKClient
+    # and PyJWKClient will fetch the signing key for us
     url = f"https://lokiam.de/realms/{x_realm}/protocol/openid-connect/certs"
     jwks_client = PyJWKClient(url)
 
     try:
+        # decode bearer token
         signing_key = jwks_client.get_signing_key_from_jwt(access_token)
         payload = jwt.decode(
             access_token,
@@ -56,28 +66,33 @@ async def verify_token(
             options={"verify_exp": True},
         )
 
+        # construct user object
         username = payload["sub"]
         client = payload["azp"]
         email = payload["email"]
+
         try:
+            # extract client roles
             roles = payload["resource_access"][client]["roles"]
         except KeyError:
             roles = []
-
+        
+        # username is required
         if username is None:
             raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail="Username not specified")
-
+    
         return User(username, email, roles)
     except jwt.exceptions.InvalidTokenError:
         raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail="Invalid token")
-    
+
 def verify_lha_user(user: User = Depends(verify_token)):
-    """Verify that the user is a LHA user"""
+    """Verify if user has lha-user role"""
     if "lha-user" not in user.role:
-        raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="User is not a LHA user")
+        raise NotAuthorizedException()
     return user
 
-# This is how they do authorization with OAuth2 in the past
+# deprecated: this is a temporary setup
+# now we use verify_token to verify the bearer token (JWT)
 bearer_auth = HTTPBearer()
 async def get_token_bearerAuth(credentials: HTTPAuthorizationCredentials = Depends(bearer_auth)) -> TokenModel:
     """

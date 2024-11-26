@@ -14,6 +14,7 @@ class User():
         )
 
 # deprecated: Used by get_token_bearerAuth which is a temporary setup
+# now we use verify_token method in security_api.py
 class VerifyToken():
     """Does all the token verification using PyJWT"""
 
