@@ -47,7 +47,8 @@ async def create_simulations(
 
 # a toy endpoint to test authorization
 @router.post(
-    "/scenarios/protected")
+    "/scenarios/protected",
+    tags=["Simulations"])
 async def create_protected_scenario(user: User = Depends(verify_lha_user)) -> str:
     return """Scenario created by {}""".format(user)
 
