@@ -18,6 +18,8 @@ from services.auth import VerifyToken, User
 from core.config import REQUIRESAUTH
 from starlette.status import HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN
 
+from functools import partial
+
 
 class NotAuthorizedException(HTTPException):
     """Exception for unauthorized access (e.g. when user does not have required role)"""
@@ -85,11 +87,17 @@ async def verify_token(
     except jwt.exceptions.InvalidTokenError:
         raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
-def verify_lha_user(user: User = Depends(verify_token)):
-    """Verify if user has lha-user role"""
-    if "lha-user" not in user.role:
+def verify_user_with_role(role: str, user: User = Depends(verify_token)):
+    """Verify if user has specified role"""
+    if role not in user.role:
         raise NotAuthorizedException()
     return user
+
+# Verify if user has lha-user role
+# Similar dependencies can be created for other roles
+# e.g. verify_lha_admin = partial(verify_user_with_role, "lha-admin")
+#      in endpoints: def foo(user: User = Depends(verify_lha_admin))
+verify_lha_user = partial(verify_user_with_role, "lha-user")
 
 # deprecated: this is a temporary setup
 # now we use verify_token to verify the bearer token (JWT)
