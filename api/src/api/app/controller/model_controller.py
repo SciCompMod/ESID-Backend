@@ -5,7 +5,7 @@ from app.models.node import Node
 from app.models.id import ID
 from uuid import uuid4
 from app.db import tasks
-from app.db.models import Compartment, Aggregation
+from app.db.models import Compartment
 from app.models.compartment import Compartment as Model_Compartment
 from app.models.group import Group as Model_Group
 from app.models.parameter_definition import ParameterDefinition as Model_ParameterDefinition
@@ -24,7 +24,7 @@ class ModelsController:
                 name=comp.name, description=comp.description, tags=comp.tags))
 
         tasks.create_new_model(model_id, new_model.name, new_model.description, compartments,
-                               new_model.groups, new_model.aggregations, new_model.parameter_definitions)
+                               new_model.groups, new_model.parameter_definitions)
         return ID(id=model_id)
 
     def get_all_models(self):

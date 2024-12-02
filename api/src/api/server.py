@@ -23,7 +23,6 @@ from app.apis.movements_api import router as MovementsApiRouter
 from app.apis.nodes_api import router as NodesApiRouter
 from app.apis.parameter_definitions_api import router as ParameterDefinitionsApiRouter
 from app.apis.simulations_api import router as SimulationsApiRouter
-from app.apis.aggregations_api import router as AggregationsApiRouter
 
 app = FastAPI(
     title="Pandemos",
@@ -46,7 +45,6 @@ app.include_router(MovementsApiRouter)
 app.include_router(NodesApiRouter)
 app.include_router(ParameterDefinitionsApiRouter)
 app.include_router(SimulationsApiRouter)
-app.include_router(AggregationsApiRouter)
 
 """
 @app.post("/test_celery/{message}")

@@ -19,7 +19,6 @@ class Model(BaseModel):
 
         name: The name of this Model [Optional].
         description: The description of this Model [Optional].
-        aggregations: The aggregations of this Model [Optional].
         compartments: The compartments of this Model.
         groups: The groups of this Model.
         parameter_definitions: The parameter_definitions of this Model.
@@ -30,7 +29,6 @@ class Model(BaseModel):
     description: Optional[str] = Field(alias="description", default=None)
     compartments: List[Compartment] = Field(alias="compartments")
     groups: List[List[str]] = Field(alias="groups")
-    aggregations: Optional[List[List]] = Field(alias="aggregations", default=None)
     parameter_definitions: List[List[str]] = Field(alias="parameterDefinitions")
 
 Model.update_forward_refs()

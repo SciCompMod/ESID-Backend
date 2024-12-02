@@ -149,24 +149,24 @@ class ModelAggregationLink(SQLModel, table=True):
     )
 
 
-class Aggregation(SQLModel, table=True):
-    id: Optional[str] = Field(default=None, primary_key=True, nullable=False)
-    name: Optional[str] = Field(default=None)
-    description: Optional[str] = Field(default=None)
-    tags: List["Tag"] = Relationship(
-        back_populates="aggregations", link_model=AggregationTagLink
-    )
-    models: List["Model"] = Relationship(
-        back_populates="aggregations", link_model=ModelAggregationLink
-    )
+# class Aggregation(SQLModel, table=True):
+#     id: Optional[str] = Field(default=None, primary_key=True, nullable=False)
+#     name: Optional[str] = Field(default=None)
+#     description: Optional[str] = Field(default=None)
+#     tags: List["Tag"] = Relationship(
+#         back_populates="aggregations", link_model=AggregationTagLink
+#     )
+#     models: List["Model"] = Relationship(
+#         back_populates="aggregations", link_model=ModelAggregationLink
+#     )
 
 
 class Tag(SQLModel, table=True):
     id: Optional[str] = Field(default=None, primary_key=True, nullable=False)
     name: Optional[str] = Field(default=None)
-    aggregations: List[Aggregation] = Relationship(
-        back_populates="tags", link_model=AggregationTagLink
-    )
+    # aggregations: List[Aggregation] = Relationship(
+    #     back_populates="tags", link_model=AggregationTagLink
+    # )
 
 
 class Model(SQLModel, table=True):
@@ -179,9 +179,9 @@ class Model(SQLModel, table=True):
     groups: List[Group] = Relationship(
         back_populates="models", link_model=ModelGroupLink
     )
-    aggregations: List[Aggregation] = Relationship(
-        back_populates="models", link_model=ModelAggregationLink
-    )
+    # aggregations: List[Aggregation] = Relationship(
+    #     back_populates="models", link_model=ModelAggregationLink
+    # )
     parameter_definitions: List[ParameterDefinition] = Relationship(
         back_populates="models", link_model=ModelParameterLink
     )

@@ -19,7 +19,6 @@ class NewModel(BaseModel):
 
         name: The name of this NewModel [Optional].
         description: The description of this NewModel [Optional].
-        aggregations: The aggregations of this NewModel [Optional].
         compartments: The compartments of this NewModel.
         groups: The groups of this NewModel.
         parameter_definitions: The parameter_definitions of this NewModel.
@@ -27,7 +26,6 @@ class NewModel(BaseModel):
 
     name: Optional[str] = Field(alias="name", default=None)
     description: Optional[str] = Field(alias="description", default=None)
-    aggregations: Optional[List[List]] = Field(alias="aggregations", default=None)
     compartments: List[Compartment] = Field(alias="compartments")
     groups: List[List] = Field(alias="groups")
     parameter_definitions: List[List] = Field(alias="parameterDefinitions")

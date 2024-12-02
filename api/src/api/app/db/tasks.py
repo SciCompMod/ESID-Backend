@@ -3,7 +3,7 @@ from uuid import uuid4
 
 from app.db import get_session
 from app.db.models import (
-    Aggregation,
+    #Aggregation,
     CategoryParameterValueRange,
     CompartmentAggregation,
     Group,
@@ -21,7 +21,7 @@ from app.db.models import (
     Scenario,
     Tag,
 )
-from app.models.aggregation import Aggregation as Model_Aggregation
+# from app.models.aggregation import Aggregation as Model_Aggregation
 from app.models.compartment import Compartment as Model_Compartment
 from app.models.model import Model as Model_Model
 from app.models.node_list import NodeList as NodeListAPI
@@ -149,61 +149,6 @@ def delete_parameter_definition_by_id(id: str):
         results = session.exec(statement)
         parameter_definition = results.one()
         session.delete(parameter_definition)
-        session.commit()
-
-
-def create_new_aggregation(id: str, name: str, description: str, tags: List):
-    all_tags = []
-    for tag in tags:
-        tag_id = str(uuid4())
-        # create_new_tag(tag_id, tag.name)
-        all_tags.append(Tag(id=tag_id, name=tag.name))
-    data_obj = Aggregation(name=name, description=description, id=id, tags=all_tags)
-    with next(get_session()) as session:
-        session.add(data_obj)
-        session.commit()
-
-
-def get_all_aggregations():
-    statement = select(Aggregation)
-    with next(get_session()) as session:
-        query_results: Aggregation = session.exec(statement).all()
-    if query_results:
-        return query_results
-
-
-def get_aggregation_for_model(id: str):
-    statement = select(Aggregation).where(Aggregation.id == id)
-    with next(get_session()) as session:
-        query_results: Aggregation = session.exec(statement).one_or_none()
-        return query_results
-
-def get_aggregation_by_id(id: str):
-    statement = select(Aggregation).where(Aggregation.id == id)
-    with next(get_session()) as session:
-        query_results: Aggregation = session.exec(statement).one_or_none()
-        if query_results:
-            tags = []
-            for tag in query_results.tags:
-                tags.append(Model_Tag(name=tag.name))
-            return Model_Aggregation(
-                id=query_results.id,
-                name=query_results.name,
-                description=query_results.description,
-                tags=query_results.tags,
-            )
-        else:
-            raise HTTPException(
-                status_code=404, detail=f"Aggregation id <{id}> does not exists"
-            )
-
-
-def delete_aggregation_by_id(id: str):
-    statement = select(Aggregation).where(Aggregation.id == id)
-    with next(get_session()) as session:
-        results = session.exec(statement)
-        aggregation = results.one()
-        session.delete(aggregation)
         session.commit()
 
 
@@ -335,20 +280,12 @@ def create_new_model(
     description: str,
     compartment: list,
     groups: list,
-    aggregation_ids: list,
     parameter_definitions: list,
 ):
     grs = []
     prds = []
     comps = []
     # tags = []
-    list_of_aggregations = []
-    for agg_id in aggregation_ids:
-        agg = get_aggregation_for_model(agg_id[0])
-        if agg:
-            list_of_aggregations.append(agg)
-        else:
-            raise ValueError(f"Aggregation with id: '{agg_id}' not found!")
 
     for comp in compartment:
         create_new_compartment(comp=comp)
@@ -379,7 +316,6 @@ def create_new_model(
         description=description,
         compartments=comps,
         groups=grs,
-        aggregations=list_of_aggregations,
         parameter_definitions=prds,
     )
     with next(get_session()) as session:
