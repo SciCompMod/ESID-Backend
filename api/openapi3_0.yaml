@@ -26,7 +26,17 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ReducedInfo'
+                  allOf:
+                    - $ref: '#/components/schemas/ReducedInfo'
+                    - type: object
+                      properties:
+                        startDate:
+                          type: string
+                          format: date
+                        endDate:
+                          type: string
+                          format: date
+
     post: #####################################################################
       description: Create a new scenario to be simulated.
       tags:
@@ -1072,6 +1082,12 @@ components:
         - $ref: '#/components/schemas/Named'
         - type: object
           properties:
+            startDate:
+              type: string
+              format: date
+            endDate:
+              type: string
+              format: date
             modelId:
               type: string
               format: uuid
