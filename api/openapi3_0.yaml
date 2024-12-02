@@ -490,25 +490,6 @@ paths:
 ###############################################################################
   /interventions/templates/{interventionTemplateId}:
 ####################################
-    get: ######################################################################
-      description: Get a specific intervention template by UUID.
-      tags:
-        - Interventions
-      operationId: getInterventionTemplate # fka: getIntervention
-      parameters:
-        - in: path
-          name: interventionTemplateId
-          required: True
-          schema:
-            format: uuid
-            type: string
-      responses:
-        '200':
-          description: Returned the intervention template data.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InterventionTemplate'
     delete: ###################################################################
       description: Delete an intervention template.
       tags:
@@ -621,7 +602,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IdList'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Node'
     post: #####################################################################
       description: Create a new node.
       tags:
@@ -642,25 +625,6 @@ paths:
 ###############################################################################
   /nodes/{nodeId}:
 ####################
-    get: ######################################################################
-      description: Get a specific node info.
-      tags:
-        - Nodes
-      operationId: getNode
-      parameters:
-        - in: path
-          name: nodeId
-          required: True
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Returned the node.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Node'
     delete: ###################################################################
       description: Delete a node.
       tags:
@@ -792,7 +756,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ReducedInfo'
+                  $ref: '#/components/schemas/Group'
     post: #####################################################################
       description: Create a new (stratification) group. All groups with the same category are mutually exclusive.
       tags:
@@ -813,25 +777,6 @@ paths:
 ###############################################################################
   /groups/{groupId}:
 ######################
-    get: ######################################################################
-      description: Get specific group info.
-      tags:
-        - Groups
-      operationId: getGroup
-      parameters:
-        - in: path
-          name: groupId
-          required: True
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: return the Group
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Group'
     delete: ###################################################################
       description: Delete the specified group.
       tags:
@@ -887,7 +832,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ReducedInfo'
+                  $ref: '#/components/schemas/Compartment'
     post: #####################################################################
       description: Create a new compartment.
       tags:
@@ -908,25 +853,6 @@ paths:
 ###############################################################################
   /compartments/{compartmentId}:
 #################################
-    get: ######################################################################
-      description: Get specific compartment info.
-      tags:
-        - Compartments
-      operationId: getCompartment # fka getAggregations
-      parameters:
-        - in: path
-          name: compartmentId
-          required: True
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Returned the compartment.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Compartment'
     delete: ###################################################################
       description: Delete specific compartment.
       tags:
@@ -964,7 +890,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ReducedInfo'
+                  $ref: '#/components/schemas/ParameterDefinition'
     post: #####################################################################
       description: Create a new parameter definition.
       tags:
@@ -985,25 +911,6 @@ paths:
 ###############################################################################
   /parameterdefinitions/{parameterId}:
 ########################################
-    get: ######################################################################
-      description: Get info on a specific parameter definition.
-      tags:
-        - ParameterDefinitions
-      operationId: getParameterDefinition
-      parameters:
-        - in: path
-          name: parameterId
-          required: True
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Returned parameter definition info.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ParameterDefinition'
     delete: ###################################################################
       description: Delete a parameter definition.
       tags:
@@ -1213,8 +1120,7 @@ components:
             nodeIds:
               type: array
               items:
-                type: string
-                format: uuid    
+                $ref: '#/components/schemas/Node'
 
     InterventionTemplate:
       allOf:
