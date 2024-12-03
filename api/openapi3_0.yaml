@@ -26,16 +26,7 @@ paths:
               schema:
                 type: array
                 items:
-                  allOf:
-                    - $ref: '#/components/schemas/ReducedInfo'
-                    - type: object
-                      properties:
-                        startDate:
-                          type: string
-                          format: date
-                        endDate:
-                          type: string
-                          format: date
+                  $ref: '#/components/schemas/ReducedScenario'
 
     post: #####################################################################
       description: Create a new scenario to be simulated.
@@ -228,11 +219,10 @@ paths:
           explode: true
           schema: 
             type: object
-            properties:
+            additionalProperties:
+              type: array
               items:
-                type: array
-                items:
-                  type: string
+                type: string
             example: {
               aggregation1: [Inf, V2],
             }
@@ -973,6 +963,18 @@ components:
         - $ref: '#/components/schemas/ID'
         - $ref: '#/components/schemas/Named'
 
+    ReducedScenario:
+      allOf:
+        - $ref: '#/components/schemas/ReducedInfo'
+        - type: object
+          properties:
+            startDate:
+              type: string
+              format: date
+            endDate:
+              type: string
+              format: date
+
     Tagged:
       type: object
       properties:
@@ -1198,7 +1200,7 @@ components:
         node: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
         group: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
         compartment: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
-        aggregation: 'aggregationName'
+        aggregation: 'aggregation1'
         values:
           '25': 0
           '50': 0
