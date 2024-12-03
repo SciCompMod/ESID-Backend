@@ -1120,9 +1120,11 @@ components:
         - type: object
           properties:
             nodeIds:
-              type: array
-              items:
-                $ref: '#/components/schemas/Node'
+                oneOf:
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/Node'
+                  - $ref: '#/components/schemas/ID'
 
     InterventionTemplate:
       allOf:
