@@ -671,7 +671,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ID'
 ###############################################################################
-  /nodelists/{nodeId}:
+  /nodelists/{nodeListId}:
 ########################
     get: ######################################################################
       description: Get specified node list.
@@ -680,7 +680,7 @@ paths:
       operationId: getNodeList
       parameters:
         - in: path
-          name: nodeId
+          name: nodeListId
           required: True
           schema:
             type: string
@@ -699,7 +699,7 @@ paths:
       operationId: deleteNodeList
       parameters:
         - in: path
-          name: nodeId
+          name: nodeListId
           required: True
           schema:
             type: string
@@ -1120,11 +1120,10 @@ components:
         - type: object
           properties:
             nodeIds:
-                oneOf:
-                  - type: array
-                    items:
-                      $ref: '#/components/schemas/Node'
-                  - $ref: '#/components/schemas/ID'
+              type: array
+              items:
+                type: string
+                format: uuid
 
     InterventionTemplate:
       allOf:
