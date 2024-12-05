@@ -1049,7 +1049,7 @@ components:
         - $ref: '#/components/schemas/ID'
         - $ref: '#/components/schemas/Named'
           
-    ParameterValueRange:
+    ParameterValueEntry:
       type: object
       required:
         - groupId
@@ -1083,7 +1083,7 @@ components:
           type: array
           description: List of values for each group (values)
           items:
-             $ref: '#/components/schemas/ParameterValueRange'
+             $ref: '#/components/schemas/ParameterValueEntry'
 
     Model:
       allOf:
