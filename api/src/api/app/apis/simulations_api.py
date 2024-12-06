@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from typing import List, Optional  # noqa: F401
+from typing import List, Optional
 
 from app.controller.simulation_controller import SimulationController
 from app.models.extra_models import TokenModel  # noqa: F401
@@ -17,19 +17,15 @@ from app.utils.constants import MigrationSort, MovementFilter
 from fastapi import (  # noqa: F401
     APIRouter,
     Body,
-    Cookie,
     Depends,
     File,
-    Form,
-    Header,
     Path,
     Query,
-    Response,
     Security,
     UploadFile,
-    status,
 )
-from security_api import get_token_bearerAuth
+from security_api import get_token_bearerAuth, verify_lha_user
+from services.auth import User
 
 router = APIRouter()
 simulation_controller = SimulationController()
@@ -49,6 +45,12 @@ async def create_simulations(
 ) -> ID:
     return simulation_controller.create_new_scenarios(new_scenario)
 
+# a toy endpoint to test authorization
+@router.post(
+    "/scenarios/protected",
+    tags=["Simulations"])
+async def create_protected_scenario(user: User = Depends(verify_lha_user)) -> str:
+    return """Scenario created by {}""".format(user)
 
 @router.delete(
     "/scenarios/{scenario_id}",
@@ -64,7 +66,6 @@ async def delete_scenario(
 ) -> None:
     """deletes the Scenario and all its runs"""
     return simulation_controller.delete_scenario_by_id(scenario_id)
-
 
 @router.delete(
     "/scenarios/{scenario_id}/simulations/{runid}",
