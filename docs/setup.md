@@ -20,13 +20,13 @@ docker-compose up --build -d
 * Generate code for migration
 
 ```
-docker-compose exec api alembic revision --autogenerate -m "Create all tables"
+docker-compose exec api-api-1 alembic revision --autogenerate -m "Create all tables"
 ```
 
 * Execute the migration
 
 ```
-docker-compose exec api alembic upgrade head
+docker-compose exec api-api-1 alembic upgrade head
 ```
 
 ## API
