@@ -14,6 +14,7 @@ erDiagram
         InterventionImplementation[] linkedInterventions FK "List of InterventionTemplate UUIDs and the implementation values"
         string timestampSubmitted
         string timestampSimulated
+        ScenarioDatapoint[] data "List of datapoints for this scenario"
     }
 
     Scenario }o..|| Model: ""
@@ -33,11 +34,11 @@ erDiagram
     _ParameterValue_ {
         Scenario scenarioId PK "UUID of the scenario"
         ParameterDefinition definitionId PK "UUID of the definition"
-        ParameterValueRange[] values "*"
+        ParameterValueEntry[] values "*"
     }
 
     _ParameterValueEntry_ {
-        string paramterId PK "UUID of the ParameterValue this belongs to"
+        string parameterId PK "UUID of the ParameterValue this belongs to"
         string groupId PK "UUID of the group this value is for"
         number valueMin "*"
         number valueMax "*"
@@ -52,8 +53,6 @@ erDiagram
         string name "*"
         string description
     }
-    
-    ParameterDefinition }|..o{ Model: ""
 
     NodeList{
         string id PK
@@ -62,7 +61,8 @@ erDiagram
         Node[] nodeIds FK "*"
     }
 
-    NodeList }o..|{ Node: ""
+    NodeList ||--|{ _NodeListNodeLink_: ""
+    _NodeListNodeLink_ }o--|| Node: ""
 
     Node {
         string id PK
@@ -70,10 +70,16 @@ erDiagram
         string name "*"
     }
 
+    _NodeListNodeLink_{
+        string nodeId PK "UUID of the node"
+        string listId PK "UUID of the list"
+    }
+
     _InterventionImplementation_ }o--|| InterventionTemplate: ""
 
     _InterventionImplementation_ {
-        string interventionId FK
+        string scenarioId PK "UUID of scenario"
+        string interventionId PK "UUID of intervention template"
         string startDate
         string endDate
         number coefficient
@@ -83,7 +89,7 @@ erDiagram
         string id PK
         string name "*"
         string description
-        string[] tags "tags used for search & filtering"
+        string[] tags "tags used for search & filtering (CSV)"
     }
 
     Group {
@@ -93,26 +99,44 @@ erDiagram
         string category "*"
     }
 
-    Group }|..o{ Model: ""
-
     Compartment {
+        
         string id PK
         string name "*"
         string description
-        string[] tags "tags used of aggregation"
+        string tags "tags used for aggregation (CSV)"
     }
 
-    Model }o..|{ Compartment: ""
+    _ModelCompartmentLink_ {
+        string modelId PK "UUID of the model"
+        string compartmentId PK "UUID of the compartment"
+    }
+    Model ||--|{ _ModelCompartmentLink_: ""
+    _ModelCompartmentLink_ }o--|| Compartment: ""
+
+    _ModelParameterDefinitionLink_ {
+        string modelId PK "UUID of the model"
+        string paramterId PK "UUID of the parameter definition"
+    }
+    Model ||--|{ _ModelParameterDefinitionLink_: ""
+    ParameterDefinition ||--|{ _ModelParameterDefinitionLink_: ""
+
+    _ModelGroupLink_ {
+        string modelId PK "UUID of the model"
+        string groupId PK "UUID of the group"
+    }
+    Group ||--o{ _ModelGroupLink_: ""
+    _ModelGroupLink_ }|--|| Model: ""
 
     ScenarioDatapoint{
         string id PK
         string scenarioId FK
         string timestamp
         string nodeId FK
-        string group FK
-        string compartment FK
-        string percentile
-        string value
+        string groupId FK
+        string compartmentId FK
+        int percentile
+        float value
     }
     ScenarioDatapoint }|--|| Scenario: ""
     ScenarioDatapoint }|--|| Node: ""
