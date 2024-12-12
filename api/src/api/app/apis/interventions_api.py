@@ -17,91 +17,67 @@ from fastapi import (  # noqa: F401
 )
 
 from app.models.extra_models import TokenModel  # noqa: F401
+from pydantic import StrictStr
+from typing import Any, List, Optional
+from app.models.error import Error
 from app.models.id import ID
-from app.models.intervention import Intervention
-from app.models.new_intervention import NewIntervention
-from fastapi.security import HTTPBearer
+from app.models.intervention_template import InterventionTemplate
 from security_api import get_token_bearerAuth
-from uuid import uuid4
 
-from app.db.tasks import create_new_intervention, get_all_interventions, get_intervention_by_id, delete_intervention_by_id
+from app.controller.interventions_controller import InterventionsController
 
 router = APIRouter()
-# get_token_bearerAuth = HTTPBearer()
+controller = InterventionsController
 
 @router.post(
-    "/interventions",
+    "/interventions/templates",
     responses={
-        201: {"model": ID, "description": "Intervention created"},
+        201: {"model": ID, "description": "Intervention created."},
     },
     tags=["Interventions"],
     response_model_by_alias=True,
 )
-
-async def create_intervention(
-    new_intervention: NewIntervention = Body(None, description=""),
+async def create_intervention_template(
+    intervention_template: Optional[InterventionTemplate] = Body(None, description=""),
     token_bearerAuth: TokenModel = Security(
         get_token_bearerAuth
     ),
 ) -> ID:
-    intervention_id = str(uuid4())
-    create_new_intervention(new_intervention.name, new_intervention.description, intervention_id)
-    return ID(id=intervention_id)
+    """Creates a new intervention template to be used in implementations."""
+    return await controller.create_intervention_template(intervention_template)
 
 
 @router.delete(
-    "/interventions/{intervention_id}",
+    "/interventions/templates/{interventionTemplateId}",
     responses={
-        202: {"description": "Node deleted"},
+        200: {"description": "Deleted template."},
+        409: {"model": Error, "description": "Preconditions not met. Error contains reason. May have additional properties referenced in error."},
     },
     tags=["Interventions"],
     response_model_by_alias=True,
 )
-async def delete_intervention(
-    intervention_id: str = Path(None, description=""),
+async def delete_intervention_template(
+    interventionTemplateId: StrictStr = Path(..., description=""),
     token_bearerAuth: TokenModel = Security(
         get_token_bearerAuth
     ),
 ) -> None:
-    """deletes the Intervention if it is not referenced in any list"""
-    delete_intervention_by_id(intervention_id)
-    return {"Intervention deleted"}
+    """Delete an intervention template."""
+    return await controller.delete_intervention_template(interventionTemplateId)
 
 
 @router.get(
-    "/interventions/{intervention_id}",
+    "/interventions/templates",
     responses={
-        200: {"model": Intervention, "description": "return the Node"},
+        200: {"model": List[InterventionTemplate], "description": "Returned the list of available templates."},
     },
     tags=["Interventions"],
     response_model_by_alias=True,
 )
-async def get_intervention(
-    intervention_id: str = Path(None, description=""),
+async def list_intervention_templates(
     token_bearerAuth: TokenModel = Security(
         get_token_bearerAuth
     ),
-) -> Intervention:
-    intervention_info = get_intervention_by_id(intervention_id)
-    return Intervention(name=intervention_info.name, description=intervention_info.description, id=intervention_info.id)
-
-@router.get(
-    "/interventions",
-    responses={
-        200: {"model": List[str], "description": "return the list of available interventions"},
-    },
-    tags=["Interventions"],
-    response_model_by_alias=True,
-)
-async def list_interventions(
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
-
-) -> List[str]:
-    interventions = get_all_interventions()
-    try: 
-        intervention_ids = [intervention.id for intervention in interventions]
-        return intervention_ids
-    except TypeError:
-        return {"No interventions available"}
+) -> List[InterventionTemplate]:
+    """List available Intervention templates that can be implemented."""
+    return await controller.list_intervention_templates()

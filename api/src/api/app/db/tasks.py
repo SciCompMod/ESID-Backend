@@ -56,6 +56,21 @@ def group_get_all_categories() -> List[str]:
     return [] # TODO select and return all categories
 
 
+### Intervention Templates ###
+def intervention_template_create(intervention: appmodels.InterventionTemplate) -> appmodels.ID:
+    # TODO create and return id
+    return appmodels.ID(id="")
+
+def intervention_template_delete(id: StrictStr) -> None:
+    # TODO check if exists or used and raise exception
+    # TODO delete
+    return
+
+def intervention_template_get_all() -> List[appmodels.InterventionTemplate]:
+    # TODO select and return all templates
+    return []
+
+
 def create_new_group(name: str, description: str, category: str, id: str):
     data_obj = Group(name=name, description=description, category=category, id=id)
     with next(get_session()) as session:
