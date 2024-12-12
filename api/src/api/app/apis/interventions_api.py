@@ -27,7 +27,7 @@ from security_api import get_token_bearerAuth
 from app.controller.interventions_controller import InterventionsController
 
 router = APIRouter()
-controller = InterventionsController
+controller = InterventionsController()
 
 @router.post(
     "/interventions/templates",

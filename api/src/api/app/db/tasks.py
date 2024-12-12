@@ -156,6 +156,8 @@ def scenario_delete() -> None:
     # TODO delete
     return
 
+'''
+#Groups
 
 def create_new_group(name: str, description: str, category: str, id: str):
     data_obj = Group(name=name, description=description, category=category, id=id)
@@ -735,16 +737,9 @@ def get_scenario_by_id(id: str):
                 run_id_list = []
 
                 run_simulations = query_results.runsimulations
-                for run_simulation in run_simulations:
-                    run_id_list.append(
-                        ScenarioRunsRunIdListInner(
-                            run_id=run_simulation.run_id,
-                            timestamp=run_simulation.timestamp,
-                        )
-                    )
                 for parameter_value in query_results.parameter_values:
                     for group in parameter_value.groups:
-                        grp = ModelParamaterValueRange(
+                        grp = ModelParamaterValueEntry(
                             groupId=group.id,
                             valueMinInclusiv=group.value_min_inclusiv,
                             valueMaxExclusiv=group.value_max_exclusiv,
@@ -752,7 +747,7 @@ def get_scenario_by_id(id: str):
                         groups.append(grp)
 
                     for category in parameter_value.categories:
-                        cat = ModelParamaterValueRange(
+                        cat = ModelParamaterValueEntry(
                             groupId=category.id,
                             valueMinInclusiv=category.value_min_inclusiv,
                             valueMaxExclusiv=category.value_max_exclusiv,
@@ -865,3 +860,4 @@ def get_compartments_from_aggregation(compaggr_name):
         query_results: CompartmentAggregation = session.exec(statement).one()
         if query_results:
             return query_results.compartments
+'''

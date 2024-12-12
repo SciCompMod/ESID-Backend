@@ -29,7 +29,7 @@ from security_api import get_token_bearerAuth
 from app.controller.compartments_controller import CompartmentController
 
 router = APIRouter()
-controller = CompartmentController
+controller = CompartmentController()
 
 @router.post(
     "/compartments",
