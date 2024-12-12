@@ -138,6 +138,25 @@ def parameter_definition_delete(id: StrictStr) -> None:
     return
 
 
+## Scenarios ##
+def scenario_create(scenario: Scenario) -> ID:
+    # TODO create scenario and return id
+    return ID(id="")
+
+def scenario_get_by_id(id: StrictStr) -> Scenario:
+    # TODO get and return specific scenario
+    return Scenario()
+
+def scenario_get_all() -> List[ReducedScenario]:
+    # TODO get all scenarios and return reduced scenario
+    return []
+
+def scenario_delete() -> None:
+    # TODO check if exists or used and raise ex
+    # TODO delete
+    return
+
+
 def create_new_group(name: str, description: str, category: str, id: str):
     data_obj = Group(name=name, description=description, category=category, id=id)
     with next(get_session()) as session:
