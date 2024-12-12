@@ -1,7 +1,8 @@
 # coding: utf-8
 
 from typing import Dict, List  # noqa: F401
-
+from pydantic import StrictStr
+from typing import Any, List, Optional
 from fastapi import (  # noqa: F401
     APIRouter,
     Body,
@@ -17,8 +18,6 @@ from fastapi import (  # noqa: F401
 )
 
 from app.models.extra_models import TokenModel  # noqa: F401
-from pydantic import StrictStr
-from typing import Any, List, Optional
 from app.models.error import Error
 from app.models.id import ID
 from app.models.intervention_template import InterventionTemplate
