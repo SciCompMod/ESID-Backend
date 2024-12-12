@@ -1,44 +1,44 @@
 from typing import List
 from uuid import uuid4
+from pydantic import StrictStr
 
 from app.db import get_session
-from app.db.models import (
-    #Aggregation,
-    CategoryParameterValueRange,
-    CompartmentAggregation,
-    Group,
-    GroupParameterValueRange,
-    InfectionData,
-    Intervention,
-    Migration,
-    Model,
-    Movements,
-    Node,
-    NodeList,
-    ParameterDefinition,
-    ParameterValue,
-    RunSimulations,
-    Scenario,
-    Tag,
-)
-# from app.models.aggregation import Aggregation as Model_Aggregation
-from app.models.compartment import Compartment as Model_Compartment
-from app.models.model import Model as Model_Model
-from app.models.node_list import NodeList as NodeListAPI
-from app.models.parameter_value import ParameterValue as ModelParameterValue
-from app.models.parameter_value_range import (
-    ParameterValueRange as ModelParamaterValueRange,
-)
-from app.models.scenario import Scenario as ModelScenario
-from app.models.scenario_runs_run_id_list_inner import ScenarioRunsRunIdListInner
-from app.models.tag import Tag as Model_Tag
+
+import app.db.models as dbmodels
+import app.models as appmodels
+
 from app.utils.constants import MovementFilter
 from app.utils.defaultDict import County, age_groups
+
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import select
 
-# Groups
+### Groups ###
+def group_create(group: appmodels.Group) -> appmodels.ID:
+    group_obj = dbmodels.Group(name=group.name, description=group.description, category=group.category)
+    with next(get_session()) as session:
+        session.add(group_obj)
+        session.commit()
+        session.refresh(group_obj)
+    return appmodels.ID(id=group_obj.id)
+
+def group_delete_by_id(id: StrictStr) -> None:
+    query = select(dbmodels.Group).where(dbmodels.Group.id == id)
+    with next(get_session()) as session:
+        group: dbmodels.Group = session.exec(query).one_or_none()
+        if not group:
+            return appmodels.Error()
+            raise HTTPException(status_code=409, detail='A group with this ID does not exist')
+        # TODO check if group is used anywhere and raise Exception
+        # TODO delete
+    return
+
+def group_get_all() -> List[appmodels.ID]:
+    return [] # TODO select and return all groups
+
+def group_get_all_categories() -> List[str]:
+    return [] # TODO select and return all categories
 
 
 def create_new_group(name: str, description: str, category: str, id: str):
