@@ -3,7 +3,7 @@
 from typing import ClassVar, Dict, List, Tuple  # noqa: F401
 from pydantic import StrictStr
 from typing import Any, List, Optional
-from uuid import uuid4
+from fastapi import HTTPException
 
 from app.models.error import Error
 from app.models.group import Group
@@ -19,6 +19,8 @@ class GroupsController:
             group: Optional[Group]
     ) -> ID:
         """Create a new (stratification) group. All groups with the same category are mutually exclusive."""
+        if not group:
+            raise HTTPException(status_code=500, detail="No group provided")
         return group_create(group)
     
     async def delete(

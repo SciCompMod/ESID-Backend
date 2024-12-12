@@ -3,6 +3,7 @@
 from typing import ClassVar, Dict, List, Tuple  # noqa: F401
 from pydantic import StrictStr
 from typing import Any, List, Optional
+from fastapi import HTTPException
 
 from app.models.error import Error
 from app.models.id import ID
@@ -17,6 +18,8 @@ class InterventionsController:
         intervention_template: Optional[InterventionTemplate],
     ) -> ID:
         """Creates a new intervention template to be used in implementations."""
+        if not intervention_template:
+            raise HTTPException(status_code=500, detail="No intervention template provided")
         return intervention_template_create(intervention_template)
 
 

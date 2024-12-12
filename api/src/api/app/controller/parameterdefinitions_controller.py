@@ -3,6 +3,7 @@
 from typing import ClassVar, Dict, List, Tuple  # noqa: F401
 from pydantic import StrictStr
 from typing import Any, List, Optional
+from fastapi import HTTPException
 
 from app.models.error import Error
 from app.models.id import ID
@@ -18,6 +19,8 @@ class ParameterController:
         parameter_definition: Optional[ParameterDefinition],
     ) -> ID:
         """Create a new parameter definition."""
+        if not parameter_definition:
+            raise HTTPException(status_code=500, detail="No parameter definition provided")
         return parameter_definition_create(parameter_definition)
 
 

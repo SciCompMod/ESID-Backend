@@ -3,6 +3,7 @@
 from typing import ClassVar, Dict, List, Tuple  # noqa: F401
 from pydantic import StrictStr
 from typing import Any, List, Optional
+from fastapi import HTTPException
 
 from app.models.error import Error
 from app.models.compartment import Compartment
@@ -19,6 +20,8 @@ class CompartmentController:
         compartment: Optional[Compartment],
     ) -> ID:
         """Create a new compartment."""
+        if not compartment:
+            raise HTTPException(status_code=500, detail="No compartment provided")
         return compartment_create(compartment)
 
 

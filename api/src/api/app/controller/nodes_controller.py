@@ -1,6 +1,7 @@
 # coding: utf-8
 
 from typing import ClassVar, Dict, List, Tuple  # noqa: F401
+from fastapi import HTTPException
 
 from pydantic import StrictStr
 from typing import Any, List, Optional
@@ -21,6 +22,8 @@ class NodeController:
         node: Optional[Node],
     ) -> ID:
         """Create a new node."""
+        if not node:
+            raise HTTPException(status_code=500, detail="No node provided")
         return node_create(node)
 
 
@@ -29,6 +32,8 @@ class NodeController:
         node_list: Optional[NodeList],
     ) -> ID:
         """Create a new node list."""
+        if not node_list:
+            raise HTTPException(status_code=500, detail="No node list provided")
         return nodelist_create(node_list)
 
 

@@ -5,6 +5,7 @@ from datetime import date
 from pydantic import Field, StrictBytes, StrictFloat, StrictInt, StrictStr
 from typing import Any, Dict, List, Optional, Tuple, Union
 from typing_extensions import Annotated
+from fastapi import HTTPException
 
 from app.models.error import Error
 from app.models.id import ID
@@ -22,6 +23,8 @@ class ScenarioController:
         scenario: Optional[Scenario],
     ) -> ID:
         """Create a new scenario to be simulated."""
+        if not scenario:
+            raise HTTPException(status_code=500, detail="No scenario provided")
         return scenario_create(scenario)
 
 
@@ -57,7 +60,7 @@ class ScenarioController:
         percentiles: Annotated[Optional[List[Union[StrictFloat, StrictInt]]], Field(description="Requested percentiles of the data")],
     ) -> List[Infectiondata]:
         """Get scenario&#39;s infection data based on specified filters."""
-        return Infectiondata(values=[]) # TODO Filter Object & DB task
+        return [] # TODO Filter Object & DB task
 
     async def import_scenario_data(
         self,
@@ -66,6 +69,5 @@ class ScenarioController:
     ) -> ID:
         """Supply simulation data for a scenario."""
         # TODO disect file and submit to datapoint_create tasks
-        datapoint_create
         return ID(id=scenarioId)
 

@@ -3,6 +3,7 @@
 from typing import ClassVar, Dict, List, Tuple  # noqa: F401
 from pydantic import StrictStr
 from typing import Any, List, Optional
+from fastapi import HTTPException
 
 from app.models.error import Error
 from app.models.id import ID
@@ -20,6 +21,8 @@ class ModelController:
         model: Optional[Model],
     ) -> ID:
         """Create a new simulation model."""
+        if not model:
+            raise HTTPException(status_code=500, detail="No model provided")
         return model_create(model)
 
 
