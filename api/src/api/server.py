@@ -22,7 +22,7 @@ from app.apis.interventions_api import router as InterventionsApiRouter
 from app.apis.models_api import router as ModelsApiRouter
 from app.apis.nodes_api import router as NodesApiRouter
 from app.apis.parameter_definitions_api import router as ParameterDefinitionsApiRouter
-from api.src.api.app.apis.scenarios_api import router as ScenariosApiRouter
+from app.apis.scenarios_api import router as ScenariosApiRouter
 
 app = FastAPI(
     title="Pandemos",

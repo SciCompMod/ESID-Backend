@@ -85,7 +85,8 @@ async def get_infection_data(
     start_date: Annotated[Optional[date], Field(description="Start date of requested data")] = Query(None, description="Start date of requested data", alias="startDate"),
     end_date: Annotated[Optional[date], Field(description="End date of requested data")] = Query(None, description="End date of requested data", alias="endDate"),
     compartments: Annotated[Optional[List[StrictStr]], Field(description="Comma separated list of Compartment IDs")] = Query(None, description="Comma separated list of Compartment IDs", alias="compartments"),
-    aggregations: Annotated[Optional[Dict[str, Dict[str, List[StrictStr]]]], Field(description="Object with named (key) lists of compartment tags (value, AND connected)")] = Query(None, description="Object with named (key) lists of compartment tags (value, AND connected)", alias="aggregations"),
+    #aggregations: Annotated[Optional[Dict[str, Dict[str, List[StrictStr]]]], Field(description="Object with named (key) lists of compartment tags (value, AND connected)")] = Query(None, description="Object with named (key) lists of compartment tags (value, AND connected)", alias="aggregations"),
+    # TODO deepObject not supported by fastapi yet, wait for https://github.com/fastapi/fastapi/pull/9867 or do custom string based solution ¯\_(ツ)_/¯
     groups: Annotated[Optional[List[StrictStr]], Field(description="List of groups requesting data for")] = Query(None, description="List of groups requesting data for", alias="groups"),
     percentiles: Annotated[Optional[List[Union[StrictFloat, StrictInt]]], Field(description="Requested percentiles of the data")] = Query(None, description="Requested percentiles of the data", alias="percentiles"),
     token_bearerAuth: TokenModel = Security(
@@ -93,7 +94,7 @@ async def get_infection_data(
     ),
 ) -> List[Infectiondata]:
     """Get scenario&#39;s infection data based on specified filters."""
-    return await controller.get_infection_data(scenarioId, nodes, start_date, end_date, compartments, aggregations, groups, percentiles)
+    return await controller.get_infection_data(scenarioId, nodes, start_date, end_date, compartments, groups, percentiles)
 
 
 @router.get(
