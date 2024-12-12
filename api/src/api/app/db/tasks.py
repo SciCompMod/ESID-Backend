@@ -91,6 +91,39 @@ def model_get_all():
     return List[appmodels.ReducedInfo]
 
 
+### Nodes ###
+def node_create(node: appmodels.Node) -> appmodels.ID:
+    # TODO create and return id
+    return appmodels.ID(id="")
+
+def node_get_all() -> List[appmodels.Node]:
+    # TODO get and return all nodes
+    return []
+
+def node_delete(id: StrictStr) -> None:
+    # TODO check if exists or used and raise exception
+    # TODO delete
+    return
+
+
+### Nodelists ###
+def nodelist_create(nodeList: appmodels.NodeList) -> appmodels.ID:
+    # TODO create nodelist and return id
+    return appmodels.ID(id="")
+
+def nodelist_get_by_id(id: appmodels.ID) -> appmodels.NodeList:
+    # TODO get and return specific nodelist
+    return appmodels.NodeList()
+def nodelist_get_all() -> List[appmodels.ReducedInfo]:
+    # TODO get all nodelists and return reduced infos
+    return []
+def nodelist_delete() -> None:
+    # TODO check if exists or used and raise ex
+    # TODO delete
+    return
+
+
+
 def create_new_group(name: str, description: str, category: str, id: str):
     data_obj = Group(name=name, description=description, category=category, id=id)
     with next(get_session()) as session:
