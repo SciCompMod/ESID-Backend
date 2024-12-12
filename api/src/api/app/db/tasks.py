@@ -4,8 +4,8 @@ from pydantic import StrictStr
 
 from app.db import get_session
 
-import app.db.models as dbmodels
-import app.models as appmodels
+import app.db.models as db
+from app.models import *
 
 from app.utils.constants import MovementFilter
 from app.utils.defaultDict import County, age_groups
@@ -15,88 +15,88 @@ from sqlalchemy.exc import IntegrityError
 from sqlmodel import select
 
 
-### Compartments ###
-def compartment_create(compartment: appmodels.Compartment) -> appmodels.ID:
+## Compartments ##
+def compartment_create(compartment: Compartment) -> ID:
     # TODO Create compartment & return id
-    return appmodels.ID(id="")
+    return ID(id="")
 
 def compartment_delete(id: StrictStr) -> None:
     # TODO check if compartment exists or is used anywhere
     # TODO delete
     return
 
-def compartment_get_all() -> List[appmodels.Compartment]:
+def compartment_get_all() -> List[Compartment]:
     # TODO get & return all Compartments
     return []
 
 
-### Groups ###
-def group_create(group: appmodels.Group) -> appmodels.ID:
-    group_obj = dbmodels.Group(name=group.name, description=group.description, category=group.category)
+## Groups ##
+def group_create(group: Group) -> ID:
+    group_obj = db.Group(name=group.name, description=group.description, category=group.category)
     with next(get_session()) as session:
         session.add(group_obj)
         session.commit()
         session.refresh(group_obj)
-    return appmodels.ID(id=group_obj.id)
+    return ID(id=group_obj.id)
 
 def group_delete_by_id(id: StrictStr) -> None:
-    query = select(dbmodels.Group).where(dbmodels.Group.id == id)
+    query = select(db.Group).where(db.Group.id == id)
     with next(get_session()) as session:
-        group: dbmodels.Group = session.exec(query).one_or_none()
+        group: db.Group = session.exec(query).one_or_none()
         if not group:
-            return appmodels.Error()
+            return Error()
             raise HTTPException(status_code=409, detail='A group with this ID does not exist')
         # TODO check if group is used anywhere and raise Exception
         # TODO delete
     return
 
-def group_get_all() -> List[appmodels.ID]:
+def group_get_all() -> List[ID]:
     return [] # TODO select and return all groups
 
 def group_get_all_categories() -> List[str]:
     return [] # TODO select and return all categories
 
 
-### Intervention Templates ###
-def intervention_template_create(intervention: appmodels.InterventionTemplate) -> appmodels.ID:
+## Intervention Templates ##
+def intervention_template_create(intervention: InterventionTemplate) -> ID:
     # TODO create and return id
-    return appmodels.ID(id="")
+    return ID(id="")
 
 def intervention_template_delete(id: StrictStr) -> None:
     # TODO check if exists or used and raise exception
     # TODO delete
     return
 
-def intervention_template_get_all() -> List[appmodels.InterventionTemplate]:
+def intervention_template_get_all() -> List[InterventionTemplate]:
     # TODO select and return all templates
     return []
 
 
-### Models ###
-def model_create(model: appmodels.Model) -> appmodels.ID:
+## Models ##
+def model_create(model: Model) -> ID:
     # TODO create and return id
-    return appmodels.ID(id="")
+    return ID(id="")
 
 def model_delete() -> None:
     # TODO check if exists or used and raise exception
     # TODO delete
     return
 
-def model_get_by_id(id: StrictStr) -> appmodels.Model:
+def model_get_by_id(id: StrictStr) -> Model:
     # TODO select and return model with id
-    return appmodels.Model()
+    return Model()
 
 def model_get_all():
     # TODO get all and return reduced info
-    return List[appmodels.ReducedInfo]
+    return List[ReducedInfo]
 
 
-### Nodes ###
-def node_create(node: appmodels.Node) -> appmodels.ID:
+## Nodes ##
+def node_create(node: Node) -> ID:
     # TODO create and return id
-    return appmodels.ID(id="")
+    return ID(id="")
 
-def node_get_all() -> List[appmodels.Node]:
+def node_get_all() -> List[Node]:
     # TODO get and return all nodes
     return []
 
@@ -106,15 +106,15 @@ def node_delete(id: StrictStr) -> None:
     return
 
 
-### Nodelists ###
-def nodelist_create(nodeList: appmodels.NodeList) -> appmodels.ID:
+## Nodelists ##
+def nodelist_create(nodeList: NodeList) -> ID:
     # TODO create nodelist and return id
-    return appmodels.ID(id="")
+    return ID(id="")
 
-def nodelist_get_by_id(id: appmodels.ID) -> appmodels.NodeList:
+def nodelist_get_by_id(id: ID) -> NodeList:
     # TODO get and return specific nodelist
-    return appmodels.NodeList()
-def nodelist_get_all() -> List[appmodels.ReducedInfo]:
+    return NodeList()
+def nodelist_get_all() -> List[ReducedInfo]:
     # TODO get all nodelists and return reduced infos
     return []
 def nodelist_delete() -> None:
@@ -122,6 +122,20 @@ def nodelist_delete() -> None:
     # TODO delete
     return
 
+
+## Parameter Definitions ##
+def parameter_definition_create(parameter: ParameterDefinition) -> ID:
+    # TODO create definition and return id
+    return ID(id="")
+
+def parameter_definition_get_all() -> List[ParameterDefinition]:
+    # TODO get and return all definitions
+    return []
+
+def parameter_definition_delete(id: StrictStr) -> None:
+    # TODO check if exists or used and raise ex
+    # TODO delete
+    return
 
 
 def create_new_group(name: str, description: str, category: str, id: str):
