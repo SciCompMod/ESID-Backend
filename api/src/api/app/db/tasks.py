@@ -14,6 +14,21 @@ from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import select
 
+### Compartments ###
+def compartment_create(compartment: appmodels.Compartment) -> appmodels.ID:
+    # TODO Create compartment & return id
+    return appmodels.ID(id="")
+
+def compartment_delete(id: StrictStr) -> None:
+    # TODO check if compartment exists or is used anywhere
+    # TODO delete
+    return
+
+def compartment_get_all() -> List[appmodels.Compartment]:
+    # TODO get & return all Compartments
+    return []
+
+
 ### Groups ###
 def group_create(group: appmodels.Group) -> appmodels.ID:
     group_obj = dbmodels.Group(name=group.name, description=group.description, category=group.category)
