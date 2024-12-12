@@ -20,6 +20,7 @@ import json
 
 
 
+from datetime import date
 from pydantic import BaseModel, ConfigDict, Field, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
 try:
@@ -27,15 +28,16 @@ try:
 except ImportError:
     from typing_extensions import Self
 
-class NodeList(BaseModel):
+class ReducedScenario(BaseModel):
     """
-    NodeList
+    ReducedScenario
     """ # noqa: E501
     id: StrictStr
     name: StrictStr = Field(description="Display Name of the object")
     description: Optional[StrictStr] = Field(default=None, description="(Tooltip) Description of the object")
-    node_ids: List[StrictStr] = Field(alias="nodeIds")
-    __properties: ClassVar[List[str]] = ["id", "name", "description", "nodeIds"]
+    start_date: Optional[date] = Field(default=None, alias="startDate")
+    end_date: Optional[date] = Field(default=None, alias="endDate")
+    __properties: ClassVar[List[str]] = ["id", "name", "description", "startDate", "endDate"]
 
     model_config = {
         "populate_by_name": True,
@@ -55,7 +57,7 @@ class NodeList(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Self:
-        """Create an instance of NodeList from a JSON string"""
+        """Create an instance of ReducedScenario from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -80,7 +82,7 @@ class NodeList(BaseModel):
 
     @classmethod
     def from_dict(cls, obj: Dict) -> Self:
-        """Create an instance of NodeList from a dict"""
+        """Create an instance of ReducedScenario from a dict"""
         if obj is None:
             return None
 
@@ -91,6 +93,9 @@ class NodeList(BaseModel):
             "id": obj.get("id"),
             "name": obj.get("name"),
             "description": obj.get("description"),
-            "nodeIds": obj.get("nodeIds")
+            "startDate": obj.get("startDate"),
+            "endDate": obj.get("endDate")
         })
         return _obj
+
+

@@ -27,15 +27,14 @@ try:
 except ImportError:
     from typing_extensions import Self
 
-class NodeList(BaseModel):
+class ReducedInfo(BaseModel):
     """
-    NodeList
+    ReducedInfo
     """ # noqa: E501
     id: StrictStr
     name: StrictStr = Field(description="Display Name of the object")
     description: Optional[StrictStr] = Field(default=None, description="(Tooltip) Description of the object")
-    node_ids: List[StrictStr] = Field(alias="nodeIds")
-    __properties: ClassVar[List[str]] = ["id", "name", "description", "nodeIds"]
+    __properties: ClassVar[List[str]] = ["id", "name", "description"]
 
     model_config = {
         "populate_by_name": True,
@@ -55,7 +54,7 @@ class NodeList(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Self:
-        """Create an instance of NodeList from a JSON string"""
+        """Create an instance of ReducedInfo from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -80,7 +79,7 @@ class NodeList(BaseModel):
 
     @classmethod
     def from_dict(cls, obj: Dict) -> Self:
-        """Create an instance of NodeList from a dict"""
+        """Create an instance of ReducedInfo from a dict"""
         if obj is None:
             return None
 
@@ -90,7 +89,8 @@ class NodeList(BaseModel):
         _obj = cls.model_validate({
             "id": obj.get("id"),
             "name": obj.get("name"),
-            "description": obj.get("description"),
-            "nodeIds": obj.get("nodeIds")
+            "description": obj.get("description")
         })
         return _obj
+
+
