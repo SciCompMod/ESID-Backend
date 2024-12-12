@@ -14,6 +14,7 @@ from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import select
 
+
 ### Compartments ###
 def compartment_create(compartment: appmodels.Compartment) -> appmodels.ID:
     # TODO Create compartment & return id
@@ -69,6 +70,25 @@ def intervention_template_delete(id: StrictStr) -> None:
 def intervention_template_get_all() -> List[appmodels.InterventionTemplate]:
     # TODO select and return all templates
     return []
+
+
+### Models ###
+def model_create(model: appmodels.Model) -> appmodels.ID:
+    # TODO create and return id
+    return appmodels.ID(id="")
+
+def model_delete() -> None:
+    # TODO check if exists or used and raise exception
+    # TODO delete
+    return
+
+def model_get_by_id(id: StrictStr) -> appmodels.Model:
+    # TODO select and return model with id
+    return appmodels.Model()
+
+def model_get_all():
+    # TODO get all and return reduced info
+    return List[appmodels.ReducedInfo]
 
 
 def create_new_group(name: str, description: str, category: str, id: str):

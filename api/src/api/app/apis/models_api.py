@@ -9,6 +9,7 @@ from fastapi import (  # noqa: F401
     Depends,
     Form,
     Header,
+    HTTPException,
     Path,
     Query,
     Response,
@@ -16,72 +17,80 @@ from fastapi import (  # noqa: F401
     status,
 )
 
+from pydantic import StrictStr
+from typing import Any, List, Optional
+
 from app.models.extra_models import TokenModel  # noqa: F401
+from app.models.error import Error
 from app.models.id import ID
 from app.models.model import Model
-from app.models.new_model import NewModel
+from app.models.reduced_info import ReducedInfo
 from security_api import get_token_bearerAuth
-from app.controller.model_controller import ModelsController
+
+from app.controller.models_controller import ModelController
 
 router = APIRouter()
-model_controller = ModelsController()
+controller = ModelController()
 
 @router.post(
     "/models",
     responses={
-        200: {"model": ID, "description": "create a new Model"},
+        200: {"model": ID, "description": "Created new model."},
     },
     tags=["Models"],
     response_model_by_alias=True,
 )
 async def create_model(
-    new_model: NewModel = Body(None, description=""),
+    model: Optional[Model] = Body(None, description=""),
     token_bearerAuth: TokenModel = Security(
         get_token_bearerAuth
     ),
 ) -> ID:
-    return model_controller.create_new_model(new_model=new_model)
+    """Create a new simulation model."""
+    return await controller.create_model(model)
 
 
 @router.delete(
-    "/models/{model_id}",
+    "/models/{modelId}",
     responses={
-        202: {"description": "Model deleted"},
+        200: {"description": "Model deleted."},
+        409: {"model": Error, "description": "Preconditions not met. Error contains reason. May have additional properties referenced in error."},
     },
     tags=["Models"],
     response_model_by_alias=True,
 )
 async def delete_model(
-    model_id: str = Path(None, description=""),
+    modelId: StrictStr = Path(..., description=""),
     token_bearerAuth: TokenModel = Security(
         get_token_bearerAuth
     ),
 ) -> None:
-    """deletes the model if it is not referenced in any scenario"""
-    return model_controller.delete_model_by_id(model_id=model_id)
+    """Delete a model if it is not referenced in any scenarios."""
+    return await controller.delete_model(modelId)
 
 
 @router.get(
-    "/models/{model_id}",
+    "/models/{modelId}",
     responses={
-        200: {"model": Model, "description": "return the list of Models"},
+        200: {"model": Model, "description": "Returned the list of Models."},
     },
     tags=["Models"],
     response_model_by_alias=True,
 )
 async def get_model(
-    model_id: str = Path(None, description=""),
+    modelId: StrictStr = Path(..., description=""),
     token_bearerAuth: TokenModel = Security(
         get_token_bearerAuth
     ),
 ) -> Model:
-    return model_controller.get_model_by_id(model_id)
+    """Get specific model information."""
+    return await controller.get_model(modelId)
 
 
 @router.get(
     "/models",
     responses={
-        200: {"model": List[str], "description": "return the list of Models"},
+        200: {"model": List[ReducedInfo], "description": "Returned list of models."},
     },
     tags=["Models"],
     response_model_by_alias=True,
@@ -90,5 +99,6 @@ async def list_models(
     token_bearerAuth: TokenModel = Security(
         get_token_bearerAuth
     ),
-) -> List[str]:
-    return model_controller.get_all_models()
+) -> List[ReducedInfo]:
+    """List all available simulation models."""
+    return await controller.list_models()
