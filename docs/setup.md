@@ -26,7 +26,7 @@ docker compose exec api-api-1 alembic revision --autogenerate -m "Create all tab
 * Execute the migration
 
 ```
-docker-compose exec api-api-1 alembic upgrade head
+docker compose exec api-api-1 alembic upgrade head
 ```
 
 ## API
