@@ -16,6 +16,7 @@ from __future__ import annotations
 import pprint
 import re  # noqa: F401
 import json
+import uuid
 
 
 
@@ -31,7 +32,7 @@ class Group(BaseModel):
     """
     Group
     """ # noqa: E501
-    id: StrictStr
+    id: Optional[StrictStr] = Field(default_factory=uuid.uuid4)
     name: StrictStr = Field(description="Display Name of the object")
     description: Optional[StrictStr] = Field(default=None, description="(Tooltip) Description of the object")
     category: StrictStr = Field(description="Category this group belongs to. Groups with the same category are grouped together e.g. in filter UIs")

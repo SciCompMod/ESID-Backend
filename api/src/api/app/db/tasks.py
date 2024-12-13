@@ -18,43 +18,87 @@ from sqlmodel import select
 ## Compartments ##
 def compartment_create(compartment: Compartment) -> ID:
     # TODO Create compartment & return id
-    return ID(id="")
+    compartment_obj = db.Compartment(
+        name=compartment.name,
+        description=compartment.description,
+        tags= ','.join(compartment.tags) if compartment.tags else None,
+        )
+    with next(get_session()) as session:
+        session.add(compartment_obj)
+        session.commit()
+        session.refresh(compartment_obj)
+    return ID(id=str(compartment_obj.id))
 
 def compartment_delete(id: StrictStr) -> None:
-    # TODO check if compartment exists or is used anywhere
-    # TODO delete
+    query = select(db.Compartment).where(db.Compartment.id == id)
+    with next(get_session()) as session:
+        compartment: db.Compartment = session.exec(query).one_or_none()
+        if not compartment:
+            raise HTTPException(status_code=404, detail='A compartment with this ID does not exist')
+        if len(compartment.modelLinks) > 0:
+            raise HTTPException(status_code=409, detail='Compartment is still linked to models: {}'.format(', '.join([str(link.modelId) for link in compartment.modelLinks])))
+        session.delete(compartment)
+        session.commit()
     return
 
 def compartment_get_all() -> List[Compartment]:
-    # TODO get & return all Compartments
-    return []
+    query = select(db.Compartment)
+    with next(get_session()) as session:
+        compartments: List[db.Compartment] = session.exec(query).all()
+    return [Compartment(
+        id=str(compartment.id),
+        name=compartment.name,
+        description=compartment.description,
+        tags=compartment.tags.split(',') if compartment.tags else None
+    ) for compartment in compartments]
 
 
 ## Groups ##
 def group_create(group: Group) -> ID:
-    group_obj = db.Group(name=group.name, description=group.description, category=group.category)
+    group_obj = db.Group(
+        name=group.name,
+        description=group.description,
+        category=group.category
+    )
     with next(get_session()) as session:
         session.add(group_obj)
         session.commit()
         session.refresh(group_obj)
-    return ID(id=group_obj.id)
+    return ID(id=str(group_obj.id))
 
 def group_delete_by_id(id: StrictStr) -> None:
     query = select(db.Group).where(db.Group.id == id)
     with next(get_session()) as session:
         group: db.Group = session.exec(query).one_or_none()
         if not group:
-            return Error()
-            raise HTTPException(status_code=409, detail='A group with this ID does not exist')
-        # TODO check if group is used anywhere and raise Exception
-        # TODO delete
+            raise HTTPException(status_code=404, detail='A group with this ID does not exist')
+        message = ""
+        if len(group.parameterValueEntries) > 0:
+            message += 'Group is still linked to parameter values: {}\n'.format(", ".join([str(entry.id) for entry in group.parameterValueEntries]))
+        if len(group.modelLinks) > 0:
+            message += 'Group is still linked to models: {}\n'.format(", ".join([str(link.modelId) for link in group.modelLinks]))
+        if not message == "":
+            raise HTTPException(status_code=409, detail=message)
+        session.delete(group)
+        session.commit()
     return
 
 def group_get_all() -> List[ID]:
-    return [] # TODO select and return all groups
+    query = select(db.Group)
+    with next(get_session()) as session:
+        groups: List[db.Group] = session.exec(query).all()
+    return [Group(
+        id=str(group.id),
+        name=group.name,
+        description=group.description,
+        category=group.category
+    ) for group in groups]
 
 def group_get_all_categories() -> List[str]:
-    return [] # TODO select and return all categories
+    query = select(db.Group.category).distinct()
+    with next(get_session()) as session:
+        categories: List[str] = session.exec(query).all()
+    return categories
 
 
 ## Intervention Templates ##

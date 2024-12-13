@@ -15,6 +15,7 @@ from __future__ import annotations
 import pprint
 import re  # noqa: F401
 import json
+import uuid
 
 from pydantic import BaseModel, Field, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional  # noqa: F401
@@ -27,7 +28,7 @@ class Compartment(BaseModel):
     """
     Compartment
     """ # noqa: E501
-    id: StrictStr
+    id: Optional[StrictStr] = Field(default_factory=uuid.uuid4)
     name: StrictStr = Field(alias="name", description="Display Name of the object")
     description: Optional[StrictStr] = Field(alias="description", default=None, description="(Tooltip) Description of the object")
     tags: Optional[List[StrictStr]] = Field(alias="tags", default=None, description="Tags attached to this object")

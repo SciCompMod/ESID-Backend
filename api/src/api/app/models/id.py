@@ -16,12 +16,15 @@ from __future__ import annotations
 import pprint
 import re  # noqa: F401
 import json
+import uuid
 
 
 
 
 from pydantic import BaseModel, ConfigDict, StrictStr
-from typing import Any, ClassVar, Dict, List
+from typing import Any, ClassVar, Dict, List, Optional
+
+from sqlmodel import Field
 try:
     from typing import Self
 except ImportError:
@@ -31,7 +34,7 @@ class ID(BaseModel):
     """
     ID
     """ # noqa: E501
-    id: StrictStr
+    id: StrictStr = Field(default_factory=uuid.uuid4)
     __properties: ClassVar[List[str]] = ["id"]
 
     model_config = {

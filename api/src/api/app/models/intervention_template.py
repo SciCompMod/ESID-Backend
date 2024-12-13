@@ -16,6 +16,7 @@ from __future__ import annotations
 import pprint
 import re  # noqa: F401
 import json
+import uuid
 
 
 
@@ -31,7 +32,7 @@ class InterventionTemplate(BaseModel):
     """
     InterventionTemplate
     """ # noqa: E501
-    id: StrictStr
+    id: Optional[StrictStr] = Field(default_factory=uuid.uuid4)
     name: StrictStr = Field(description="Display Name of the object")
     description: Optional[StrictStr] = Field(default=None, description="(Tooltip) Description of the object")
     tags: Optional[List[StrictStr]] = Field(default=None, description="Tags attached to this object")

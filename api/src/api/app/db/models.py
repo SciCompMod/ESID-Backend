@@ -120,7 +120,7 @@ class ModelParameterDefinitionLink(SQLModel, table=True):
     modelId: Optional[uuid.UUID] = Field(default=None, nullable=False, primary_key=True, foreign_key="model.id")
     parameterId: Optional[uuid.UUID] = Field(default=None, nullable=False, primary_key=True, foreign_key="parameterdefinition.id")
 
-    model: "Model" = Relationship(back_populates="ParameterDefinitions")
+    model: "Model" = Relationship(back_populates="parameterDefinitions")
     parameter: "ParameterDefinition" = Relationship(back_populates="modelLinks")
 
 
