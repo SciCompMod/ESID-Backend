@@ -13,14 +13,14 @@ git clone git@github.com:DLR-SC/ESID-Backend.git
 cp .docker-env.template .docker-env
 ```
 ```
-docker-compose up --build -d
+docker compose up --build -d
 ```
 4. Perform database migrations (Create tables - on initial run)
     
 * Generate code for migration
 
 ```
-docker-compose exec api-api-1 alembic revision --autogenerate -m "Create all tables"
+docker compose exec api-api-1 alembic revision --autogenerate -m "Create all tables"
 ```
 
 * Execute the migration
