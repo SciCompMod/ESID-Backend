@@ -28,7 +28,7 @@ class Compartment(BaseModel):
     Compartment
     """ # noqa: E501
     id: StrictStr
-    name: Optional[StrictStr] = Field(alias="name", default=None, description="Display Name of the object")
+    name: StrictStr = Field(alias="name", description="Display Name of the object")
     description: Optional[StrictStr] = Field(alias="description", default=None, description="(Tooltip) Description of the object")
     tags: Optional[List[StrictStr]] = Field(alias="tags", default=None, description="Tags attached to this object")
     __properties: ClassVar[List[str]] = ["id", "name", "description", "tags"]
