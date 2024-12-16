@@ -72,12 +72,12 @@ def group_delete_by_id(id: StrictStr) -> None:
         group: db.Group = session.exec(query).one_or_none()
         if not group:
             raise HTTPException(status_code=404, detail='A group with this ID does not exist')
-        message = ""
+        message = {}
         if len(group.parameterValueEntries) > 0:
-            message += 'Group is still linked to parameter values: {}'.format(', '.join([str(entry.id) for entry in group.parameterValueEntries]))
+            message['parameterValues'] = 'Group is still linked to parameter values: {}'.format(', '.join([str(entry.id) for entry in group.parameterValueEntries]))
         if len(group.modelLinks) > 0:
-            message += 'Group is still linked to models: {}'.format(', '.join([str(link.modelId) for link in group.modelLinks]))
-        if not message == "":
+            message['models'] = 'Group is still linked to models: {}'.format(', '.join([str(link.modelId) for link in group.modelLinks]))
+        if message:
             raise HTTPException(status_code=409, detail=message)
         session.delete(group)
         session.commit()
@@ -140,21 +140,104 @@ def intervention_template_get_all() -> List[InterventionTemplate]:
 
 ## Models ##
 def model_create(model: Model) -> ID:
-    # TODO create and return id
-    return ID(id="")
+    model_obj = db.Model(
+        name=model.name,
+        description=model.description,
+        # compartments=model.compartments                   Links for compartments
+        # groups=model.groups                               Links for groups
+        # parameterDefinitions=model.parameter_definitions  Links for parameter definitions
+    )
+    with next(get_session()) as session:
+        message = {}
+        # Check compartments are valid
+        foundCompartments: List[db.Compartment] = session.exec(
+            select(db.Compartment).where(db.Compartment.id.in_(model.compartments))
+        ).all()
+        if not len(foundCompartments) == len(model.compartments):
+            wrongCompartments = list(set(model.compartments).difference([str(compartment.id) for compartment in foundCompartments]))
+            message['compartments'] = 'One or more Compartment IDs do not exist in compartment table. Unknown compartments: {}'.format( ', '.join(wrongCompartments))
+        # Check groups are valid
+        foundGroups: List[db.Group] = session.exec(
+            select(db.Group).where(db.Group.id.in_(model.groups))
+        ).all()
+        if not len(foundGroups) == len(model.groups):
+            wrongGroups = list(set(model.groups).difference([str(group.id) for group in foundGroups]))
+            message['groups'] = 'One or more Group IDs do not exist in group table. Unknown groups: {}'.format( ', '.join(wrongGroups))
+        # Check parameter definitions are valid
+        foundParameters: List[db.ParameterDefinition] = session.exec(
+            select(db.ParameterDefinition).where(db.ParameterDefinition.id.in_(model.parameter_definitions))
+        ).all()
+        if not len(foundParameters) == len(model.parameter_definitions):
+            wrongParameters = list(set(model.parameter_definitions).difference([str(param.id) for param in foundParameters]))
+            message['parameter_definitions'] = 'One or more Parameter Definition IDs do not exist in parameter definition table. Unknown parameter definitions: {}'.format( ', '.join(wrongParameters))
+        # Raise Exception if any validation issues found
+        if message:
+            raise HTTPException(status_code=422, detail=message)
 
-def model_delete() -> None:
-    # TODO check if exists or used and raise exception
-    # TODO delete
+        # Otherwise create object & Link Table entries TODO parallelize write ops like these?
+        session.add(model_obj)
+        for compartmentId in model.compartments:
+            session.add(db.ModelCompartmentLink(
+                modelId=model_obj.id,
+                compartmentId=compartmentId
+            ))
+        for groupId in model.groups:
+            session.add(db.ModelGroupLink(
+                modelId=model_obj.id,
+                groupId=groupId
+            ))
+        for defininitionId in model.parameter_definitions:
+            session.add(db.ModelParameterDefinitionLink(
+                modelId=model_obj.id,
+                parameterId=defininitionId
+            ))
+        # Commit & refresh to get final object
+        session.commit()
+        session.refresh(model_obj)
+    return ID(id=str(model_obj.id))
+
+def model_delete(id: StrictStr) -> None:
+    query = (
+        select(db.Model).where(db.Model.id == id)
+        .options(selectinload(db.Model.scenarios))
+        )
+    with next(get_session()) as session:
+        model: db.Model = session.exec(query).one_or_none()
+        if not model:
+            raise HTTPException(status_code=404, detail='A model with this ID does not exist')
+        if len(model.scenarios) > 0:
+            raise HTTPException(status_code=404, detail='Model is still linked to scenarios: {}'.format(', '.join([str(link.id) for link in model.scenarios])))
+        session.delete(model)
+        session.commit()
     return
 
 def model_get_by_id(id: StrictStr) -> Model:
-    # TODO select and return model with id
-    return Model()
+    query = select(db.Model).where(db.Model.id == id)
+    with next(get_session()) as session:
+        model: db.Model = session.exec(query).one_or_none()
+        if not model:
+            raise HTTPException(status_code=404, detail='A model with this ID does not exist')
+        compartmentIDs: List[StrictStr] = [str(compartment.compartmentId) for compartment in model.compartments]
+        groupIDs: List[StrictStr] = [str(group.groupId) for group in model.groups]
+        definitionIDs: List[StrictStr] = [str(definition.parameterId) for definition in model.parameterDefinitions]
+    return Model(
+        id=str(model.id),
+        name=model.name,
+        description=model.description,
+        compartments=compartmentIDs,
+        groups=groupIDs,
+        parameterDefinitions=definitionIDs
+    )
 
 def model_get_all():
-    # TODO get all and return reduced info
-    return List[ReducedInfo]
+    query = select(db.Model)
+    with next(get_session()) as session:
+        models: List[db.Model] = session.exec(query).all()
+    return [ReducedInfo(
+        id=str(model.id),
+        name=model.name,
+        description=model.description
+    ) for model in models]
 
 
 ## Nodes ##
@@ -183,12 +266,12 @@ def node_delete(id: StrictStr) -> None:
     query = select(db.Node).where(db.Node.id == id).options(selectinload(db.Node.nodelistLinks))
     with next(get_session()) as session:
         node: db.Node = session.exec(query).one_or_none()
-    if not node:
-        raise HTTPException(status_code=404, detail='A node with this ID does not exist')
-    if len(node.nodelistLinks) > 0:
-        raise HTTPException(status_code=409, detail='Node is still linked in node lists: {}'.format( ', '.join([str(link.listId) for link in node.nodelistLinks])))
-    session.delete(node)
-    session.commit()
+        if not node:
+            raise HTTPException(status_code=404, detail='A node with this ID does not exist')
+        if len(node.nodelistLinks) > 0:
+            raise HTTPException(status_code=409, detail='Node is still linked in node lists: {}'.format( ', '.join([str(link.listId) for link in node.nodelistLinks])))
+        session.delete(node)
+        session.commit()
     return
 
 
@@ -200,15 +283,20 @@ def nodelist_create(nodeList: NodeList) -> ID:
         )
     query = select(db.Node).where(db.Node.id.in_(nodeList.node_ids))
     with next(get_session()) as session:
+        # Check Nodes are valid
         foundNodes: List[db.Node] = session.exec(query).all()
         if not len(foundNodes) == len(nodeList.node_ids):
-            raise HTTPException(status_code=422, detail='One or more Node ID do not exist in nodes table. found nodes: {}'.format( ', '.join([str(node.id) for node in foundNodes])))
+            wrongNodes = list(set(nodeList.node_ids).difference([str(node.id) for node in foundNodes]))
+            raise HTTPException(status_code=422, detail='One or more Node IDs do not exist in nodes table. Unknown nodes: {}'.format( ', '.join(wrongNodes)))
+        # Create Nodelist Object
         session.add(list_obj)
+        # Add Node Link Table Entries (Relations)
         for nodeId in nodeList.node_ids:
             session.add(db.NodeListNodeLink(
                 nodeId=nodeId,
                 listId=list_obj.id
             ))
+        # Commit & refresh to get final object
         session.commit()
         session.refresh(list_obj)
     return ID(id=str(list_obj.id))
@@ -238,13 +326,12 @@ def nodelist_get_all() -> List[ReducedInfo]:
     ) for list in nodelists]
 
 def nodelist_delete(id: StrictStr) -> None:
-    query = select(db.NodeList).where(db.NodeList.id == id)
+    query = select(db.NodeList).where(db.NodeList.id == id).options(selectinload(db.NodeList.scenarios))
     with next(get_session()) as session:
         nodelist: db.NodeList = session.exec(query).one_or_none()
         if not nodelist:
             raise HTTPException(status_code=404, detail='A nodelist with this ID does not exist')
         if len(nodelist.scenarios) > 0:
-            session.refresh(nodelist)
             raise HTTPException(status_code=409, detail='Nodelist is still linked to scenarios: {}'.format(', '.join([str(link.id) for link in nodelist.scenarios])))
         session.delete(nodelist)
         session.commit()
@@ -253,15 +340,45 @@ def nodelist_delete(id: StrictStr) -> None:
 
 ## Parameter Definitions ##
 def parameter_definition_create(parameter: ParameterDefinition) -> ID:
-    return ID(id="")
+    definition_obj = db.ParameterDefinition(
+        name=parameter.name,
+        description=parameter.description
+    )
+    with next(get_session()) as sesssion:
+        sesssion.add(definition_obj)
+        sesssion.commit()
+        sesssion.refresh(definition_obj)
+    return ID(id=str(definition_obj.id))
 
 def parameter_definition_get_all() -> List[ParameterDefinition]:
-    # TODO get and return all definitions
-    return []
+    query = select(db.ParameterDefinition)
+    with next(get_session()) as session:
+        definitions: List[db.ParameterDefinition] = session.exec(query).all()
+    return [ParameterDefinition(
+        id=str(definition.id),
+        name=definition.name,
+        description=definition.description
+    ) for definition in definitions]
 
 def parameter_definition_delete(id: StrictStr) -> None:
-    # TODO check if exists or used and raise ex
-    # TODO delete
+    query = (
+        select(db.ParameterDefinition).where(db.ParameterDefinition.id == id)
+        .options(selectinload(db.ParameterDefinition.scenarioLinks))
+        .options(selectinload(db.ParameterDefinition.modelLinks))
+        )
+    with next(get_session()) as session:
+        definition: db.ParameterDefinition = session.exec(query).one_or_none()
+        if not definition:
+            raise HTTPException(status_code=404, detail='A parameter definition with this ID does not exist')
+        message = {}
+        if len(definition.scenarioLinks) > 0:
+            message['scenarios'] = 'Parameter Definition is still used in scenarios: {}'.format(', '.join([str(link.scenarioId) for link in definition.scenarioLinks]))
+        if len(definition.modelLinks) > 0:
+            message['models'] = 'Parameter Definition is still used in models: {}'.format(', '.join([str(link.modelId) for link in definition.modelLinks]))
+        if message:
+            raise HTTPException(status_code=409, detail=message)
+        session.delete(definition)
+        session.commit()
     return
 
 
