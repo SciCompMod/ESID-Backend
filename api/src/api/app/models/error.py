@@ -31,7 +31,7 @@ class Error(BaseModel):
     """
     Error
     """ # noqa: E501
-    detail: StrictStr
+    detail: StrictStr # TODO change this to dict
     __properties: ClassVar[List[str]] = ["detail"]
 
     model_config = {
