@@ -16,12 +16,13 @@ from __future__ import annotations
 import pprint
 import re  # noqa: F401
 import json
+import uuid
 
 
 
 
 from pydantic import BaseModel, ConfigDict, Field, StrictStr
-from typing import Any, ClassVar, Dict, List
+from typing import Any, ClassVar, Dict, List, Optional
 try:
     from typing import Self
 except ImportError:
@@ -31,7 +32,7 @@ class Node(BaseModel):
     """
     Node
     """ # noqa: E501
-    id: StrictStr
+    id: Optional[StrictStr] = Field(default_factory=uuid.uuid4)
     nuts: StrictStr = Field(description="NUTS identifier of the node (district)")
     name: StrictStr = Field(description="Display name of the node (district)")
     __properties: ClassVar[List[str]] = ["id", "nuts", "name"]

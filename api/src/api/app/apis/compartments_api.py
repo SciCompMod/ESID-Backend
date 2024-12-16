@@ -38,7 +38,7 @@ controller = CompartmentController()
     response_model_by_alias=True,
 )
 async def create_compartment(
-    compartment: Optional[Compartment] = Body(None, description=""),
+    compartment: Compartment = Body(None, description=""),
     token_bearerAuth: TokenModel = Security(
         get_token_bearerAuth
     ),

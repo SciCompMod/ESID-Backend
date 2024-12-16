@@ -43,7 +43,7 @@ controller = ScenarioController()
     response_model_by_alias=True,
 )
 async def create_scenario(
-    scenario: Optional[Scenario] = Body(None, description=""),
+    scenario: Scenario = Body(None, description=""),
     token_bearerAuth: TokenModel = Security(
         get_token_bearerAuth
     ),

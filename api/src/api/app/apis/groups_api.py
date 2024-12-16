@@ -38,7 +38,7 @@ controller = GroupsController()
     response_model_by_alias=True,
 )
 async def create_group(
-    group: Optional[Group] = Body(None, description=""),
+    group: Group = Body(None, description=""),
     token_bearerAuth: TokenModel = Security(
         get_token_bearerAuth
     ),

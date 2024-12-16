@@ -21,6 +21,7 @@ import json
 
 
 from datetime import date, datetime
+import uuid
 from pydantic import BaseModel, ConfigDict, Field, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
 from app.models.intervention_implementation import InterventionImplementation
@@ -34,7 +35,7 @@ class Scenario(BaseModel):
     """
     Scenario
     """ # noqa: E501
-    id: StrictStr
+    id: Optional[StrictStr] = Field(default_factory=uuid.uuid4)
     name: StrictStr = Field(description="Display Name of the object")
     description: Optional[StrictStr] = Field(default=None, description="(Tooltip) Description of the object")
     start_date: date = Field(alias="startDate")

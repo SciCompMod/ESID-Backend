@@ -39,7 +39,7 @@ controller = ModelController()
     response_model_by_alias=True,
 )
 async def create_model(
-    model: Optional[Model] = Body(None, description=""),
+    model: Model = Body(None, description=""),
     token_bearerAuth: TokenModel = Security(
         get_token_bearerAuth
     ),

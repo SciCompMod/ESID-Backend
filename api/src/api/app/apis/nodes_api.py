@@ -41,7 +41,7 @@ controller = NodeController()
     response_model_by_alias=True,
 )
 async def create_node(
-    node: Optional[Node] = Body(None, description=""),
+    node: Node = Body(None, description=""),
     token_bearerAuth: TokenModel = Security(
         get_token_bearerAuth
     ),
@@ -59,7 +59,7 @@ async def create_node(
     response_model_by_alias=True,
 )
 async def create_node_list(
-    node_list: Optional[NodeList] = Body(None, description=""),
+    node_list: NodeList = Body(None, description=""),
     token_bearerAuth: TokenModel = Security(
         get_token_bearerAuth
     ),

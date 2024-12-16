@@ -37,7 +37,7 @@ controller = InterventionsController()
     response_model_by_alias=True,
 )
 async def create_intervention_template(
-    intervention_template: Optional[InterventionTemplate] = Body(None, description=""),
+    intervention_template: InterventionTemplate = Body(None, description=""),
     token_bearerAuth: TokenModel = Security(
         get_token_bearerAuth
     ),

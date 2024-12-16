@@ -39,7 +39,7 @@ controller = ParameterController()
     response_model_by_alias=True,
 )
 async def create_parameter_definition(
-    parameter_definition: Optional[ParameterDefinition] = Body(None, description=""),
+    parameter_definition: ParameterDefinition = Body(None, description=""),
     token_bearerAuth: TokenModel = Security(
         get_token_bearerAuth
     ),
