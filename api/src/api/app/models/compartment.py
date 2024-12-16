@@ -18,7 +18,7 @@ import json
 import uuid
 
 from pydantic import BaseModel, Field, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional  # noqa: F401
+from typing import Annotated, Any, ClassVar, Dict, List, Optional  # noqa: F401
 try:
     from typing import Self
 except ImportError:
@@ -34,6 +34,19 @@ class Compartment(BaseModel):
     tags: Optional[List[StrictStr]] = Field(alias="tags", default=None, description="Tags attached to this object")
     __properties: ClassVar[List[str]] = ["id", "name", "description", "tags"]
 
+    # Add an example for OpenApi Documentation
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "name": "compartment name",
+                "description": "optional description",
+                "tags": [
+                    "optional",
+                    "tags"
+                ]
+            }
+        }
+    }
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""
