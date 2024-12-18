@@ -20,14 +20,18 @@ docker compose up --build -d
 * Generate code for migration
 
 ```
-docker compose exec api-api-1 alembic revision --autogenerate -m "Create all tables"
+docker compose exec api alembic revision --autogenerate -m "Create all tables"
 ```
 
 * Execute the migration
 
 ```
-docker compose exec api-api-1 alembic upgrade head
+docker compose exec api alembic upgrade head
 ```
+
+> [!NOTE]  
+> In older docker compose versions you may need to provide the .env file in each command (3 & 4) because the file is not recognized in the docker-compose.yml
+> in this case add `--env-file .docker-env` directly after `docker compose` and before the rest of the commands
 
 ## API
 Goto http://localhost:8000
