@@ -44,6 +44,11 @@ http://localhost:8000/docs
 ## Project Setup
 ### Docker
 Follow steps 1-3 from Deployment - Setup the Project.
+
+You can use `docker compose logs -f` to get a feed of the container logs.
+
+`docker compose logs -f api db` to only see logs for the api & db containers.
+
 watchgod will automatically restart the docker-ized Application with each code change.
 
 ## Development
