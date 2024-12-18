@@ -397,101 +397,155 @@ def parameter_definition_delete(id: StrictStr) -> None:
 
 ## Scenarios ##
 def scenario_create(scenario: Scenario) -> ID:
-    # TODO create scenario and return id
-    return ID(id="")
+    scenario_obj = db.Scenario(
+        name=scenario.name,
+        description=scenario.description,
+        startDate=scenario.start_date,
+        endDate=scenario.end_date,
+        modelId=scenario.model_id,
+        nodeListId=scenario.node_list_id,
+        # modelParameters=scenario.model_parameters          Links for ParameterValue
+        # linkedInterventions=scenario.linked_interventions  Links for InterventionImplementations
+        timestampSubmitted=datetime.now(),
+        timestampSimulated=None,
+    )
+    with next(get_session()) as session:
+        message = {}
+        # validate model
+        model: db.Model = session.exec(
+            select(db.Model).where(db.Model.id == scenario.model_id)
+            .options(selectinload(db.Model.parameterDefinitions))
+            .options(selectinload(db.Model.groups))
+        ).one_or_none()
+        if not model:
+            message['modelId'] = 'A model with this ID does not exist'
+        # validate node list
+        nodelist: db.NodeList = session.exec(
+            select(db.NodeList).where(db.NodeList.id == scenario.node_list_id)
+        ).one_or_none()
+        if not nodelist:
+            message['nodeListID'] = 'A nodelist with this ID does not exist'
+        # validate interventions
+        foundInterventions: List[db.InterventionTemplate] = session.exec(
+            select(db.InterventionTemplate).where(db.InterventionTemplate.id.in_([intervention.intervention_id for intervention in scenario.linked_interventions]))
+        ).all()
+        if not len(foundInterventions) == len(scenario.linked_interventions):
+            wrongInterventions = list(set([intervention.intervention_id for intervention in scenario.linked_interventions]).difference([str(intervention.id) for intervention in foundInterventions]))
+            message['linkedInterventions'] = 'One or more linked interventions do not exist in intervention template table. Unknown interventions: {}'.format(', '.join(wrongInterventions))
+        # validate parameters
+        if model:
+            # check each parameter matches model parameters
+            params_onModel = set([str(definition.parameterId) for definition in model.parameterDefinitions])
+            params_onScenario = set([impl.parameter_id for impl in scenario.model_parameters])
+            if params_onModel.difference(params_onScenario):
+                message['modelParameters']['missing'] = 'One or parameters of model {modelID} are not defined. Missing parameters: {params}'.format(modelID=str(model.id), params=', '.join(params_onModel.difference(params_onScenario)))
+            if params_onScenario.difference(params_onModel):
+                message['modelParameters']['unknown'] = 'One or more parameters do not exist in model {modelID}. Unknown parameters: {params}'.format(modelID=str(model.id), params=', '.join(params_onScenario.difference(params_onModel)))
+            # check each parameter group matches model groups
+            groups_onModel = set([str(group.groupId) for group in model.groups])
+            for parameter in scenario.model_parameters:
+                groups_onParameter = set([group.group_id for group in parameter.values])
+                if groups_onModel.difference(groups_onParameter):
+                    message['modelParameters'][parameter.parameter_id]['missing'] = 'One or more groups of model {modelID} are not defined. Missing groups: {groups}'.format(modelID=str(model.id), groups=', '.join(groups_onModel.difference(groups_onParameter)))
+                if groups_onParameter.difference(groups_onModel):
+                    message['modelParameters'][parameter.parameter_id]['unknown'] = 'One or more groups do not exist in model {modelID}. Unknown groups: {groups}'.format(modelID=str(model.id), groups=', '.join(groups_onParameter.difference(groups_onModel)))
+        # Raise exception if anyvalidation issues found
+        if message:
+            raise HTTPException(status_code=422, detail=message)
+        
+        # Otherwise create Scenario & Link Table entries
+        session.add(scenario_obj)
+        # Intervention Implementation Links
+        session.add_all([db.InterventionImplementation(
+                scenarioId=scenario_obj.id,
+                interventionId=intervention.intervention_id,
+                startDate=intervention.start_date,
+                endDate=intervention.end_date,
+                coefficient=intervention.coefficient,
+            ) for intervention in scenario.linked_interventions])
+        # Parameter Value Links
+        for parameter in scenario.model_parameters:
+            session.add(db.ParameterValue(
+            scenarioId=scenario_obj.id,
+            definitionId=parameter.parameter_id,
+            ))
+            # Parameter Value Entry Links
+            session.add_all([db.ParameterValueEntry(
+                parameterValueIdScenario=scenario_obj.id,
+                parameterValueIdDefinition=parameter.parameter_id,
+                groupId=group.group_id,
+                valueMin=group.value_min,
+                valueMax=group.value_max,
+            ) for group in parameter.values])
+        session.commit()
+        session.refresh(scenario_obj)
+    return ID(id=str(scenario_obj.id))
 
 def scenario_get_by_id(id: StrictStr) -> Scenario:
-    # TODO get and return specific scenario
-    return Scenario()
+    query = (
+        select(db.Scenario).where(db.Scenario.id == id)
+        .options(selectinload(db.Scenario.modelParameters).selectinload(db.ParameterValue.values))
+        .options(selectinload(db.Scenario.linkedInterventions))
+        )
+    with next(get_session()) as session:
+        scenario: db.Scenario = session.exec(query).one_or_none()
+        if not scenario:
+            raise HTTPException(status_code=404, detail='a scenario with this ID does not exist')
+        modelParams: List[ParameterValue] = [ParameterValue(
+            parameterId=str(value.definitionId),
+            values=[ParameterValueEntry(
+                groupId=str(entry.groupId),
+                valueMin=entry.valueMin,
+                valueMax=entry.valueMax,
+            ) for entry in value.values]
+        ) for value in scenario.modelParameters]
+        linkedInterventions=[InterventionImplementation(
+            interventionId=str(intervention.interventionId),
+            startDate=intervention.startDate,
+            endDate=intervention.endDate,
+            coefficient=intervention.coefficient,
+        ) for intervention in scenario.linkedInterventions]
+    return Scenario(
+        id=str(scenario.id),
+        name=scenario.name,
+        description=scenario.description,
+        startDate=scenario.startDate,
+        endDate=scenario.endDate,
+        modelId=str(scenario.modelId),
+        modelParameters=modelParams,
+        nodeListId=str(scenario.nodeListId),
+        linkedInterventions=linkedInterventions,
+        timestampSubmitted=scenario.timestampSubmitted,
+        timestampSimulated=scenario.timestampSimulated,
+    )
 
 def scenario_get_all() -> List[ReducedScenario]:
-    # TODO get all scenarios and return reduced scenario
-    return []
+    query = select(db.Scenario)
+    with next(get_session()) as session:
+        scenarios: List[db.Scenario] = session.exec(query).all()
+    return [ReducedScenario(
+        id=str(sc.id),
+        name=sc.name,
+        description=sc.description,
+        startDate=sc.startDate,
+        endDate=sc.endDate,
+        timestampSubmitted=sc.timestampSubmitted,
+        timestampSimulated=sc.timestampSimulated,
+    ) for sc in scenarios]
 
-def scenario_delete() -> None:
-    # TODO check if exists or used and raise ex
-    # TODO delete
+def scenario_delete(id: StrictStr) -> None:
+    query = (
+        select(db.Scenario).where(db.Scenario.id == id)
+    )
+    with next(get_session()) as session:
+        scenario: db.Scenario = session.exec(query).one_or_none()
+        if not scenario:
+            raise HTTPException(status_code=404, detail='A scenario with this ID does not exist')
+        session.delete(scenario)
+        session.commit()
     return
 
 '''
-#Groups
-
-def create_new_group(name: str, description: str, category: str, id: str):
-    data_obj = Group(name=name, description=description, category=category, id=id)
-    with next(get_session()) as session:
-        session.add(data_obj)
-        session.commit()
-
-def create_groups(group_maps):
-    # remove key "Total" from group maps 
-    del group_maps["Total"]
-    category = "age"
-    for group_id, group_name in group_maps.items():
-        grp_idx = group_name.split("_")[1]
-        des = age_groups[int(grp_idx)]
-        create_new_group(group_name, des, category, group_id)
-
-def get_all_group():
-    statement = select(Group)
-    with next(get_session()) as session:
-        query_results: Group = session.exec(statement).all()
-    if query_results:
-        return query_results
-
-
-def get_group_by_id(id: str):
-    statement = select(Group).where(Group.id == id)
-    with next(get_session()) as session:
-        query_results: Group = session.exec(statement).one_or_none()
-    if query_results:
-        return query_results
-
-
-def delete_group_by_id(id: str):
-    statement = select(Group).where(Group.id == id)
-    with next(get_session()) as session:
-        group = session.exec(statement).one_or_none()
-        if group:
-            session.delete(group)
-            session.commit()
-            return id
-
-
-# Interventions
-
-
-def create_new_intervention(name: str, description: str, id: str):
-    data_obj = Intervention(name=name, description=description, id=id)
-    with next(get_session()) as session:
-        session.add(data_obj)
-        session.commit()
-
-
-def get_all_interventions():
-    statement = select(Intervention)
-    with next(get_session()) as session:
-        query_results: Intervention = session.exec(statement).all()
-    if query_results:
-        return query_results
-
-
-def get_intervention_by_id(id: str):
-    statement = select(Intervention).where(Intervention.id == id)
-    with next(get_session()) as session:
-        query_results: Intervention = session.exec(statement).one_or_none()
-    if query_results:
-        return query_results
-
-
-def delete_intervention_by_id(id: str):
-    statement = select(Intervention).where(Intervention.id == id)
-    with next(get_session()) as session:
-        results = session.exec(statement)
-        intervention = results.one()
-        session.delete(intervention)
-        session.commit()
-
-
 # ParameterDefinitions
 
 
