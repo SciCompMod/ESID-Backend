@@ -1,4 +1,5 @@
 from collections import defaultdict
+import json
 from typing import List, Optional, Union
 from uuid import uuid4
 from pydantic import StrictStr
@@ -410,7 +411,8 @@ def scenario_create(scenario: Scenario) -> ID:
         timestampSimulated=None,
     )
     with next(get_session()) as session:
-        message = defaultdict(dict)
+        nested_dict = lambda: defaultdict(nested_dict)
+        message = nested_dict()
         # validate model
         model: db.Model = session.exec(
             select(db.Model).where(db.Model.id == scenario.model_id)
@@ -451,7 +453,7 @@ def scenario_create(scenario: Scenario) -> ID:
                     message['modelParameters'][parameter.parameter_id]['unknown'] = 'One or more groups do not exist in model {modelID}. Unknown groups: {groups}'.format(modelID=str(model.id), groups=', '.join(groups_onParameter.difference(groups_onModel)))
         # Raise exception if anyvalidation issues found
         if message:
-            raise HTTPException(status_code=422, detail=message)
+            raise HTTPException(status_code=422, detail=json.loads(json.dumps(message)))
         
         # Otherwise create Scenario & Link Table entries
         session.add(scenario_obj)
