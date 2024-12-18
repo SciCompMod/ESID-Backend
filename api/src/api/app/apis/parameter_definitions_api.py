@@ -82,3 +82,20 @@ async def list_parameter_definitions(
 ) -> List[ParameterDefinition]:
     """List all existing Parameter definitions."""
     return await controller.list_parameter_definitions()
+
+@router.get(
+    "/parameterdefinitions/{parameterId}",
+    responses={
+        200: {"model": ParameterDefinition, "description": "Returned specific of parameter definitions."},
+    },
+    tags=["ParameterDefinitions"],
+    response_model_by_alias=True,
+)
+async def get_parameter_definition(
+    parameterId: StrictStr = Path(..., description=""),
+    token_bearerAuth: TokenModel = Security(
+        get_token_bearerAuth
+    ),
+) -> ParameterDefinition:
+    """Get specific Parameter definitions."""
+    return await controller.get_parameter_definition(parameterId)

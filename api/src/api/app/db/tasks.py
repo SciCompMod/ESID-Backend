@@ -1,6 +1,7 @@
 from typing import List
 from uuid import uuid4
 from pydantic import StrictStr
+from datetime import date, datetime
 
 from app.db import get_session
 
@@ -359,6 +360,18 @@ def parameter_definition_get_all() -> List[ParameterDefinition]:
         name=definition.name,
         description=definition.description
     ) for definition in definitions]
+
+def parameter_definition_get_by_id(id: StrictStr) -> ParameterDefinition:
+    query = select(db.ParameterDefinition).where(db.ParameterDefinition.id == id)
+    with next(get_session()) as session:
+        parameter: db.ParameterDefinition = session.exec(query).one_or_none()
+        if not parameter:
+            raise HTTPException(status_code=404, detail='A parameter definition with this ID does not exist')
+    return ParameterDefinition(
+        id=str(parameter.id),
+        name=parameter.name,
+        description=parameter.description
+    )
 
 def parameter_definition_delete(id: StrictStr) -> None:
     query = (

@@ -10,7 +10,7 @@ from app.models.id import ID
 from app.models.parameter_definition import ParameterDefinition
 from security_api import get_token_bearerAuth
 
-from app.db.tasks import parameter_definition_create, parameter_definition_get_all, parameter_definition_delete
+from app.db.tasks import parameter_definition_create, parameter_definition_get_all, parameter_definition_get_by_id, parameter_definition_delete
 
 class ParameterController:
     
@@ -37,3 +37,10 @@ class ParameterController:
     ) -> List[ParameterDefinition]:
         """List all existing Parameter definitions."""
         return parameter_definition_get_all()
+
+    async def get_parameter_definition(
+        self,
+        parameterId: StrictStr,
+    ) -> ParameterDefinition:
+        """Get specific Parameter definitions."""
+        return parameter_definition_get_by_id(parameterId)
