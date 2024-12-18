@@ -976,6 +976,12 @@ components:
             endDate:
               type: string
               format: date
+            timestampSubmitted:
+              type: string
+              format: date-time
+            timestampSimulated:
+              type: string
+              format: date-time
 
     Tagged:
       type: object

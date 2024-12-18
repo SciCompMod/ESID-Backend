@@ -20,7 +20,7 @@ import json
 
 
 
-from datetime import date
+from datetime import date, datetime
 from pydantic import BaseModel, ConfigDict, Field, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
 try:
@@ -35,9 +35,11 @@ class ReducedScenario(BaseModel):
     id: StrictStr
     name: StrictStr = Field(description="Display Name of the object")
     description: Optional[StrictStr] = Field(default=None, description="(Tooltip) Description of the object")
-    start_date: Optional[date] = Field(default=None, alias="startDate")
-    end_date: Optional[date] = Field(default=None, alias="endDate")
-    __properties: ClassVar[List[str]] = ["id", "name", "description", "startDate", "endDate"]
+    start_date: Optional[date] = Field(default=None, alias="startDate", description="First date of the scenario")
+    end_date: Optional[date] = Field(default=None, alias="endDate", description="Last date of the scenario")
+    timestamp_submitted: Optional[datetime] = Field(default=None, alias="timestampSubmitted", description="Timestamp when the scenario was added/created")
+    timestamp_simulated: Optional[datetime] = Field(default=None, alias="timestampSimulated", description="Timestamp when the scenario was finished simulating and data is available")
+    __properties: ClassVar[List[str]] = ["id", "name", "description", "startDate", "endDate", "timestamp_submitted", "timestamp_simulated"]
 
     model_config = {
         "populate_by_name": True,
@@ -94,7 +96,9 @@ class ReducedScenario(BaseModel):
             "name": obj.get("name"),
             "description": obj.get("description"),
             "startDate": obj.get("startDate"),
-            "endDate": obj.get("endDate")
+            "endDate": obj.get("endDate"),
+            "timestamp_submitted": obj.get("timestamp_submitted"),
+            "timestamp_simulated": obj.get("timestamp_simulated"),
         })
         return _obj
 
