@@ -1,4 +1,5 @@
-from typing import List
+from collections import defaultdict
+from typing import List, Optional, Union
 from uuid import uuid4
 from pydantic import StrictStr
 from datetime import date, datetime
@@ -409,7 +410,7 @@ def scenario_create(scenario: Scenario) -> ID:
         timestampSimulated=None,
     )
     with next(get_session()) as session:
-        message = {}
+        message = defaultdict(dict)
         # validate model
         model: db.Model = session.exec(
             select(db.Model).where(db.Model.id == scenario.model_id)
