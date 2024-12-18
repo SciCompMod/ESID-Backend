@@ -38,14 +38,14 @@ class Scenario(BaseModel):
     id: Optional[StrictStr] = Field(default_factory=uuid.uuid4)
     name: StrictStr = Field(description="Display Name of the object")
     description: Optional[StrictStr] = Field(default=None, description="(Tooltip) Description of the object")
-    start_date: date = Field(alias="startDate")
-    end_date: date = Field(alias="endDate")
+    start_date: date = Field(alias="startDate", description="First date of the scenario")
+    end_date: date = Field(alias="endDate", description="Last date of the scenario")
     model_id: StrictStr = Field(description="UUID of the model this scenario belongs to", alias="modelId")
     model_parameters: List[ParameterValue] = Field(description="List of (available) model parameters (UUIDs & values)", alias="modelParameters")
     node_list_id: StrictStr = Field(description="UUID of the node list (districts etc.) of this scenario", alias="nodeListId")
     linked_interventions: Optional[List[InterventionImplementation]] = Field(default=None, description="List of intervention implementations used in this scenario", alias="linkedInterventions")
-    timestamp_submitted: Optional[datetime] = Field(default=None, alias="timestampSubmitted")
-    timestamp_simulated: Optional[datetime] = Field(default=None, alias="timestampSimulated")
+    timestamp_submitted: Optional[datetime] = Field(default=None, alias="timestampSubmitted", description="Timestamp when the scenario was added/created")
+    timestamp_simulated: Optional[datetime] = Field(default=None, alias="timestampSimulated", description="Timestamp when the scenario was finished simulating and data is available")
     __properties: ClassVar[List[str]] = ["id", "name", "description", "startDate", "endDate", "modelId", "modelParameters", "nodeListId", "linkedInterventions", "timestampSubmitted", "timestampSimulated"]
 
     model_config = {
