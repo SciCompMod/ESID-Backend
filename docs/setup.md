@@ -30,8 +30,8 @@ docker compose exec api alembic upgrade head
 ```
 
 > [!NOTE]  
-> In older docker compose versions you may need to provide the .env file in each command (3 & 4) because the file is not recognized in the docker-compose.yml
-> in this case add `--env-file .docker-env` directly after `docker compose` and before the rest of the commands
+> In older docker compose versions you may need to provide the .env file in each command (3 & 4) because the file is not recognized in the docker-compose.yml  
+> In this case add `--env-file .docker-env` directly after `docker compose` and before the rest of the commands
 
 ## API
 Goto http://localhost:8000
