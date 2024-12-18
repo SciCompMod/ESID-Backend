@@ -2,7 +2,7 @@ from collections import defaultdict
 import json
 from typing import List, Optional, Union
 from uuid import uuid4
-from pydantic import StrictStr
+from pydantic import StrictInt, StrictStr
 from datetime import date, datetime
 
 from app.db import get_session
@@ -547,6 +547,42 @@ def scenario_delete(id: StrictStr) -> None:
         session.commit()
     return
 
+def scenario_get_data_by_filter(
+    scenarioId: StrictStr,
+    nodes: Optional[List[StrictStr]],
+    start_date: Optional[date],
+    end_date: Optional[date],
+    compartments: Optional[List[StrictStr]],
+    # aggregations: Optional[Dict[str, Dict[str, List[StrictStr]]]],
+    groups: Optional[List[StrictStr]],
+    percentiles: Optional[List[StrictInt]],
+) -> List[Infectiondata]:
+    # validate scenario ID?
+    query = select(db.ScenarioDatapoint).where(db.ScenarioDatapoint.scenarioId == scenarioId)
+    # if nodes supplied select only those node else return all
+    if nodes:
+        query = query.where(db.ScenarioDatapoint.nodeId.in_(nodes))
+    if start_date:
+        query = query.where(db.ScenarioDatapoint.timestamp.date() >= start_date)
+    if end_date:
+        query = query.where(db.ScenarioDatapoint.timestamp.date() <= end_date)
+    if compartments:
+        query = query.where(db.ScenarioDatapoint.compartmentId.in_(compartments))
+    if groups:
+        query = query.where(db.ScenarioDatapoint.groupId.in_(groups))
+    if percentiles:
+        query = query.where(db.ScenarioDatapoint.percentile.in_(percentiles))
+    
+    with next(get_session()) as session:
+        datapoints: List[db.ScenarioDatapoint] = session.exec(query).all()
+    return [Infectiondata(
+        date=point.timestamp.date(),
+        node=point.nodeId,
+        group=point.groupId,
+        compartment=point.compartmentId,
+        # aggregation=
+        # values=
+    ) for point in datapoints]
 '''
 # ParameterDefinitions
 

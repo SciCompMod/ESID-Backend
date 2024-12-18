@@ -37,7 +37,7 @@ class Infectiondata(BaseModel):
     group: Optional[StrictStr] = None
     compartment: Optional[StrictStr] = None
     aggregation: Optional[StrictStr] = None
-    values: List[Union[StrictFloat, StrictInt]]
+    values: Dict[StrictInt, StrictFloat] # TODO
     __properties: ClassVar[List[str]] = ["date", "node", "group", "compartment", "aggregation", "values"]
 
     model_config = {

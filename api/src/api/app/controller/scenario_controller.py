@@ -14,7 +14,7 @@ from app.models.reduced_scenario import ReducedScenario
 from app.models.scenario import Scenario
 from security_api import get_token_bearerAuth
 
-from app.db.tasks import scenario_create, scenario_get_by_id, scenario_get_all, scenario_delete
+from app.db.tasks import scenario_create, scenario_get_by_id, scenario_get_all, scenario_get_data_by_filter, scenario_delete
 
 class ScenarioController:
     
@@ -51,16 +51,25 @@ class ScenarioController:
     async def get_infection_data(
         self,
         scenarioId: StrictStr,
-        nodes: Annotated[Optional[List[StrictStr]], Field(description="Comma separated list of NodeIds or NUTS")],
-        start_date: Annotated[Optional[date], Field(description="Start date of requested data")],
-        end_date: Annotated[Optional[date], Field(description="End date of requested data")],
-        compartments: Annotated[Optional[List[StrictStr]], Field(description="Comma separated list of Compartment IDs")],
-        aggregations: Annotated[Optional[Dict[str, Dict[str, List[StrictStr]]]], Field(description="Object with named (key) lists of compartment tags (value, AND connected)")],
-        groups: Annotated[Optional[List[StrictStr]], Field(description="List of groups requesting data for")],
+        nodes: Optional[List[StrictStr]],
+        start_date: Optional[date],
+        end_date: Optional[date],
+        compartments: Optional[List[StrictStr]],
+        # aggregations: Optional[Dict[str, Dict[str, List[StrictStr]]]],
+        groups: Optional[List[StrictStr]],
         percentiles: Annotated[Optional[List[Union[StrictFloat, StrictInt]]], Field(description="Requested percentiles of the data")],
     ) -> List[Infectiondata]:
         """Get scenario&#39;s infection data based on specified filters."""
-        return [] # TODO Filter Object & DB task
+        return scenario_get_data_by_filter(
+            scenarioId,
+            nodes,
+            start_date,
+            end_date,
+            compartments,
+            # aggregations,
+            groups,
+            percentiles
+        )
 
     async def import_scenario_data(
         self,

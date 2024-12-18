@@ -88,7 +88,7 @@ async def get_infection_data(
     #aggregations: Annotated[Optional[Dict[str, Dict[str, List[StrictStr]]]], Field(description="Object with named (key) lists of compartment tags (value, AND connected)")] = Query(None, description="Object with named (key) lists of compartment tags (value, AND connected)", alias="aggregations"),
     # TODO deepObject not supported by fastapi yet, wait for https://github.com/fastapi/fastapi/pull/9867 or do custom string based solution ¯\_(ツ)_/¯
     groups: Annotated[Optional[List[StrictStr]], Field(description="List of groups requesting data for")] = Query(None, description="List of groups requesting data for", alias="groups"),
-    percentiles: Annotated[Optional[List[Union[StrictFloat, StrictInt]]], Field(description="Requested percentiles of the data")] = Query(None, description="Requested percentiles of the data", alias="percentiles"),
+    percentiles: Annotated[Optional[List[StrictInt]], Field(description="Requested percentiles of the data")] = Query(None, description="Requested percentiles of the data", alias="percentiles"),
     token_bearerAuth: TokenModel = Security(
         get_token_bearerAuth
     ),
