@@ -177,21 +177,21 @@ def model_create(model: Model) -> ID:
 
         # Otherwise create object & Link Table entries TODO parallelize write ops like these?
         session.add(model_obj)
-        for compartmentId in model.compartments:
-            session.add(db.ModelCompartmentLink(
-                modelId=model_obj.id,
-                compartmentId=compartmentId
-            ))
-        for groupId in model.groups:
-            session.add(db.ModelGroupLink(
-                modelId=model_obj.id,
-                groupId=groupId
-            ))
-        for defininitionId in model.parameter_definitions:
-            session.add(db.ModelParameterDefinitionLink(
-                modelId=model_obj.id,
-                parameterId=defininitionId
-            ))
+        # Compartment Links
+        session.add_all([db.ModelCompartmentLink(
+            modelId=model_obj.id,
+            compartmentId=compartmentId
+        ) for compartmentId in model.compartments])
+        # Group Links
+        session.add_all([db.ModelGroupLink(
+            modelId=model_obj.id,
+            groupId=groupId
+        ) for groupId in model.groups])
+        # Parameter Definition Links
+        session.add_all([db.ModelParameterDefinitionLink(
+            modelId=model_obj.id,
+            parameterId=defininitionId
+        ) for defininitionId in model.parameter_definitions])
         # Commit & refresh to get final object
         session.commit()
         session.refresh(model_obj)
@@ -292,11 +292,10 @@ def nodelist_create(nodeList: NodeList) -> ID:
         # Create Nodelist Object
         session.add(list_obj)
         # Add Node Link Table Entries (Relations)
-        for nodeId in nodeList.node_ids:
-            session.add(db.NodeListNodeLink(
+        session.add_all([db.NodeListNodeLink(
                 nodeId=nodeId,
                 listId=list_obj.id
-            ))
+            ) for nodeId in nodeList.node_ids])
         # Commit & refresh to get final object
         session.commit()
         session.refresh(list_obj)
