@@ -21,7 +21,7 @@ services:
       - .docker-env
     volumes:
       - ./src/api/:/api
-      - ${INPUT_DIR}:/api/input/
+      - ${VOLUME_DIR}/input:/api/input/
     ports:
       - ${API_PORT}:8000
     depends_on:
@@ -32,20 +32,34 @@ services:
     restart: always
     image: redis
     volumes:
-      - ${REDIS_DIR}:/var/lib/redis/data
+      - ${VOLUME_DIR}/redis_data:/var/lib/redis/data
     networks:
       - backnet
   db:
     restart: always
     image: postgres:latest
     volumes:
-      - ${POSTGRES_DIR}:/var/lib/postgresql/data/
+      - ${VOLUME_DIR}/postgres_data:/var/lib/postgresql/data/
     env_file:
       - .docker-env
     networks:
       - backnet
     ports:
       - ${DB_PORT}:5432
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+    networks:
+      - backnet
+    ports:
+      - 5052:80
+    volumes:
+      - ${VOLUME_DIR}/pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - db
 
 networks:
   backnet:
