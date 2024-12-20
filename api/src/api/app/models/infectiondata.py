@@ -37,8 +37,9 @@ class Infectiondata(BaseModel):
     group: Optional[StrictStr] = None
     compartment: Optional[StrictStr] = None
     aggregation: Optional[StrictStr] = None
-    values: Dict[StrictInt, StrictFloat] # TODO
-    __properties: ClassVar[List[str]] = ["date", "node", "group", "compartment", "aggregation", "values"]
+    percentile: StrictInt = 50
+    value: StrictFloat
+    __properties: ClassVar[List[str]] = ["date", "node", "group", "compartment", "aggregation", "percentile", "value"]
 
     model_config = {
         "populate_by_name": True,
@@ -94,6 +95,7 @@ class Infectiondata(BaseModel):
             "group": obj.get("group"),
             "compartment": obj.get("compartment"),
             "aggregation": obj.get("aggregation"),
-            "values": obj.get("values")
+            "percentile": obj.get("percentile"),
+            "value": obj.get("value")
         })
         return _obj

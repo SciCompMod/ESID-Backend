@@ -583,6 +583,8 @@ def scenario_get_data_by_filter(
         group=point.groupId,
         compartment=point.compartmentId,
         # aggregation=
+        percentile=point.percentile,
+        value=point.value
     ) for point in datapoints]
 '''
 # ParameterDefinitions
