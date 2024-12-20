@@ -22,7 +22,7 @@ import json
 
 from datetime import date, datetime
 import uuid
-from pydantic import BaseModel, ConfigDict, Field, StrictStr
+from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
 from app.models.intervention_implementation import InterventionImplementation
 from app.models.parameter_value import ParameterValue
@@ -44,9 +44,10 @@ class Scenario(BaseModel):
     model_parameters: List[ParameterValue] = Field(description="List of (available) model parameters (UUIDs & values)", alias="modelParameters")
     node_list_id: StrictStr = Field(description="UUID of the node list (districts etc.) of this scenario", alias="nodeListId")
     linked_interventions: Optional[List[InterventionImplementation]] = Field(default=None, description="List of intervention implementations used in this scenario", alias="linkedInterventions")
+    percentiles: Optional[List[StrictInt]] = Field(default=[50], description="List of available percentiles for this scenario", alias="percentiles")
     timestamp_submitted: Optional[datetime] = Field(default=None, alias="timestampSubmitted", description="Timestamp when the scenario was added/created")
     timestamp_simulated: Optional[datetime] = Field(default=None, alias="timestampSimulated", description="Timestamp when the scenario was finished simulating and data is available")
-    __properties: ClassVar[List[str]] = ["id", "name", "description", "startDate", "endDate", "modelId", "modelParameters", "nodeListId", "linkedInterventions", "timestampSubmitted", "timestampSimulated"]
+    __properties: ClassVar[List[str]] = ["id", "name", "description", "startDate", "endDate", "modelId", "modelParameters", "nodeListId", "linkedInterventions", "percentiles", "timestampSubmitted", "timestampSimulated"]
 
     model_config = {
         "populate_by_name": True,
@@ -126,6 +127,7 @@ class Scenario(BaseModel):
             "modelParameters": [ParameterValue.from_dict(_item) for _item in obj.get("modelParameters")] if obj.get("modelParameters") is not None else None,
             "nodeListId": obj.get("nodeListId"),
             "linkedInterventions": [InterventionImplementation.from_dict(_item) for _item in obj.get("linkedInterventions")] if obj.get("linkedInterventions") is not None else None,
+            "percentiles": obj.get("percentiles"),
             "timestampSubmitted": obj.get("timestampSubmitted"),
             "timestampSimulated": obj.get("timestampSimulated")
         })

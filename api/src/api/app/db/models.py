@@ -23,6 +23,8 @@ class Scenario(SQLModel, table=True):
     modelParameters: List["ParameterValue"] = Relationship(back_populates="scenario", cascade_delete=True)
     linkedInterventions: List["InterventionImplementation"] = Relationship(back_populates="scenario", cascade_delete=True)
 
+    percentiles: Optional[str] = Field(default='50', nullable=False)
+
     timestampSubmitted: Optional[datetime] = Field(default=None, nullable=True)
     timestampSimulated: Optional[datetime] = Field(default=None, nullable=True)
 
