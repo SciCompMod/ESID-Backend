@@ -579,9 +579,9 @@ def scenario_get_data_by_filter(
         datapoints: List[db.ScenarioDatapoint] = session.exec(query).all()
     return [Infectiondata(
         date=point.timestamp.date(),
-        node=point.nodeId,
-        group=point.groupId,
-        compartment=point.compartmentId,
+        node=str(point.nodeId),
+        group=str(point.groupId),
+        compartment=str(point.compartmentId),
         # aggregation=
         percentile=point.percentile,
         value=point.value

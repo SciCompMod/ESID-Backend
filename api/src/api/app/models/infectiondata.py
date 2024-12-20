@@ -37,7 +37,7 @@ class Infectiondata(BaseModel):
     group: Optional[StrictStr] = None
     compartment: Optional[StrictStr] = None
     aggregation: Optional[StrictStr] = None
-    percentile: StrictInt = 50
+    percentile: StrictInt
     value: StrictFloat
     __properties: ClassVar[List[str]] = ["date", "node", "group", "compartment", "aggregation", "percentile", "value"]
 
