@@ -518,7 +518,7 @@ def scenario_get_by_id(id: StrictStr) -> Scenario:
         modelParameters=modelParams,
         nodeListId=str(scenario.nodeListId),
         linkedInterventions=linkedInterventions,
-        percentiles=[int(perc) for perc in scenario.percentiles.split(',')],
+        percentiles=[int(perc) for perc in scenario.percentiles.split(',')] if scenario.percentiles else [50],
         timestampSubmitted=scenario.timestampSubmitted,
         timestampSimulated=scenario.timestampSimulated,
     )
