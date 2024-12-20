@@ -51,24 +51,24 @@ class ScenarioController:
     async def get_infection_data(
         self,
         scenarioId: StrictStr,
-        nodes: Optional[List[StrictStr]],
+        nodes: Optional[StrictStr],
         start_date: Optional[date],
         end_date: Optional[date],
-        compartments: Optional[List[StrictStr]],
+        compartments: Optional[StrictStr],
         # aggregations: Optional[Dict[str, Dict[str, List[StrictStr]]]],
-        groups: Optional[List[StrictStr]],
-        percentiles: Annotated[Optional[List[Union[StrictFloat, StrictInt]]], Field(description="Requested percentiles of the data")],
+        groups: Optional[StrictStr],
+        percentiles: Optional[StrictStr],
     ) -> List[Infectiondata]:
         """Get scenario&#39;s infection data based on specified filters."""
         return scenario_get_data_by_filter(
-            scenarioId,
-            nodes,
-            start_date,
-            end_date,
-            compartments,
+            scenarioId=scenarioId,
+            nodes=[StrictStr(node) for node in nodes.split(',')] if nodes else None,
+            start_date=start_date,
+            end_date=end_date,
+            compartments=[StrictStr(comp) for comp in compartments.split(',')] if compartments else None,
             # aggregations,
-            groups,
-            percentiles
+            groups=[StrictStr(group) for group in groups.split(',')] if groups else None,
+            percentiles=[StrictInt(perc) for perc in percentiles.split(',')] if percentiles else [StrictInt(50)]
         )
 
     async def import_scenario_data(

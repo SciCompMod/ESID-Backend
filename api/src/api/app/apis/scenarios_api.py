@@ -81,14 +81,14 @@ async def delete_scenario(
 )
 async def get_infection_data(
     scenarioId: StrictStr = Path(..., description=""),
-    nodes: Annotated[Optional[List[StrictStr]], Field(description="Comma separated list of NodeIds or NUTS")] = Query(None, description="Comma separated list of NodeIds or NUTS", alias="nodes"),
+    nodes: Annotated[Optional[StrictStr], Field(description="Comma separated list of NodeIds")] = Query(None, description="Comma separated list of NodeIds or NUTS", alias="nodes"),
     start_date: Annotated[Optional[date], Field(description="Start date of requested data")] = Query(None, description="Start date of requested data", alias="startDate"),
     end_date: Annotated[Optional[date], Field(description="End date of requested data")] = Query(None, description="End date of requested data", alias="endDate"),
-    compartments: Annotated[Optional[List[StrictStr]], Field(description="Comma separated list of Compartment IDs")] = Query(None, description="Comma separated list of Compartment IDs", alias="compartments"),
+    compartments: Annotated[Optional[StrictStr], Field(description="Comma separated list of Compartment IDs")] = Query(None, description="Comma separated list of Compartment IDs", alias="compartments"),
     #aggregations: Annotated[Optional[Dict[str, Dict[str, List[StrictStr]]]], Field(description="Object with named (key) lists of compartment tags (value, AND connected)")] = Query(None, description="Object with named (key) lists of compartment tags (value, AND connected)", alias="aggregations"),
     # TODO deepObject not supported by fastapi yet, wait for https://github.com/fastapi/fastapi/pull/9867 or do custom string based solution ¯\_(ツ)_/¯
-    groups: Annotated[Optional[List[StrictStr]], Field(description="List of groups requesting data for")] = Query(None, description="List of groups requesting data for", alias="groups"),
-    percentiles: Annotated[Optional[List[StrictInt]], Field(description="Requested percentiles of the data")] = Query(None, description="Requested percentiles of the data", alias="percentiles"),
+    groups: Annotated[Optional[StrictStr], Field(description="Comma separated list of groups requesting data for")] = Query(None, description="List of groups requesting data for", alias="groups"),
+    percentiles: Annotated[Optional[StrictStr], Field(description="Comma separated list of requested percentiles of the data")] = Query(None, description="Requested percentiles of the data", alias="percentiles"),
     token_bearerAuth: TokenModel = Security(
         get_token_bearerAuth
     ),
