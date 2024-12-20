@@ -565,9 +565,9 @@ def scenario_get_data_by_filter(
     if nodes:
         query = query.where(db.ScenarioDatapoint.nodeId.in_(nodes))
     if start_date:
-        query = query.where(datetime.date(db.ScenarioDatapoint.timestamp) >= start_date)
+        query = query.where(db.ScenarioDatapoint.timestamp >= datetime.combine(start_date, datetime.time()))
     if end_date:
-        query = query.where(datetime.date(db.ScenarioDatapoint.timestamp) <= end_date)
+        query = query.where(db.ScenarioDatapoint.timestamp <= datetime.combine(end_date, datetime.time()))
     if compartments:
         query = query.where(db.ScenarioDatapoint.compartmentId.in_(compartments))
     if groups:
