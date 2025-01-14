@@ -564,6 +564,12 @@ def scenario_delete(id: StrictStr) -> None:
         ).all()
         for entry in entries:
             session.delete(entry)
+        # Delete all datapoints associated to the scenario
+        data: List[db.ScenarioDatapoint] = session.exec(
+            select(db.ScenarioDatapoint).where(db.ScenarioDatapoint.scenarioId == id)
+        ).all()
+        for point in data:
+            session.delete(point)
         session.commit()
     return
 
