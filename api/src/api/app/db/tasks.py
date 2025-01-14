@@ -405,9 +405,7 @@ def scenario_create(scenario: Scenario) -> ID:
         endDate=scenario.end_date,
         modelId=scenario.model_id,
         nodeListId=scenario.node_list_id,
-        # modelParameters=scenario.model_parameters          Links for ParameterValue
-        # linkedInterventions=scenario.linked_interventions  Links for InterventionImplementations
-        percentiles=','.join(scenario.percentiles) if scenario.percentiles else '50',
+        percentiles=','.join(str(scenario.percentiles)) if scenario.percentiles else '50',
         timestampSubmitted=datetime.now(),
         timestampSimulated=None,
     )
@@ -428,13 +426,14 @@ def scenario_create(scenario: Scenario) -> ID:
         ).one_or_none()
         if not nodelist:
             message['nodeListID'] = 'A nodelist with this ID does not exist'
-        # validate interventions
-        foundInterventions: List[db.InterventionTemplate] = session.exec(
-            select(db.InterventionTemplate).where(db.InterventionTemplate.id.in_([intervention.intervention_id for intervention in scenario.linked_interventions]))
-        ).all()
-        if not len(foundInterventions) == len(scenario.linked_interventions):
-            wrongInterventions = list(set([intervention.intervention_id for intervention in scenario.linked_interventions]).difference([str(intervention.id) for intervention in foundInterventions]))
-            message['linkedInterventions'] = 'One or more linked interventions do not exist in intervention template table. Unknown interventions: {}'.format(', '.join(wrongInterventions))
+        # validate interventions (if there are any)
+        if scenario.linked_interventions:
+            foundInterventions: List[db.InterventionTemplate] = session.exec(
+                select(db.InterventionTemplate).where(db.InterventionTemplate.id.in_([intervention.intervention_id for intervention in scenario.linked_interventions]))
+            ).all()
+            if not len(foundInterventions) == len(scenario.linked_interventions):
+                wrongInterventions = list(set([intervention.intervention_id for intervention in scenario.linked_interventions]).difference([str(intervention.id) for intervention in foundInterventions]))
+                message['linkedInterventions'] = 'One or more linked interventions do not exist in intervention template table. Unknown interventions: {}'.format(', '.join(wrongInterventions))
         # validate parameters
         if model:
             # check each parameter matches model parameters
@@ -458,14 +457,15 @@ def scenario_create(scenario: Scenario) -> ID:
         
         # Otherwise create Scenario & Link Table entries
         session.add(scenario_obj)
-        # Intervention Implementation Links
-        session.add_all([db.InterventionImplementation(
-                scenarioId=scenario_obj.id,
-                interventionId=intervention.intervention_id,
-                startDate=intervention.start_date,
-                endDate=intervention.end_date,
-                coefficient=intervention.coefficient,
-            ) for intervention in scenario.linked_interventions])
+        # Intervention Implementation Links (if there are interventions)
+        if scenario.linked_interventions:
+            session.add_all([db.InterventionImplementation(
+                    scenarioId=scenario_obj.id,
+                    interventionId=intervention.intervention_id,
+                    startDate=intervention.start_date,
+                    endDate=intervention.end_date,
+                    coefficient=intervention.coefficient,
+                ) for intervention in scenario.linked_interventions])
         # Parameter Value Links
         for parameter in scenario.model_parameters:
             session.add(db.ParameterValue(
