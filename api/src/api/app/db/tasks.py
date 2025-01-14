@@ -546,6 +546,24 @@ def scenario_delete(id: StrictStr) -> None:
         if not scenario:
             raise HTTPException(status_code=404, detail='A scenario with this ID does not exist')
         session.delete(scenario)
+        # Delete Intervention Implementations for this scenario
+        interventions: List[db.InterventionImplementation] = session.exec(
+            select(db.InterventionImplementation).where(db.InterventionImplementation.scenarioId == id)
+        ).all()
+        for intervention in interventions:
+            session.delete(intervention)
+        # Delete Parameter Values for this scenario
+        parameters: List[db.ParameterValue] = session.exec(
+            select(db.ParameterValue).where(db.ParameterValue.scenarioId == id)
+        ).all()
+        for param in parameters:
+            session.delete(param)
+        # Delete Parameter Value Entries tied to the parameter values (also found by scenario id due to composite key)
+        entries: List[db.ParameterValueEntry] = session.exec(
+            select(db.ParameterValueEntry).where(db.ParameterValueEntry.parameterValueIdScenario == id)
+        ).all()
+        for entry in entries:
+            session.delete(entry)
         session.commit()
     return
 
