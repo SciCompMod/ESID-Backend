@@ -545,7 +545,7 @@ def scenario_delete(id: StrictStr) -> None:
         scenario: db.Scenario = session.exec(query).one_or_none()
         if not scenario:
             raise HTTPException(status_code=404, detail='A scenario with this ID does not exist')
-        session.delete(scenario)
+        
         # Delete Intervention Implementations for this scenario
         interventions: List[db.InterventionImplementation] = session.exec(
             select(db.InterventionImplementation).where(db.InterventionImplementation.scenarioId == id)
@@ -570,6 +570,9 @@ def scenario_delete(id: StrictStr) -> None:
         ).all()
         for point in data:
             session.delete(point)
+
+        # Finally delete scenario
+        session.delete(scenario)
         session.commit()
     return
 
