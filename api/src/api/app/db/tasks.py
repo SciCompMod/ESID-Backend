@@ -405,7 +405,7 @@ def scenario_create(scenario: Scenario) -> ID:
         endDate=scenario.end_date,
         modelId=scenario.model_id,
         nodeListId=scenario.node_list_id,
-        percentiles=','.join(str(scenario.percentiles)) if scenario.percentiles else '50',
+        percentiles=','.join([str(perc) for perc in scenario.percentiles]) if scenario.percentiles else '50',
         timestampSubmitted=datetime.now(),
         timestampSimulated=None,
     )
