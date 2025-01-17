@@ -2,6 +2,7 @@
 
 from typing import ClassVar, Dict, List, Tuple  # noqa: F401
 from datetime import date, timedelta
+import uuid
 import zipfile
 import aiofiles
 import asyncio
@@ -221,9 +222,9 @@ class ScenarioController:
                             # Create Datapoint from infos
                             datapoints.append(Infectiondata(
                                 date=infos.scenario.start_date + timedelta(days=dayoffset),
-                                node=next((n.id for n in infos.nodes if n.nuts == node.zfill(6)), node.zfill(6)),
-                                group=next((g.id for g in infos.groups if g.name == group), group),
-                                compartment=next((c for c in infos.compartments if c.name == CompartmentNames[compartment]), CompartmentNames[compartment]),
+                                node=next((n.id for n in infos.nodes if n.nuts == node.zfill(6)), None),
+                                group=next((g.id for g in infos.groups if g.name == group), None),
+                                compartment=next((c for c in infos.compartments if c.name == CompartmentNames[compartment]), None),
                                 percentile=percentile,
                                 value=value
                             ))
