@@ -33,7 +33,7 @@ class GroupsController:
 
     async def getAll(
             self
-        ) -> List[ID]:
+        ) -> List[Group]:
         """List all (stratification) groups."""
         return group_get_all()
 

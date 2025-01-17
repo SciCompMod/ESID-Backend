@@ -10,6 +10,7 @@ from fastapi import (  # noqa: F401
     Body,
     Cookie,
     Depends,
+    File,
     Form,
     Header,
     HTTPException,
@@ -18,6 +19,7 @@ from fastapi import (  # noqa: F401
     Response,
     Security,
     status,
+    UploadFile,
 )
 
 from app.models.extra_models import TokenModel  # noqa: F401
@@ -124,14 +126,14 @@ async def get_scenario(
     response_model_by_alias=True,
 )
 async def import_scenario_data(
-    scenarioId: StrictStr = Path(..., description=""),
-    body: Optional[Union[StrictBytes, StrictStr, Tuple[StrictStr, StrictBytes]]] = Body(None, description=""),
+    scenarioId: StrictStr = Path(..., description="UUID of the scenario"),
+    file: UploadFile = File(None, description="zipped HDF5 files of the simulation results"),
     token_bearerAuth: TokenModel = Security(
         get_token_bearerAuth
     ),
 ) -> ID:
     """Supply simulation data for a scenario."""
-    return await controller.import_scenario_data(scenarioId, body)
+    return await controller.import_scenario_data(scenarioId, file)
 
 
 @router.get(

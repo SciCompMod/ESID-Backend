@@ -86,7 +86,7 @@ def group_delete_by_id(id: StrictStr) -> None:
         session.commit()
     return
 
-def group_get_all() -> List[ID]:
+def group_get_all() -> List[Group]:
     query = select(db.Group)
     with next(get_session()) as session:
         groups: List[db.Group] = session.exec(query).all()
@@ -259,6 +259,16 @@ def node_get_all() -> List[Node]:
     query = select(db.Node)
     with next(get_session()) as session:
         nodes: List[db.Node] = session.exec(query).all()
+    return [Node(
+        id=str(node.id),
+        nuts=node.nuts,
+        name=node.name,
+    ) for node in nodes]
+
+def node_get_by_list(id: StrictStr) -> List[Node]:
+    query = select(db.Node).where(db.Node.id.in_(select(db.NodeListNodeLink.nodeId).where(db.NodeListNodeLink.listId == id)))
+    with next(get_session()) as session:
+        nodes: List[Node] = session.exec(query).all()
     return [Node(
         id=str(node.id),
         nuts=node.nuts,
@@ -613,3 +623,20 @@ def scenario_get_data_by_filter(
         percentile=point.percentile,
         value=point.value
     ) for point in datapoints]
+
+def datapoint_create_batch(
+    scenarioId: StrictStr,
+    datapoints: List[Infectiondata]
+) -> None:
+    with next(get_session()) as session:
+        session.add_all([db.ScenarioDatapoint(
+            scenarioId=scenarioId,
+            timestamp=datetime.combine(dp.var_date, time.min),
+            nodeId=dp.node,
+            groupId=dp.group,
+            compartmentId=dp.compartment,
+            percentile=dp.percentile,
+            value=dp.value
+        ) for dp in datapoints])
+        session.commit()
+    return
