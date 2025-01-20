@@ -110,7 +110,7 @@ class ScenarioController:
             compartments=[StrictStr(comp) for comp in compartments.split(',')] if compartments else None,
             # aggregations,
             groups=[StrictStr(group) for group in groups.split(',')] if groups else None,
-            percentiles=[StrictInt(perc) for perc in percentiles.split(',')] if percentiles else [StrictInt(50)]
+            percentiles=[StrictInt(perc) for perc in percentiles.split(',')] if percentiles else None
         )
 
     async def import_scenario_data(
