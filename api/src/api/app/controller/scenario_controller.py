@@ -264,7 +264,7 @@ class ScenarioController:
                         # validate compartments
                         if not is_compartments_validated:
                             infoCompartments: Set[StrictStr] = set([icomp.name for icomp in infos.compartments])
-                            fileCompartments: Set[str] = set([str(fcomp) for fcomp, _ in enumerate(compartments)])
+                            fileCompartments: Set[str] = set([CompartmentNames[fcomp] for fcomp, _ in enumerate(compartments)])
                             if not fileCompartments.issubset(infoCompartments):
                                 raise Exception({
                                     'percentile': percentile,
