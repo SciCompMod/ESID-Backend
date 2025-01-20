@@ -224,7 +224,7 @@ class ScenarioController:
                                 date=infos.scenario.start_date + timedelta(days=dayoffset),
                                 node=next((n.id for n in infos.nodes if n.nuts == node.zfill(6)), None),
                                 group=next((g.id for g in infos.groups if g.name == group), None),
-                                compartment=next((c for c in infos.compartments if c.name == CompartmentNames[compartment]), None),
+                                compartment=next((c.id for c in infos.compartments if c.name == CompartmentNames[compartment]), None),
                                 percentile=percentile,
                                 value=value
                             ))
