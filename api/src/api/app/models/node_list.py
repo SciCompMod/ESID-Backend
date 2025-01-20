@@ -17,7 +17,7 @@ import pprint
 import re  # noqa: F401
 import json
 import uuid
-
+from app.models.node import Node
 
 
 
@@ -95,3 +95,6 @@ class NodeList(BaseModel):
             "nodeIds": obj.get("nodeIds")
         })
         return _obj
+
+class NodeListWithNodes(NodeList):
+    node_ids: List[Node] = Field(alias='nodeIds')

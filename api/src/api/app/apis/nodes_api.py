@@ -22,7 +22,7 @@ from app.models.extra_models import TokenModel  # noqa: F401
 from app.models.error import Error
 from app.models.id import ID
 from app.models.node import Node
-from app.models.node_list import NodeList
+from app.models.node_list import NodeList, NodeListWithNodes
 from app.models.reduced_info import ReducedInfo
 from security_api import get_token_bearerAuth
 
@@ -109,7 +109,7 @@ async def delete_node_list(
 @router.get(
     "/nodelists/{nodeListId}",
     responses={
-        200: {"model": NodeList, "description": "Returned the node list."},
+        200: {"model": NodeListWithNodes, "description": "Returned the node list."},
     },
     tags=["Nodes"],
     response_model_by_alias=True,
@@ -119,7 +119,7 @@ async def get_node_list(
     token_bearerAuth: TokenModel = Security(
         get_token_bearerAuth
     ),
-) -> NodeList:
+) -> NodeListWithNodes:
     """Get specified node list."""
     return await controller.get_node_list(nodeListId)
 
