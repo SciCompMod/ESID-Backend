@@ -234,6 +234,7 @@ class ScenarioController:
                 if not is_groups_validated:
                     infoGroups: Set[StrictStr] = set([igroup.name for igroup in infos.groups])
                     fileGroups: Set[str] = set([str(fgroup) for fgroup in file[node].keys()])
+                    fileGroups.remove('Time')
                     if not fileGroups.issubset(infoGroups):
                         # some groups not in DB
                         raise Exception({
