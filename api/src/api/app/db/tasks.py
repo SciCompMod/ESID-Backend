@@ -631,6 +631,7 @@ def datapoint_update_all_by_scenario(
 ) -> None:
     # SQLAlchemy Statement to delete all old records
     stmt = delete(db.ScenarioDatapoint).where(db.ScenarioDatapoint.scenarioId == scenarioId)
+    query = select(db.Scenario).where(db.Scenario.id == scenarioId)
     with next(get_session()) as session:
         # Delete old datapoints
         session.exec(stmt)
@@ -644,5 +645,9 @@ def datapoint_update_all_by_scenario(
             percentile=dp.percentile,
             value=dp.value
         ) for dp in datapoints])
+        # Update timestampSimulated
+        scenario: db.Scenario = session.exec(query).one_or_none()
+        scenario.timestampSimulated = datetime.now()
+        session.add(scenario)
         session.commit()
     return
