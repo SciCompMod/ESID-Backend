@@ -8,6 +8,7 @@ import aiofiles
 import asyncio
 import h5py
 import numpy
+from json import dumps
 from pathlib import Path
 from pydantic import Field, StrictBytes, StrictFloat, StrictInt, StrictStr
 from typing import Any, Dict, List, Optional, Tuple, Union, Set
@@ -137,10 +138,11 @@ class ScenarioController:
         # Check if any percs had errors
         errors = [ex for ex in res if isinstance(ex, Exception)]
         if errors:
-            print([type(o) for o in errors])
             message = {}
             for idx, error in enumerate(errors):
                 message[idx] = error.args
+            # also post error into log
+            print('Exception in PUT scenario/\{scenarioId\}:\n', dumps(message, indent=4))
             raise HTTPException(
                 status_code=422,
                 detail=message
