@@ -39,7 +39,7 @@ from app.db.tasks import (
     group_get_all,
     compartment_get_all,
     node_get_by_list,
-    datapoint_create_batch
+    datapoint_update_all_by_scenario
 )
 
 class LookupObject:
@@ -133,17 +133,20 @@ class ScenarioController:
         info.nodes = node_get_by_list(info.scenario.node_list_id)
         # Handle h5 files for each percentile asynchronously
         res = await asyncio.gather(*[self._read_percentiles(perc, percentile_paths[perc], info) for perc in percentile_paths.keys()], return_exceptions=True)
-        print(res)
         # Check if any percs had errors
-        errors = [ex for ex in res if ex != None]
+        errors = [ex for ex in res if isinstance(ex, Exception)]
         if errors:
+            print([type(o) for o in errors])
             message = {}
-            for error in errors:
-                message = error.args
+            for idx, error in enumerate(errors):
+                message[idx] = error.args
             raise HTTPException(
                 status_code=422,
                 detail=message
             )
+        else:
+            # Flatten and send to DB
+            datapoint_update_all_by_scenario(scenarioId, numpy.concatenate(res).tolist())
         return ID(id=scenarioId)
 
 
@@ -197,7 +200,7 @@ class ScenarioController:
             percentile: int,
             path: str,
             infos: LookupObject
-    ) -> None:
+    ) -> List[Infectiondata]:
         """
         A helper function to read the h5 files of a percentile asynchronously and send it to the DB.
         Args:
@@ -214,19 +217,18 @@ class ScenarioController:
             file = h5py.File(path, "r")
             for node in file.keys():
                 for group in file[node].keys():
+                    # Skip Time group
                     if(group == 'Time'):
-                        # Skip Time group
                         continue
                     for dayoffset, compartments in enumerate(file[node][group]):
                         for compartment, value in enumerate(compartments):
                             # Create Datapoint from infos
                             datapoints.append(Infectiondata(
                                 date=infos.scenario.start_date + timedelta(days=dayoffset),
-                                node=next((n.id for n in infos.nodes if n.nuts == node.zfill(6)), None),
+                                node=next((n.id for n in infos.nodes if n.nuts == node.zfill(5)), None),
                                 group=next((g.id for g in infos.groups if g.name == group), None),
                                 compartment=next((c.id for c in infos.compartments if c.name == CompartmentNames[compartment]), None),
                                 percentile=percentile,
                                 value=value
                             ))
-        datapoint_create_batch(infos.scenario.id , datapoints)
-        return
+        return datapoints

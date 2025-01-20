@@ -16,6 +16,7 @@ from app.utils.defaultDict import County, age_groups
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import selectinload
+from sqlalchemy import delete
 from sqlmodel import select
 
 
@@ -624,11 +625,16 @@ def scenario_get_data_by_filter(
         value=point.value
     ) for point in datapoints]
 
-def datapoint_create_batch(
+def datapoint_update_all_by_scenario(
     scenarioId: StrictStr,
     datapoints: List[Infectiondata]
 ) -> None:
+    # SQLAlchemy Statement to delete all old records
+    stmt = delete(db.ScenarioDatapoint).where(db.ScenarioDatapoint.scenarioId == scenarioId)
     with next(get_session()) as session:
+        # Delete old datapoints
+        session.exec(stmt)
+        # Add new datapoints
         session.add_all([db.ScenarioDatapoint(
             scenarioId=scenarioId,
             timestamp=datetime.combine(dp.var_date, time.min),
