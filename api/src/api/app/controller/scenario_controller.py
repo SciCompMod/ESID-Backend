@@ -7,9 +7,10 @@ import zipfile
 import aiofiles
 import asyncio
 import h5py
+import numpy
 from pathlib import Path
 from pydantic import Field, StrictBytes, StrictFloat, StrictInt, StrictStr
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union, Set
 from typing_extensions import Annotated
 from fastapi import HTTPException, UploadFile
 import os
@@ -212,15 +213,64 @@ class ScenarioController:
         datapoints: List[Infectiondata] = []
 
         for path in h5_files:
-            is_validated = False
-            # validate nodes
             file = h5py.File(path, "r")
+
+            # validate nodes
+            infoNodes: Set[StrictStr] = set([inode.nuts for inode in infos.nodes])
+            fileNodes: Set[str] = set([str(fnode).zfill(5) for fnode in file.keys()])
+            if not fileNodes.issubset(infoNodes):
+                # some nodes not in db
+                raise Exception({
+                    'percentile': percentile,
+                    'unknownNodes': f'Following nodes in file not found in DB: {fileNodes.difference(infoNodes)}'
+                })
+            is_groups_validated = False
+            is_compartments_validated = False
+            is_dates_validated = False
+            
             for node in file.keys():
+
+                # validate groups:
+                if not is_groups_validated:
+                    infoGroups: Set[StrictStr] = set([igroup.name for igroup in infos.groups])
+                    fileGroups: Set[str] = set([str(fgroup) for fgroup in file[node].keys()])
+                    if not fileGroups.issubset(infoGroups):
+                        # some groups not in DB
+                        raise Exception({
+                            'percentile': percentile,
+                            'unknownGroups': f'Following groups in file not found in DB: {fileGroups.difference(infoGroups)}'
+                        })
+                    is_groups_validated = True
+
                 for group in file[node].keys():
                     # Skip Time group
                     if(group == 'Time'):
                         continue
+
+                    # validate days
+                    if not is_dates_validated:
+                        # Scenario duration according to DB
+                        idelta = (infos.scenario.end_date - infos.scenario.start_date).days
+                        if len(file[node][group]) != idelta:
+                            raise Exception({
+                                'percentile': percentile,
+                                'dateMismatch': f'Scenario duration is {idelta} days but file contains {len(file[node][group])} datapoints'
+                            })
+                        is_dates_validated = True
+
                     for dayoffset, compartments in enumerate(file[node][group]):
+
+                        # validate compartments
+                        if not is_compartments_validated:
+                            infoCompartments: Set[StrictStr] = set([icomp.name for icomp in infos.compartments])
+                            fileCompartments: Set[str] = set([str(fcomp) for fcomp, _ in enumerate(compartments)])
+                            if not fileCompartments.issubset(infoCompartments):
+                                raise Exception({
+                                    'percentile': percentile,
+                                    'unknownCompartments': f'following compartments in file not found in DB: {fileCompartments.difference(infoCompartments)}'
+                                })
+                            is_compartments_validated = True
+
                         for compartment, value in enumerate(compartments):
                             # Create Datapoint from infos
                             datapoints.append(Infectiondata(
