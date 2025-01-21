@@ -544,6 +544,7 @@ def scenario_get_all() -> List[ReducedScenario]:
         description=sc.description,
         startDate=sc.startDate,
         endDate=sc.endDate,
+        percentiles=[int(perc) for perc in sc.percentiles.split(',')],
         timestampSubmitted=sc.timestampSubmitted,
         timestampSimulated=sc.timestampSimulated,
     ) for sc in scenarios]

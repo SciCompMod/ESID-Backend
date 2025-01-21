@@ -21,7 +21,7 @@ import json
 
 
 from datetime import date, datetime
-from pydantic import BaseModel, ConfigDict, Field, StrictStr
+from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
 try:
     from typing import Self
@@ -37,6 +37,7 @@ class ReducedScenario(BaseModel):
     description: Optional[StrictStr] = Field(default=None, description="(Tooltip) Description of the object")
     start_date: Optional[date] = Field(default=None, alias="startDate", description="First date of the scenario")
     end_date: Optional[date] = Field(default=None, alias="endDate", description="Last date of the scenario")
+    percentiles: Optional[List[StrictInt]] = Field(default=None, alias="percentiles", description="List of available percentiles for this scenario")
     timestamp_submitted: Optional[datetime] = Field(default=None, alias="timestampSubmitted", description="Timestamp when the scenario was added/created")
     timestamp_simulated: Optional[datetime] = Field(default=None, alias="timestampSimulated", description="Timestamp when the scenario was finished simulating and data is available")
     __properties: ClassVar[List[str]] = ["id", "name", "description", "startDate", "endDate", "timestamp_submitted", "timestamp_simulated"]
@@ -97,6 +98,7 @@ class ReducedScenario(BaseModel):
             "description": obj.get("description"),
             "startDate": obj.get("startDate"),
             "endDate": obj.get("endDate"),
+            "percentiles": obj.get("percentiles"),
             "timestamp_submitted": obj.get("timestamp_submitted"),
             "timestamp_simulated": obj.get("timestamp_simulated"),
         })
