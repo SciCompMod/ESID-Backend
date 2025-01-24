@@ -45,6 +45,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ID'
+  /scenarios/protected:
+    post:
+      tags:
+        - Simulations
+      summary: Toy endpoint to demonstrate authorization flow
+      description: Toy hello-world like endpoint returns a message if request is authorized, no actual new scenario will be created
+      operationId: createProtectedScenario
+      responses:
+        '200':
+          description: Authorized user created scenario (fake)
+        '401':
+          description: Token is not valid or X-Realm header is missing
+        '403':
+          description: User does not have specific role
 ###############################################################################
   /scenarios/{scenarioId}:
 ############################

@@ -1,6 +1,20 @@
 import jwt
 from core.config import DOMAIN, API_AUDIENCE, ALGORITHMS, ISSUER
 
+class User():
+    """A simple user model for authentication & authorization"""
+    def __init__(self, username: str, email: str = "", role: list[str] = []):
+        self.username = username
+        self.email = email
+        self.role = role
+
+    def __str__(self):
+        return """User(username="{}", email="{}", roles=[{}])""".format(
+            self.username, self.email, ", ".join(self.role)
+        )
+
+# deprecated: Used by get_token_bearerAuth which is a temporary setup
+# now we use verify_token method in security_api.py
 class VerifyToken():
     """Does all the token verification using PyJWT"""
 

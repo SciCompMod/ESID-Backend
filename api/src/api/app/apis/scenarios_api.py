@@ -32,9 +32,19 @@ from security_api import get_token_bearerAuth
 
 from app.controller.scenario_controller import ScenarioController
 
+from security_api import get_token_bearerAuth, verify_lha_user
+from services.auth import User
+
 router = APIRouter()
 controller = ScenarioController()
 
+
+# a toy endpoint to test authorization
+@router.post(
+    "/scenarios/protected",
+    tags=["Simulations"])
+async def create_protected_scenario(user: User = Depends(verify_lha_user)) -> str:
+    return """Scenario created by {}""".format(user)
 
 @router.post(
     "/scenarios",
