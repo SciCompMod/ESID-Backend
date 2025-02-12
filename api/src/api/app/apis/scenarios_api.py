@@ -28,7 +28,6 @@ from app.models.id import ID
 from app.models.infectiondata import Infectiondata
 from app.models.reduced_scenario import ReducedScenario
 from app.models.scenario import Scenario
-from security_api import get_token_bearerAuth
 
 from app.controller.scenario_controller import ScenarioController
 
