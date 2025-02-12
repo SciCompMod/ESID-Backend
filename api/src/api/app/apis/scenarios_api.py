@@ -1,5 +1,6 @@
 # coding: utf-8
 
+import logging
 from typing import Dict, List  # noqa: F401
 from datetime import date
 from pydantic import Field, StrictBytes, StrictFloat, StrictInt, StrictStr
@@ -37,6 +38,7 @@ from services.auth import User
 router = APIRouter()
 controller = ScenarioController()
 
+log = logging.getLogger()
 
 # a toy endpoint to test authorization
 @router.post(
@@ -142,7 +144,7 @@ async def import_scenario_data(
     ),
 ) -> ID:
     """Supply simulation data for a scenario."""
-    print(f'PUT /scenarios/{scenarioId} received...')
+    log.info(f'PUT /scenarios/{scenarioId} received...')
     return await controller.import_scenario_data(scenarioId, file)
 
 
