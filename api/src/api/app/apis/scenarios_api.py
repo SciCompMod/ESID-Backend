@@ -38,7 +38,8 @@ from services.auth import User
 router = APIRouter()
 controller = ScenarioController()
 
-log = logging.getLogger('logger_sqlalchemy')
+log = logging.getLogger('API.Scenarios')
+logging.basicConfig(level=logging.INFO)
 
 # a toy endpoint to test authorization
 @router.post(
