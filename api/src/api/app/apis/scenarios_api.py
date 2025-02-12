@@ -143,6 +143,7 @@ async def import_scenario_data(
     ),
 ) -> ID:
     """Supply simulation data for a scenario."""
+    print(f'PUT /scenarios/{scenarioId} received...')
     return await controller.import_scenario_data(scenarioId, file)
 
 
