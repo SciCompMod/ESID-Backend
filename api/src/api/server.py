@@ -46,7 +46,7 @@ app.include_router(NodesApiRouter)
 app.include_router(ParameterDefinitionsApiRouter)
 app.include_router(ScenariosApiRouter)
 
-logging.getLogger('sqlalchemy.engine').setLevel(logging.WARN)
+logging.getLogger('sqlalchemy.engine.Engine').setLevel(logging.WARN)
 
 """
 @app.post("/test_celery/{message}")
