@@ -125,6 +125,8 @@ async def get_scenario(
     ),
 ) -> Scenario:
     """Get information about the specified scenario."""
+    log.info(f'GET /scenarios/{scenarioId} received...')
+    log.warning(f'GET /scenarios/{scenarioId} received...')
     return await controller.get_scenario(scenarioId)
 
 
