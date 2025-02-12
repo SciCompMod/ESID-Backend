@@ -38,7 +38,7 @@ from services.auth import User
 router = APIRouter()
 controller = ScenarioController()
 
-log = logging.getLogger()
+log = logging.getLogger('sqlalchemy.engine')
 
 # a toy endpoint to test authorization
 @router.post(
@@ -126,7 +126,7 @@ async def get_scenario(
 ) -> Scenario:
     """Get information about the specified scenario."""
     log.info(f'GET /scenarios/{scenarioId} received...')
-    log.warning(f'GET /scenarios/{scenarioId} received...')
+    log.warning(f'GET /scenarios/{scenarioId} received... [WARN]')
     return await controller.get_scenario(scenarioId)
 
 
