@@ -8,7 +8,7 @@ from typing import Any, List, Optional
 from app.models.error import Error
 from app.models.id import ID
 from app.models.node import Node
-from app.models.node_list import NodeList
+from app.models.node_list import NodeList, NodeListWithNodes
 from app.models.reduced_info import ReducedInfo
 from security_api import get_token_bearerAuth
 
@@ -56,7 +56,7 @@ class NodeController:
     async def get_node_list(
         self,
         nodeListId: StrictStr,
-    ) -> NodeList:
+    ) -> NodeListWithNodes:
         """Get specified node list."""
         return nodelist_get_by_id(nodeListId)
 

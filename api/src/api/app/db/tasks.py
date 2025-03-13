@@ -314,14 +314,18 @@ def nodelist_create(nodeList: NodeList) -> ID:
         session.refresh(list_obj)
     return ID(id=str(list_obj.id))
 
-def nodelist_get_by_id(id: StrictStr) -> NodeList:
-    query = select(db.NodeList).where(db.NodeList.id == id)
+def nodelist_get_by_id(id: StrictStr) -> NodeListWithNodes:
+    query = select(db.NodeList).where(db.NodeList.id == id).options(selectinload(db.NodeList.nodeLinks).selectinload(db.NodeListNodeLink.node))
     with next(get_session()) as session:
         nodelist: db.NodeList = session.exec(query).one_or_none()
         if not nodelist:
             raise HTTPException(status_code=404, detail='A nodelist with this ID does not exist')
-        nodeIDs: List[StrictStr] = [str(link.nodeId) for link in nodelist.nodeLinks]
-    return NodeList(
+        nodeIDs: List[Node] = [Node(
+            id=str(link.node.id),
+            nuts=link.node.nuts,
+            name=link.node.name
+            )for link in nodelist.nodeLinks]
+    return NodeListWithNodes(
         id=str(nodelist.id),
         name=nodelist.name,
         description=nodelist.description,

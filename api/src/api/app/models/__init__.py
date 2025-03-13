@@ -8,7 +8,7 @@ from .intervention_implementation import InterventionImplementation
 from .intervention_template import InterventionTemplate
 from .model import Model
 from .named import Named
-from .node_list import NodeList
+from .node_list import NodeList, NodeListWithNodes
 from .node import Node
 from .parameter_definition import ParameterDefinition
 from .parameter_value_entry import ParameterValueEntry
