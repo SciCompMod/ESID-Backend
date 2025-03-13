@@ -13,7 +13,7 @@ git clone git@github.com:DLR-SC/ESID-Backend.git
 cp .docker-env.template .docker-env
 ```
 ```
-docker compose up --build -d
+docker compose --env-file .docker-env up --build -d
 ```
 4. Perform database migrations (Create tables - on initial run)
     
