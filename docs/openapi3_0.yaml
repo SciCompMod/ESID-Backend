@@ -26,16 +26,7 @@ paths:
               schema:
                 type: array
                 items:
-                  allOf:
-                    - $ref: '#/components/schemas/ReducedInfo'
-                    - type: object
-                      properties:
-                        startDate:
-                          type: string
-                          format: date
-                        endDate:
-                          type: string
-                          format: date
+                  $ref: '#/components/schemas/ReducedScenario'
 
     post: #####################################################################
       description: Create a new scenario to be simulated.
@@ -242,11 +233,10 @@ paths:
           explode: true
           schema: 
             type: object
-            properties:
+            additionalProperties:
+              type: array
               items:
-                type: array
-                items:
-                  type: string
+                type: string
             example: {
               aggregation1: [Inf, V2],
             }
@@ -695,7 +685,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ID'
 ###############################################################################
-  /nodelists/{nodeId}:
+  /nodelists/{nodeListId}:
 ########################
     get: ######################################################################
       description: Get specified node list.
@@ -704,7 +694,7 @@ paths:
       operationId: getNodeList
       parameters:
         - in: path
-          name: nodeId
+          name: nodeListId
           required: True
           schema:
             type: string
@@ -723,7 +713,7 @@ paths:
       operationId: deleteNodeList
       parameters:
         - in: path
-          name: nodeId
+          name: nodeListId
           required: True
           schema:
             type: string
@@ -974,6 +964,8 @@ components:
 
     Named:
       type: object
+      required:
+        - name
       properties:
         name:
           type: string
@@ -986,6 +978,24 @@ components:
       allOf:
         - $ref: '#/components/schemas/ID'
         - $ref: '#/components/schemas/Named'
+
+    ReducedScenario:
+      allOf:
+        - $ref: '#/components/schemas/ReducedInfo'
+        - type: object
+          properties:
+            startDate:
+              type: string
+              format: date
+            endDate:
+              type: string
+              format: date
+            timestampSubmitted:
+              type: string
+              format: date-time
+            timestampSimulated:
+              type: string
+              format: date-time
 
     Tagged:
       type: object
@@ -1002,6 +1012,12 @@ components:
         - $ref: '#/components/schemas/ID'
         - $ref: '#/components/schemas/Named'
         - type: object
+          required:
+            - startDate
+            - endDate
+            - modelId
+            - modelParameters
+            - nodeListId
           properties:
             startDate:
               type: string
@@ -1041,6 +1057,8 @@ components:
         - $ref: '#/components/schemas/ID'
         - $ref: '#/components/schemas/Named'
         - type: object
+          required:
+            - category
           properties:
             category:
               type: string
@@ -1051,8 +1069,12 @@ components:
         - $ref: '#/components/schemas/ID'
         - $ref: '#/components/schemas/Named'
           
-    ParameterValueRange:
+    ParameterValueEntry:
       type: object
+      required:
+        - groupId
+        - valueMin
+        - valueMax
       properties:
         groupId:
           type: string
@@ -1071,6 +1093,7 @@ components:
       type: object
       required:
         - parameterId
+        - values
       properties:
         parameterId:
           type: string
@@ -1080,7 +1103,7 @@ components:
           type: array
           description: List of values for each group (values)
           items:
-             $ref: '#/components/schemas/ParameterValueRange'
+             $ref: '#/components/schemas/ParameterValueEntry'
 
     Model:
       allOf:
@@ -1088,9 +1111,9 @@ components:
         - $ref: '#/components/schemas/Named'
         - type: object
           required:
+            - compartments
             - groups
             - parameterDefinitions
-            - compartments
           properties:
             compartments:
               type: array
@@ -1130,11 +1153,14 @@ components:
         - $ref: '#/components/schemas/ID'
         - $ref: '#/components/schemas/Named'
         - type: object
+          required:
+            - nodeIds
           properties:
             nodeIds:
               type: array
               items:
-                $ref: '#/components/schemas/Node'
+                type: string
+                format: uuid
 
     InterventionTemplate:
       allOf:
@@ -1146,6 +1172,8 @@ components:
       type: object
       required:
         - intervention_id
+        - startDate
+        - endDate
         - coefficient
       properties:
         interventionId:
@@ -1212,7 +1240,7 @@ components:
         node: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
         group: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
         compartment: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
-        aggregation: 'aggregationName'
+        aggregation: 'aggregation1'
         values:
           '25': 0
           '50': 0
@@ -1228,7 +1256,7 @@ components:
     Error:
       type: object
       required:
-        - error
+        - detail
       properties:
-        error:
+        detail:
           type: string

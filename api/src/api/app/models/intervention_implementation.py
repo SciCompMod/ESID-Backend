@@ -16,27 +16,27 @@ from __future__ import annotations
 import pprint
 import re  # noqa: F401
 import json
-import uuid
-from app.models.node import Node
 
 
 
-from pydantic import BaseModel, ConfigDict, Field, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional
+
+from datetime import date
+from pydantic import BaseModel, ConfigDict, Field, StrictFloat, StrictInt, StrictStr
+from typing import Any, ClassVar, Dict, List, Optional, Union
 try:
     from typing import Self
 except ImportError:
     from typing_extensions import Self
 
-class NodeList(BaseModel):
+class InterventionImplementation(BaseModel):
     """
-    NodeList
+    InterventionImplementation
     """ # noqa: E501
-    id: Optional[StrictStr] = Field(default_factory=uuid.uuid4)
-    name: StrictStr = Field(description="Display Name of the object")
-    description: Optional[StrictStr] = Field(default=None, description="(Tooltip) Description of the object")
-    node_ids: List[StrictStr] = Field(alias="nodeIds")
-    __properties: ClassVar[List[str]] = ["id", "name", "description", "nodeIds"]
+    intervention_id: Optional[StrictStr] = Field(default=None, alias="interventionId")
+    start_date: date = Field(alias="startDate")
+    end_date: date = Field(alias="endDate")
+    coefficient: Union[StrictFloat, StrictInt]
+    __properties: ClassVar[List[str]] = ["interventionId", "startDate", "endDate", "coefficient"]
 
     model_config = {
         "populate_by_name": True,
@@ -56,7 +56,7 @@ class NodeList(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Self:
-        """Create an instance of NodeList from a JSON string"""
+        """Create an instance of InterventionImplementation from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -68,12 +68,10 @@ class NodeList(BaseModel):
         * `None` is only added to the output dict for nullable fields that
           were set at model initialization. Other fields with value `None`
           are ignored.
-        * OpenAPI `readOnly` fields are excluded.
         """
         _dict = self.model_dump(
             by_alias=True,
             exclude={
-                "id",
             },
             exclude_none=True,
         )
@@ -81,7 +79,7 @@ class NodeList(BaseModel):
 
     @classmethod
     def from_dict(cls, obj: Dict) -> Self:
-        """Create an instance of NodeList from a dict"""
+        """Create an instance of InterventionImplementation from a dict"""
         if obj is None:
             return None
 
@@ -89,12 +87,11 @@ class NodeList(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "id": obj.get("id"),
-            "name": obj.get("name"),
-            "description": obj.get("description"),
-            "nodeIds": obj.get("nodeIds")
+            "interventionId": obj.get("interventionId"),
+            "startDate": obj.get("startDate"),
+            "endDate": obj.get("endDate"),
+            "coefficient": obj.get("coefficient")
         })
         return _obj
 
-class NodeListWithNodes(NodeList):
-    node_ids: List[Node] = Field(alias='nodeIds')
+

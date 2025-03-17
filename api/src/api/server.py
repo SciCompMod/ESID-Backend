@@ -16,14 +16,13 @@ import logging
 from fastapi import FastAPI
 
 from fastapi.middleware.cors import CORSMiddleware
-from app.apis.interventions_api import router as InterventionsApiRouter
+from app.apis.compartments_api import router as CompartmentsApiRouter
 from app.apis.groups_api import router as GroupsApiRouter
+from app.apis.interventions_api import router as InterventionsApiRouter
 from app.apis.models_api import router as ModelsApiRouter
-from app.apis.movements_api import router as MovementsApiRouter
 from app.apis.nodes_api import router as NodesApiRouter
 from app.apis.parameter_definitions_api import router as ParameterDefinitionsApiRouter
-from app.apis.simulations_api import router as SimulationsApiRouter
-from app.apis.aggregations_api import router as AggregationsApiRouter
+from app.apis.scenarios_api import router as ScenariosApiRouter
 
 app = FastAPI(
     title="Pandemos",
@@ -39,14 +38,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(CompartmentsApiRouter)
 app.include_router(GroupsApiRouter)
 app.include_router(InterventionsApiRouter)
 app.include_router(ModelsApiRouter)
-app.include_router(MovementsApiRouter)
 app.include_router(NodesApiRouter)
 app.include_router(ParameterDefinitionsApiRouter)
-app.include_router(SimulationsApiRouter)
-app.include_router(AggregationsApiRouter)
+app.include_router(ScenariosApiRouter)
 
 """
 @app.post("/test_celery/{message}")

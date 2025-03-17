@@ -13,21 +13,25 @@ git clone git@github.com:DLR-SC/ESID-Backend.git
 cp .docker-env.template .docker-env
 ```
 ```
-docker-compose up --build -d
+docker compose --env-file .docker-env up --build -d
 ```
 4. Perform database migrations (Create tables - on initial run)
     
 * Generate code for migration
 
 ```
-docker-compose exec api alembic revision --autogenerate -m "Create all tables"
+docker compose exec api alembic revision --autogenerate -m "Create all tables"
 ```
 
 * Execute the migration
 
 ```
-docker-compose exec api alembic upgrade head
+docker compose exec api alembic upgrade head
 ```
+
+> [!NOTE]  
+> In older docker compose versions you may need to provide the .env file in each command (3 & 4) because the file is not recognized in the docker-compose.yml  
+> In this case add `--env-file .docker-env` directly after `docker compose` and before the rest of the commands
 
 ## API
 Goto http://localhost:8000
@@ -40,6 +44,11 @@ http://localhost:8000/docs
 ## Project Setup
 ### Docker
 Follow steps 1-3 from Deployment - Setup the Project.
+
+You can use `docker compose logs -f` to get a feed of the container logs.
+
+`docker compose logs -f api db` to only see logs for the api & db containers.
+
 watchgod will automatically restart the docker-ized Application with each code change.
 
 ## Development

@@ -21,9 +21,9 @@ services:
       - .docker-env
     volumes:
       - ./src/api/:/api
-      - ${PWD}/input:/api/input/
+      - ${VOLUME_DIR}/input:/api/input/
     ports:
-      - "8000:8000"
+      - ${API_PORT}:8000
     depends_on:
       - redis
     extra_hosts:
@@ -32,26 +32,26 @@ services:
     restart: always
     image: redis
     volumes:
-      - redis_data:/var/lib/redis/data
+      - ${VOLUME_DIR}/redis_data:/var/lib/redis/data
     networks:
       - backnet
   db:
     restart: always
     image: postgres:latest
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - ${VOLUME_DIR}/postgres_data:/var/lib/postgresql/data/
     env_file:
       - .docker-env
     networks:
       - backnet
     ports:
-      - 5433:5432
+      - ${DB_PORT}:5432
 
 networks:
   backnet:
 
-volumes:
-  input:
-  output:
-  postgres_data:
-  redis_data:
+# volumes:
+#   input:
+#   output:
+#   postgres_data:
+#   redis_data:

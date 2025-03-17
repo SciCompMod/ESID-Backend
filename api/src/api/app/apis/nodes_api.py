@@ -1,7 +1,8 @@
 # coding: utf-8
 
 from typing import Dict, List  # noqa: F401
-
+from pydantic import StrictStr
+from typing import Any, List, Optional
 from fastapi import (  # noqa: F401
     APIRouter,
     Body,
@@ -9,6 +10,7 @@ from fastapi import (  # noqa: F401
     Depends,
     Form,
     Header,
+    HTTPException,
     Path,
     Query,
     Response,
@@ -17,16 +19,17 @@ from fastapi import (  # noqa: F401
 )
 
 from app.models.extra_models import TokenModel  # noqa: F401
+from app.models.error import Error
 from app.models.id import ID
-from app.models.new_node import NewNode
-from app.models.new_node_list import NewNodeList
-from app.models.node_list import NodeList
 from app.models.node import Node
+from app.models.node_list import NodeList, NodeListWithNodes
+from app.models.reduced_info import ReducedInfo
 from security_api import get_token_bearerAuth
-from app.controller.nodes_controller import NodesController
+
+from app.controller.nodes_controller import NodeController
 
 router = APIRouter()
-nodes_controller = NodesController()
+controller = NodeController()
 
 
 @router.post(
@@ -38,121 +41,110 @@ nodes_controller = NodesController()
     response_model_by_alias=True,
 )
 async def create_node(
-    new_node: NewNode = Body(None, description=""),
+    node: Node = Body(None, description=""),
     token_bearerAuth: TokenModel = Security(
         get_token_bearerAuth
     ),
 ) -> ID:
-    return nodes_controller.create_new_node(new_node)
+    """Create a new node."""
+    return await controller.create_node(node)
 
 
 @router.post(
     "/nodelists",
     responses={
-        201: {"model": ID, "description": "node list created"},
+        201: {"model": ID, "description": "Created node list."},
     },
     tags=["Nodes"],
     response_model_by_alias=True,
 )
 async def create_node_list(
-    new_nodelists: NewNodeList = Body(None, description=""),
+    node_list: NodeList = Body(None, description=""),
     token_bearerAuth: TokenModel = Security(
         get_token_bearerAuth
     ),
 ) -> ID:
-    return nodes_controller.create_new_nodelist(new_nodelists)
+    """Create a new node list."""
+    return await controller.create_node_list(node_list)
 
 
 @router.delete(
-    "/nodes/{node_id}",
+    "/nodes/{nodeId}",
     responses={
-        202: {"description": "Node deleted"},
+        200: {"description": "Deleted node."},
+        409: {"model": Error, "description": "Preconditions not met. Error contains reason. May have additional properties referenced in error."},
     },
     tags=["Nodes"],
     response_model_by_alias=True,
 )
 async def delete_node(
-    node_id: str = Path(None, description=""),
+    nodeId: StrictStr = Path(..., description=""),
     token_bearerAuth: TokenModel = Security(
         get_token_bearerAuth
     ),
 ) -> None:
-    """deletes the node if it is not referenced in any list"""
-    return nodes_controller.delete_node_by_id(node_id=node_id)
+    """Delete a node."""
+    return await controller.delete_node(nodeId)
 
 
 @router.delete(
-    "/nodelists/{nodelist_id}",
+    "/nodelists/{nodeListId}",
     responses={
-        202: {"description": "NodeList deleted"},
+        200: {"description": "Deleted node list."},
+        409: {"model": Error, "description": "Preconditions not met. Error contains reason. May have additional properties referenced in error."},
     },
     tags=["Nodes"],
     response_model_by_alias=True,
 )
 async def delete_node_list(
-    nodelist_id: str = Path(None, description=""),
+    nodeListId: StrictStr = Path(..., description=""),
     token_bearerAuth: TokenModel = Security(
         get_token_bearerAuth
     ),
 ) -> None:
-    """deletes the node list"""
-    return nodes_controller.delete_nodelist_by_id(nodelist_id)
+    """Delete the specified node list."""
+    return await controller.delete_node_list(nodeListId)
 
 
 @router.get(
-    "/nodes/{node_id}",
+    "/nodelists/{nodeListId}",
     responses={
-        200: {"model": Node, "description": "return the Node"},
-    },
-    tags=["Nodes"],
-    response_model_by_alias=True,
-)
-async def get_node(
-    node_id: str = Path(None, description=""),
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
-) -> Node:
-    return nodes_controller.get_node_by_id(node_id=node_id)
-
-
-@router.get(
-    "/nodelists/{nodelist_id}",
-    responses={
-        200: {"model": List[str], "description": "return the Node"},
+        200: {"model": NodeListWithNodes, "description": "Returned the node list."},
     },
     tags=["Nodes"],
     response_model_by_alias=True,
 )
 async def get_node_list(
-    nodelist_id: str = Path(None, description=""),
+    nodeListId: StrictStr = Path(..., description=""),
     token_bearerAuth: TokenModel = Security(
         get_token_bearerAuth
     ),
-) -> List[str]:
-    return nodes_controller.get_nodelist_by_id(nodelist_id=nodelist_id)
+) -> NodeListWithNodes:
+    """Get specified node list."""
+    return await controller.get_node_list(nodeListId)
 
 
 @router.get(
     "/nodelists",
     responses={
-        200: {"model": NewNodeList, "description": "return all defined nodelists"},
+        200: {"model": List[ReducedInfo], "description": "Returned all defined node lists"},
     },
     tags=["Nodes"],
     response_model_by_alias=True,
 )
-async def get_node_lists(
+async def list_node_lists(
     token_bearerAuth: TokenModel = Security(
         get_token_bearerAuth
     ),
-) -> NewNodeList:
-    return nodes_controller.get_all_nodelists()
+) -> List[ReducedInfo]:
+    """List defined node lists."""
+    return await controller.list_node_lists()
 
 
 @router.get(
     "/nodes",
     responses={
-        200: {"model": List[str], "description": "return the account"},
+        200: {"model": List[Node], "description": "Returned list of nodes"},
     },
     tags=["Nodes"],
     response_model_by_alias=True,
@@ -161,5 +153,6 @@ async def list_nodes(
     token_bearerAuth: TokenModel = Security(
         get_token_bearerAuth
     ),
-) -> List[str]:
-    return nodes_controller.get_all_nodes()
+) -> List[Node]:
+    """List all available nodes."""
+    return await controller.list_nodes()
