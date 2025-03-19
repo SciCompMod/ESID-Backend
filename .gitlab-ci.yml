@@ -8,7 +8,7 @@ build_docker_image:
   tags:
     - shell
   script:
-    - echo "Building docker images ...""
+    - echo "Building docker images ..."
     - echo "Building api:"
     - docker image build -t esid/backend-api:latest api/src/api
     - echo "Building worker:"
