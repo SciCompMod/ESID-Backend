@@ -1,43 +1,7 @@
 
-Skip to content
-Pull requests
-Issues
-Codespaces
-Marketplace
-Explore
-@slymon
-github /
-gitignore
-Public
+# IDE workspace/project files
+*.code-workspace
 
-Fork your own copy of github/gitignore
-
-Code
-Pull requests 373
-Actions
-Security
-
-    Insights
-
-gitignore/Python.gitignore
-@astrojuanlu
-astrojuanlu Update Python.gitignore
-Latest commit 8e67b94 Feb 20, 2022
-History
-90 contributors
-@arcresu
-@shiftkey
-@jwg4
-@astrojuanlu
-@GabrielC101
-@misaelnieto
-@pmsosa
-@svkampen
-@vltr
-@thedrow
-@matheussl
-@Lucretiel
-160 lines (131 sloc) 3.01 KB
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -198,3 +162,7 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+.DS_Store
+
+# DB migration files
+api/src/api/app/db/migrations/versions/*.py

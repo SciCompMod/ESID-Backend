@@ -1,0 +1,1262 @@
+openapi: 3.0.0
+info:
+  title: Pandemos
+  description: >-
+    API for visualization of Infection Models
+  version: "1"
+security:
+  - bearerAuth: []
+servers:
+  - url: 'https://api.example.com/api/v0'
+  - url: 'http://localhost:8000/'
+paths:
+###############################################################################
+  /scenarios:
+##############
+    get: ######################################################################
+      description: List all available scenarios.
+      tags:
+        - Scenarios
+      operationId: listScenarios
+      responses:
+        '200':
+          description: Returned list of scenario IDs.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReducedScenario'
+
+    post: #####################################################################
+      description: Create a new scenario to be simulated.
+      tags:
+        - Scenarios
+      operationId: createScenario # fka: createSimulations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Scenario'
+      responses:
+        '201':
+          description: Created new scenario.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ID'
+  /scenarios/protected:
+    post:
+      tags:
+        - Simulations
+      summary: Toy endpoint to demonstrate authorization flow
+      description: Toy hello-world like endpoint returns a message if request is authorized, no actual new scenario will be created
+      operationId: createProtectedScenario
+      responses:
+        '200':
+          description: Authorized user created scenario (fake)
+        '401':
+          description: Token is not valid or X-Realm header is missing
+        '403':
+          description: User does not have specific role
+###############################################################################
+  /scenarios/{scenarioId}:
+############################
+    get: ######################################################################
+      description: Get information about the specified scenario.
+      tags:
+        - Scenarios
+      operationId: getScenario
+      parameters:
+        - in: path
+          name: scenarioId
+          required: True
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Returned scenario.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Scenario'
+    delete: ###################################################################
+      description: Delete the Scenario and its data
+      tags:
+        - Scenarios
+      operationId: deleteScenario
+      parameters:
+        - in: path
+          name: scenarioId
+          required: True
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Deleted scenario.
+        '409':
+          description: Preconditions not met. Error contains reason. May have additional properties referenced in error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put: ######################################################################
+      description: Supply simulation data for a scenario.
+      tags:
+        - Scenarios
+      operationId: importScenarioData # fka: triggerSimulationRun
+      parameters:
+          - in: path
+            name: scenarioId
+            required: True
+            schema:
+              type: string
+              format: uuid
+      requestBody: 
+        content: 
+          application/zip:
+            schema: 
+              type: string
+              format: binary
+      responses:
+        '201':
+          description: Added data to scenario.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ID'
+###############################################################################
+#  /scenarios/{scenarioId}/simulations/{runId}:
+#    get:
+#      tags:
+#        - Scenarios
+#      operationId: getSimulationRunStatus
+#      parameters:
+#        - in: path
+#          name: scenarioId
+#          required: True
+#          schema:
+#            type: string
+#            format: uuid
+#        - in: path
+#          name: runId
+#          required: True
+#          schema:
+#            type: string
+#            format: uuid
+#          
+#      responses:
+#        '200':
+#          description: return the simulation run status
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/SimulationRunStatus'
+#    delete:
+#      tags:
+#        - Scenarios
+#      operationId: deleteSimulationRun
+#      parameters:
+#        - in: path
+#          name: scenarioId
+#          required: True
+#          schema:
+#            type: string
+#            format: uuid
+#        - in: path
+#          name: runId
+#          required: True
+#          schema:
+#            type: string
+#            format: uuid
+#      description: deletes the run
+#      responses:
+#        '202':
+#          description: run deleted
+###############################################################################
+  /scenarios/{scenarioId}/infectiondata:
+##########################################
+    get: ######################################################################
+      description: Get scenario's infection data based on specified filters.
+      tags:
+        - Scenarios
+      operationId: getInfectionData
+      parameters:
+        - in: path
+          name: scenarioId
+          required: True
+          schema: 
+            type: string
+            format: uuid
+        - in: query
+          name: nodes
+          required: false
+          description: Comma separated list of NodeIds or NUTS
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: startDate
+          required: false
+          description: Start date of requested data
+          schema:
+            type: string
+            format: date
+            example: '2024-01-01'
+        - in: query
+          name: endDate
+          required: false
+          description: End date of requested data
+          schema:
+            type: string
+            format: date
+            example: '2024-01-01'
+        - in: query
+          name: compartments
+          required: false
+          description: Comma separated list of Compartment IDs
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+        - in: query
+          name: aggregations
+          required: false
+          description: Object with named (key) lists of compartment tags (value, AND connected)
+          style: deepObject
+          explode: true
+          schema: 
+            type: object
+            additionalProperties:
+              type: array
+              items:
+                type: string
+            example: {
+              aggregation1: [Inf, V2],
+            }
+        - in: query
+          name: groups
+          required: false
+          description: List of groups requesting data for
+          explode: false
+          schema:
+            type: array
+            items: 
+              type: string
+              format: uuid
+        - in: query
+          name: percentiles
+          required: false
+          description: Requested percentiles of the data
+          explode: false
+          schema:
+            type: array
+            items:
+              type: number
+              example: 50
+          examples:
+            default:
+              value:
+                - 25
+                - 50
+                - 75
+      responses:
+        '200':
+          description: Returned data matching filters. Unnecessary fields are omitted.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Infectiondata'
+###############################################################################
+  # /scenarios/{scenarioId}/migrations:
+  #   get:
+  #     tags: 
+  #       - Scenarios
+  #     operationId: listNodeMigrations
+  #     parameters: 
+  #       - in: path
+  #         name: scenarioId
+  #         required: True
+  #         schema: 
+  #           type: string
+  #           format: uuid
+  #       - in: path
+  #         name: runId
+  #         required: True
+  #         schema: 
+  #           type: string
+  #           format: uuid
+  #       - in: query
+  #         required: false
+  #         name: startDate
+  #         schema:
+  #           type: string
+  #       - in: query
+  #         required: false
+  #         name: endDate
+  #         schema:
+  #           type: string
+  #       - in: query
+  #         required: false
+  #         name: compartments
+  #         description: Compartment Aggregation
+  #         schema:
+  #           type: string
+  #       - in: query
+  #         required: false
+  #         name: aggregations
+  #         schema: 
+  #           type: boolean
+  #       - in: query
+  #         required: false
+  #         name: groups
+  #         schema:
+  #           type: array
+  #           items: 
+  #             type: string
+  #       - in: query
+  #         required: true
+  #         name: startNode
+  #         schema: 
+  #           type: string
+  #       - in: query
+  #         required: true
+  #         name: endNode
+  #         schema: 
+  #           type: array
+  #           items: 
+  #             type: string
+  #     responses:
+  #       '200':
+  #         description: return 
+  #         content: 
+  #           application/json:
+  #             schema: 
+  #               $ref: '#/components/schemas/NodeMigrations'
+                
+  # /scenarios/{scenarioId}/simulations/{runId}/topMigrations:
+  #   get:
+  #     tags: 
+  #       - Scenarios
+  #     operationId: getTopMigrations
+  #     parameters: 
+  #       - in: path
+  #         name: scenarioId
+  #         required: True
+  #         schema: 
+  #           type: string
+  #           format: uuid
+  #       - in: path
+  #         name: runid
+  #         required: True
+  #         schema: 
+  #           type: string
+  #           format: uuid
+  #       - in: query
+  #         name: date
+  #         required: false
+  #         schema:
+  #           type: string
+  #       - in: query
+  #         name: compartments
+  #         required: false
+  #         description: Compartment Aggregation
+  #         schema:
+  #           type: string
+  #       - in: query
+  #         name: aggregation_flag
+  #         required: false
+  #         schema: 
+  #           type: boolean
+  #       - in: query
+  #         name: groups
+  #         required: false
+  #         schema:
+  #           type: array
+  #           items: 
+  #             type: string
+  #       - in: query
+  #         name: node
+  #         required: true
+  #         schema: 
+  #           type: string
+  #       - in: query
+  #         name: count
+  #         required: false
+  #         schema:
+  #           type: number
+  #           format: integer
+  #       - in: query
+  #         name: sort
+  #         required: false
+  #         schema: 
+  #           type: string
+  #     responses:
+  #       '200':
+  #         description: return 
+  #         content: 
+  #           application/json:
+  #             schema: 
+  #               $ref: '#/components/schemas/IdList'
+
+  # /scenarios/{scenarioId}/simulations/{runId}/gridcells:
+  #   get:
+  #     tags:
+  #       - Scenarios
+  #     operationId: listGridcells
+  #     parameters:
+  #       - in: path
+  #         name: scenarioId
+  #         required: True
+  #         schema: 
+  #           type: string
+  #           format: uuid
+  #       - in: path
+  #         name: runId
+  #         required: True
+  #         schema: 
+  #           type: string
+  #           format: uuid
+  #     responses:
+  #       '200':
+  #         description: return the account
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/IdList'
+  # /scenarios/{scenarioId}/simulations/{runId}/movements:
+  #   get:
+  #     tags:
+  #       - Scenarios
+  #     operationId: listMovments
+  #     parameters:
+  #       - in: path
+  #         name: scenarioId
+  #         required: True
+  #         schema: 
+  #           type: string
+  #           format: uuid
+  #       - in: path
+  #         name: runId
+  #         required: True
+  #         schema: 
+  #           type: string
+  #           format: uuid
+  #     responses:
+  #       '200':
+  #         description: return the account
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/IdList'
+###############################################################################
+  /interventions/templates:
+##################
+    get: ######################################################################
+      description: List available Intervention templates that can be implemented.
+      tags:
+        - Interventions
+      operationId: listInterventionTemplates # fka: listInterventions
+      responses:
+        '200':
+          description: Returned the list of available templates.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InterventionTemplate'
+    post: #####################################################################
+      description: Creates a new intervention template to be used in implementations.
+      tags:
+        - Interventions
+      operationId: createInterventionTemplate # fka: createIntervention
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InterventionTemplate'
+      responses:
+        '201':
+          description: Intervention created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ID'
+###############################################################################
+  /interventions/templates/{interventionTemplateId}:
+####################################
+    delete: ###################################################################
+      description: Delete an intervention template.
+      tags:
+        - Interventions
+      operationId: deleteInterventionTemplate # fka: deleteIntervention
+      parameters:
+        - in: path
+          name: interventionTemplateId
+          required: True
+          schema:
+            format: uuid
+            type: string
+      responses:
+        '200':
+          description: Deleted template.
+        '409':
+          description: Preconditions not met. Error contains reason. May have additional properties referenced in error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+###############################################################################
+  /models:
+###########
+    get: ######################################################################
+      description: List all available simulation models.
+      tags:
+        - Models
+      operationId: listModels
+      responses:
+        '200':
+          description: Returned list of models.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReducedInfo'
+    post: #####################################################################
+      description: Create a new simulation model.
+      tags:
+        - Models
+      operationId: createModel
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Model'
+      responses:
+        '200':
+          description: Created new model.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ID'
+###############################################################################
+  /models/{modelId}:
+######################
+    get: ######################################################################
+      description: Get specific model information.
+      tags:
+        - Models
+      operationId: getModel
+      parameters:
+        - in: path
+          name: modelId
+          required: True
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Returned the list of Models.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Model'
+    delete: ###################################################################
+      description: Delete a model if it is not referenced in any scenarios.
+      tags:
+        - Models
+      operationId: deleteModel
+      parameters:
+        - in: path
+          name: modelId
+          required: True
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Model deleted.
+        '409':
+          description: Preconditions not met. Error contains reason. May have additional properties referenced in error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+###############################################################################
+  /nodes:
+##########
+    get: ######################################################################
+      description: List all available nodes.
+      tags:
+        - Nodes
+      operationId: listNodes
+      responses:
+        '200':
+          description: Returned list of nodes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Node'
+    post: #####################################################################
+      description: Create a new node.
+      tags:
+        - Nodes
+      operationId: createNode
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Node'
+      responses:
+        '201':
+          description: node created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ID'
+###############################################################################
+  /nodes/{nodeId}:
+####################
+    delete: ###################################################################
+      description: Delete a node.
+      tags:
+        - Nodes
+      operationId: deleteNode
+      parameters:
+        - in: path
+          name: nodeId
+          required: True
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Deleted node.
+        '409':
+          description: Preconditions not met. Error contains reason. May have additional properties referenced in error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+###############################################################################
+  /nodelists:
+##############
+    get: ######################################################################
+      description: List defined node lists.
+      tags:
+        - Nodes
+      operationId: listNodeLists # fka getNodeLists
+      responses:
+        '200':
+          description: Returned all defined node lists
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReducedInfo'
+    post: #####################################################################
+      description: Create a new node list.
+      tags:
+        - Nodes
+      operationId: createNodeList
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NodeList'
+      responses:
+        '201':
+          description: Created node list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ID'
+###############################################################################
+  /nodelists/{nodeListId}:
+########################
+    get: ######################################################################
+      description: Get specified node list.
+      tags:
+        - Nodes
+      operationId: getNodeList
+      parameters:
+        - in: path
+          name: nodeListId
+          required: True
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Returned the node list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NodeList'
+    delete: ###################################################################
+      description: Delete the specified node list.      
+      tags:
+        - Nodes
+      operationId: deleteNodeList
+      parameters:
+        - in: path
+          name: nodeListId
+          required: True
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Deleted node list.
+        '409':
+          description: Preconditions not met. Error contains reason. May have additional properties referenced in error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+###############################################################################
+#   /movements:
+# ##############
+#     get: ######################################################################
+#       description: List all movements.
+#       tags:
+#         - Movements
+#       operationId: listMovements
+#       responses:
+#         '200':
+#           description: Returned list of movements.
+#           content:
+#             application/json:
+#               schema:
+#                 type: array
+#                 items:
+#                   $ref: '#/components/schemas/ReducedInfo'
+###############################################################################
+  /groups:
+###########
+    get: ######################################################################
+      description: List all (stratification) groups.
+      tags:
+        - Groups
+      operationId: listGroups
+      responses:
+        '200':
+          description: Returned list of existing groups
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Group'
+    post: #####################################################################
+      description: Create a new (stratification) group. All groups with the same category are mutually exclusive.
+      tags:
+        - Groups
+      operationId: createGroup
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Group'
+      responses:
+        '201':
+          description: Created group.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ID'
+###############################################################################
+  /groups/{groupId}:
+######################
+    delete: ###################################################################
+      description: Delete the specified group.
+      tags:
+        - Groups
+      operationId: deleteGroup
+      parameters:
+        - in: path
+          name: groupId
+          required: True
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Group deleted.
+        '409':
+          description: Preconditions not met. Error contains reason. May have additional properties referenced in error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+###############################################################################
+  /groups/categories/:
+#######################
+    get:
+      description: List all existing categories.
+      tags:
+        - Groups
+      operationId: listsCategories
+      responses:
+          '200':
+            description: Returned list of existing categories.
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    type: string
+                    example: age
+###############################################################################
+  /compartments:
+#################
+    get: ######################################################################
+      description: List all existing compartments.
+      tags:
+        - Compartments
+      operationId: listCompartments # fka listAggregations
+      responses:
+        '200':
+          description: Returned the list of compartments.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Compartment'
+    post: #####################################################################
+      description: Create a new compartment.
+      tags:
+        - Compartments
+      operationId: createCompartment # fka createAggregations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Compartment'
+      responses:
+        '201':
+          description: Created compartment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ID'
+###############################################################################
+  /compartments/{compartmentId}:
+#################################
+    delete: ###################################################################
+      description: Delete specific compartment.
+      tags:
+        - Compartments
+      operationId: deleteCompartment # fka deleteAggregation
+      parameters:
+        - in: path
+          name: compartmentId
+          required: True
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Deleted compartment.
+        '409':
+          description: Preconditions not met. Error contains reason. May have additional properties referenced in error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+###############################################################################
+  /parameterdefinitions:
+#########################
+    get: ######################################################################
+      description: List all existing Parameter definitions.
+      tags:
+        - ParameterDefinitions
+      operationId: listParameterDefinitions
+      responses:
+        '200':
+          description: Returned list of parameter definitions.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ParameterDefinition'
+    post: #####################################################################
+      description: Create a new parameter definition.
+      tags:
+        - ParameterDefinitions
+      operationId: createParameterDefinition
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParameterDefinition'
+      responses:
+        '201':
+          description: Created parameter definition.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ID'
+###############################################################################
+  /parameterdefinitions/{parameterId}:
+########################################
+    delete: ###################################################################
+      description: Delete a parameter definition.
+      tags:
+        - ParameterDefinitions
+      operationId: deleteParameterDefinition
+      parameters:
+        - in: path
+          name: parameterId
+          required: True
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Deleted parameter definition.
+        '409':
+          description: Preconditions not met. Error contains reason. May have additional properties referenced in error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+###############################################################################
+components:
+  securitySchemes:
+    bearerAuth: # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+
+    ID:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+
+    IdList:
+      type: array
+      items:
+        type: string
+        format: uuid
+
+    Named:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Display Name of the object
+        description:
+          type: string
+          description: (Tooltip) Description of the object
+
+    ReducedInfo:
+      allOf:
+        - $ref: '#/components/schemas/ID'
+        - $ref: '#/components/schemas/Named'
+
+    ReducedScenario:
+      allOf:
+        - $ref: '#/components/schemas/ReducedInfo'
+        - type: object
+          properties:
+            startDate:
+              type: string
+              format: date
+            endDate:
+              type: string
+              format: date
+            timestampSubmitted:
+              type: string
+              format: date-time
+            timestampSimulated:
+              type: string
+              format: date-time
+
+    Tagged:
+      type: object
+      properties:
+        tags:
+          type: array
+          description: Tags attached to this object
+          items:
+            type: string
+            description: String-tags used in search and filter operations
+
+    Scenario:
+      allOf:
+        - $ref: '#/components/schemas/ID'
+        - $ref: '#/components/schemas/Named'
+        - type: object
+          required:
+            - startDate
+            - endDate
+            - modelId
+            - modelParameters
+            - nodeListId
+          properties:
+            startDate:
+              type: string
+              format: date
+            endDate:
+              type: string
+              format: date
+            modelId:
+              type: string
+              format: uuid
+              description: UUID of the model this scenario belongs to
+            modelParameters:
+              type: array
+              description: List of (available) model parameters (UUIDs & values)
+              items: 
+                 $ref: '#/components/schemas/ParameterValue'
+            nodeListId:
+              type: string
+              format: uuid
+              description: UUID of the node list (districts etc.) of this scenario
+            linkedInterventions:
+              type: array
+              description: List of intervention implementations used in this scenario
+              items:
+                 $ref: '#/components/schemas/InterventionImplementation'
+            timestampSubmitted:
+              type: string
+              format: date-time
+              readOnly: true
+            timestampSimulated:
+              type: string
+              format: date-time
+              readOnly: true
+
+    Group:
+      allOf:
+        - $ref: '#/components/schemas/ID'
+        - $ref: '#/components/schemas/Named'
+        - type: object
+          required:
+            - category
+          properties:
+            category:
+              type: string
+              description: Category this group belongs to. Groups with the same category are grouped together e.g. in filter UIs
+
+    ParameterDefinition:
+      allOf:
+        - $ref: '#/components/schemas/ID'
+        - $ref: '#/components/schemas/Named'
+          
+    ParameterValueEntry:
+      type: object
+      required:
+        - groupId
+        - valueMin
+        - valueMax
+      properties:
+        groupId:
+          type: string
+          format: uuid
+          description: UUID of the group this value set is for
+        valueMin:
+          type: number
+          description: Floor of the parameter value (inclusive)
+          example: 0
+        valueMax:
+          type: number
+          description: Ceiling of the parameter value (inclusive)
+          example: 1
+
+    ParameterValue:
+      type: object
+      required:
+        - parameterId
+        - values
+      properties:
+        parameterId:
+          type: string
+          format: uuid
+          description: UUID of the parameter (key)
+        values:
+          type: array
+          description: List of values for each group (values)
+          items:
+             $ref: '#/components/schemas/ParameterValueEntry'
+
+    Model:
+      allOf:
+        - $ref: '#/components/schemas/ID'
+        - $ref: '#/components/schemas/Named'
+        - type: object
+          required:
+            - compartments
+            - groups
+            - parameterDefinitions
+          properties:
+            compartments:
+              type: array
+              items:
+                type: string
+                format: uuid
+            groups:
+              type: array
+              items:
+                type: string
+                format: uuid
+            parameterDefinitions:
+              type: array
+              items:
+                type: string
+                format: uuid
+
+    Node:
+      allOf:
+        - $ref: '#/components/schemas/ID'
+        - type: object
+          required:
+            - nuts
+            - name
+          properties:
+            nuts:
+              type: string
+              description: NUTS identifier of the node (district)
+              example: '07131'
+            name:
+              type: string
+              description: Display name of the node (district)
+              example: Ahrweiler (LK)
+
+    NodeList:
+      allOf:
+        - $ref: '#/components/schemas/ID'
+        - $ref: '#/components/schemas/Named'
+        - type: object
+          required:
+            - nodeIds
+          properties:
+            nodeIds:
+              type: array
+              items:
+                type: string
+                format: uuid
+
+    InterventionTemplate:
+      allOf:
+        - $ref: '#/components/schemas/ID'
+        - $ref: '#/components/schemas/Named'
+        - $ref: '#/components/schemas/Tagged'
+
+    InterventionImplementation:
+      type: object
+      required:
+        - intervention_id
+        - startDate
+        - endDate
+        - coefficient
+      properties:
+        interventionId:
+          type: string
+          format: uuid
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        coefficient:
+          type: number
+
+    Compartment:
+      allOf:
+        - $ref: '#/components/schemas/ID'
+        - $ref: '#/components/schemas/Named'
+        - $ref: '#/components/schemas/Tagged'
+                
+    # NodeMigrations: 
+    #   type: array 
+    #   items: 
+    #     type: object
+    #     properties: 
+    #       timestamp: 
+    #         type: string
+    #         format: date
+    #       node:
+    #         type: string
+    #       incoming: 
+    #         type: number
+    #         format: integer
+    #       outgoing: 
+    #         type: number
+    #         format: integer
+        
+    Infectiondata: 
+      type: object
+      required:
+        - values
+      properties: 
+        date: 
+          type: string
+          format: date
+        node: 
+          type: string
+          format: uuid
+        group:
+          type: string
+          format: uuid
+        compartment:
+          type: string
+          format: uuid
+        aggregation:
+          type: string
+        values: 
+          type: object
+          items:
+            type: number
+            format: integer
+      example:
+        date: '2024-01-01'
+        node: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
+        group: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
+        compartment: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
+        aggregation: 'aggregation1'
+        values:
+          '25': 0
+          '50': 0
+          '75': 0
+
+    # Movement:
+    #   type: object
+
+    # Restriction:
+    #   allOf:
+    #     - $ref: '#/components/schemas/Named'
+
+    Error:
+      type: object
+      required:
+        - detail
+      properties:
+        detail:
+          type: string

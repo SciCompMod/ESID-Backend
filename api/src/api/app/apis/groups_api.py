@@ -1,7 +1,8 @@
 # coding: utf-8
 
 from typing import Dict, List  # noqa: F401
-
+from pydantic import StrictStr
+from typing import Any, List, Optional
 from fastapi import (  # noqa: F401
     APIRouter,
     Body,
@@ -9,6 +10,7 @@ from fastapi import (  # noqa: F401
     Depends,
     Form,
     Header,
+    HTTPException,
     Path,
     Query,
     Response,
@@ -17,74 +19,57 @@ from fastapi import (  # noqa: F401
 )
 
 from app.models.extra_models import TokenModel  # noqa: F401
+from app.models.error import Error
 from app.models.group import Group
 from app.models.id import ID
-from app.models.new_group import NewGroup
 from security_api import get_token_bearerAuth
-from uuid import uuid4
 
-from app.db.tasks import create_new_group, get_all_group
 from app.controller.groups_controller import GroupsController
 
 router = APIRouter()
-groups_controller = GroupsController()
+controller = GroupsController()
 
 @router.post(
     "/groups",
     responses={
-        201: {"model": ID, "description": "node created"},
+        201: {"model": ID, "description": "Created group."},
     },
     tags=["Groups"],
     response_model_by_alias=True,
 )
 async def create_group(
-    new_group: NewGroup = Body(None, description=""),
+    group: Group = Body(None, description=""),
     token_bearerAuth: TokenModel = Security(
         get_token_bearerAuth
     ),
 ) -> ID:
-    return groups_controller.create_group(new_group)
+    """Create a new (stratification) group. All groups with the same category are mutually exclusive."""
+    return await controller.create(group)
 
 
 @router.delete(
-    "/groups/{group_id}",
+    "/groups/{groupId}",
     responses={
-        202: {"description": "Group deleted"},
+        200: {"description": "Group deleted."},
+        409: {"model": Error, "description": "Preconditions not met. Error contains reason. May have additional properties referenced in error."},
     },
     tags=["Groups"],
     response_model_by_alias=True,
 )
 async def delete_group(
-    group_id: str = Path(None, description=""),
+    groupId: StrictStr = Path(..., description=""),
     token_bearerAuth: TokenModel = Security(
         get_token_bearerAuth
     ),
 ) -> None:
-    """deletes the Group if it is not referenced in any list"""
-    return groups_controller.delete_group(group_id)
-
-
-@router.get(
-    "/groups/{group_id}",
-    responses={
-        200: {"model": Group, "description": "return the Group"},
-    },
-    tags=["Groups"],
-    response_model_by_alias=True,
-)
-async def get_group(
-    group_id: str = Path(None, description=""),
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
-) -> Group:
-    return groups_controller.get_group_by_id(group_id)
+    """Delete the specified group."""
+    return await controller.delete(groupId)
 
 
 @router.get(
     "/groups",
     responses={
-        200: {"model": List[str], "description": "return the list of existing groups"},
+        200: {"model": List[Group], "description": "Returned list of existing groups"},
     },
     tags=["Groups"],
     response_model_by_alias=True,
@@ -93,5 +78,23 @@ async def list_groups(
     token_bearerAuth: TokenModel = Security(
         get_token_bearerAuth
     ),
+) -> List[Group]:
+    """List all (stratification) groups."""
+    return await controller.getAll()
+
+
+@router.get(
+    "/groups/categories/",
+    responses={
+        200: {"model": List[str], "description": "Returned list of existing categories."},
+    },
+    tags=["Groups"],
+    response_model_by_alias=True,
+)
+async def list_categories(
+    token_bearerAuth: TokenModel = Security(
+        get_token_bearerAuth
+    ),
 ) -> List[str]:
-    return groups_controller.get_all_groups()
+    """List all existing categories."""
+    return await controller.getCategories()
