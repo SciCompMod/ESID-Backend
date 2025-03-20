@@ -8,16 +8,13 @@ build_docker_image:
   tags:
     - shell
   script:
-    - echo "Building docker images ...""
+    - echo "Building docker images ..."
     - echo "Building api:"
-    - docker image build -t esid/backend-api:latest api/src/api
+    - docker image build -t $ARTIFACT_STORE/esid/backend-api:latest api/src/api
     - echo "Building worker:"
-    - docker image build -t esid/backend-worker:latest api/src/worker
+    - docker image build -t $ARTIFACT_STORE/esid/backend-worker:latest api/src/worker
     - echo "Building docker images successful"
-    - docker image save esid/backend-api:latest esid/backend-worker:latest | gzip > esid-backend_latest.tar.gz
-    - echo "Saved images to file"
-  artifacts:
-    when: on_success
-    paths:
-      - esid-backend_latest.tar.gz
-    expire_in: "1 hour"
+    - echo "Pushing to artifacts store ..."
+    - echo $ARTIFACTORY_TOKEN | docker login $ARTIFACT_STORE -u $ARTIFACTORY_USER --password-stdin
+    - docker push $ARTIFACT_STORE/esid/backend-api:latest
+    - docker push $ARTIFACT_STORE/esid/backend-worker:latest
