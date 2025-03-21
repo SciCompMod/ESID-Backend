@@ -170,9 +170,6 @@ async def list_scenarios(
 # a toy endpoint to test authorization
 @router.post(
     "/scenarios/auth",
-    responses={
-        200: {"model": User, "description": "Returned authenticated user."}
-    },
     tags=["Simulations"]
 )
 async def create_protected_scenario(user: User = Depends(verify_lha_user)) -> str:
