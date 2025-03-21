@@ -41,12 +41,6 @@ controller = ScenarioController()
 log = logging.getLogger('API.Scenarios')
 logging.basicConfig(level=logging.INFO)
 
-# a toy endpoint to test authorization
-@router.post(
-    "/scenarios/protected",
-    tags=["Simulations"])
-async def create_protected_scenario(user: User = Depends(verify_lha_user)) -> str:
-    return """Scenario created by {}""".format(user)
 
 @router.post(
     "/scenarios",
@@ -169,8 +163,11 @@ async def list_scenarios(
 
 # a toy endpoint to test authorization
 @router.post(
-    "/scenarios/auth",
-    tags=["Simulations"]
+    "/auth/test",
+    responses={
+        200: {"description": "Return authenticated user."},
+    },
+    tags=["Authentication"],
 )
 async def create_protected_scenario(user: User = Depends(verify_lha_user)) -> str:
     """Display authenticated user."""
