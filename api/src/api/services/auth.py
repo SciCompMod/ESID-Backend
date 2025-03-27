@@ -1,7 +1,7 @@
 import jwt
 from core.config import DOMAIN, API_AUDIENCE, ALGORITHMS, ISSUER
 
-class User():
+class UserDetail():
     """A simple user model for authentication & authorization"""
     def __init__(self, username: str, email: str = "", role: list[str] = []):
         self.username = username
