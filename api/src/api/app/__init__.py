@@ -3,7 +3,7 @@ from core import config
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-"""
+
 celery_app = Celery(
     broker=config.CELERY_BROKER_URL,
     backend=config.CELERY_RESULT_BACKEND,
@@ -11,7 +11,7 @@ celery_app = Celery(
     include=["tasks"],
 )
 celery_app.config_from_object("celery_app_config")
-"""
+
 
 def create_app():
     app = FastAPI(title=config.PROJECT_NAME, version=config.VERSION)

@@ -35,6 +35,8 @@ services:
       - ${VOLUME_DIR}/redis_data:/var/lib/redis/data
     networks:
       - backnet
+    ports:
+      - 6379:6379
   db:
     restart: always
     image: postgres:latest
