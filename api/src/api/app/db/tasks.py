@@ -640,9 +640,10 @@ def datapoint_update_all_by_scenario(
     query = select(db.Scenario).where(db.Scenario.id == scenarioId)
     with next(get_session()) as session:
         # Delete old datapoints
-        result = session.exec(checkExisting).first()
-        if (result):
-            raise HTTPException(status_code=409, detail=f"There are already existing datapoints for the scenario {scenarioId}")
+        oldEntries: List[db.ScenarioDatapoint] = session.exec(checkExisting).all()
+        print(f'Deleting {len(oldEntries)} old datapoints')
+        for entry in oldEntries:
+            session.delete(entry)
         # Add new datapoints
         session.add_all([db.ScenarioDatapoint(
             scenarioId=scenarioId,
