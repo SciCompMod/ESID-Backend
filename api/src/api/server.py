@@ -55,8 +55,8 @@ logging.basicConfig(level=logging.INFO)
 )
 def send_message(
     task: Literal[
-        "test_worker",
-        "scenario_upload"
+        "tasks.test_worker",
+        "tasks.scenario_upload"
     ],
     payload: dict
     ):

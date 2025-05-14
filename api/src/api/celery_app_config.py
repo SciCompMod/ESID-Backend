@@ -1,3 +1,1 @@
-task_routes = {
-    "test_worker": {"queue": "hello_world"}
-}
+task_default_queue = 'default'

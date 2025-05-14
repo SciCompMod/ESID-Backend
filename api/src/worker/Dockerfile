@@ -14,4 +14,4 @@ RUN pip install --upgrade pip \
 
 COPY . /worker
 
-ENTRYPOINT celery -A app worker -Q extract_text --loglevel=info --uid=nobody --gid=nogroup
+ENTRYPOINT celery -A app worker -Q default --loglevel=INFO --uid=nobody --gid=nogroup
