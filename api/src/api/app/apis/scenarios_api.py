@@ -121,7 +121,6 @@ async def get_scenario(
 ) -> Scenario:
     """Get information about the specified scenario."""
     log.info(f'GET /scenarios/{scenarioId} received...')
-    log.warning(f'GET /scenarios/{scenarioId} received... [WARN]')
     return await controller.get_scenario(scenarioId)
 
 
@@ -143,6 +142,25 @@ async def import_scenario_data(
     """Supply simulation data for a scenario."""
     log.info(f'PUT /scenarios/{scenarioId} received...')
     return await controller.import_scenario_data(scenarioId, file)
+
+@router.put(
+    "/scenarios/{scenarioId}/worker",
+    responses={
+        201: {"model": ID, "description": "Job ID of the upload worker task."},
+    },
+    tags=["Scenarios", "Worker"],
+    response_model_by_alias=True,
+)
+async def import_scenario_data_by_worker(
+    scenarioId: StrictStr = Path(..., description="UUID of scenario"),
+    file: UploadFile = File(None, description="zipped HDF5 files of the simulation results"),
+    token_bearerAuth: TokenModel = Security(
+        get_token_bearerAuth
+    ),
+) -> ID:
+    """Upload simulation data for a scenario."""
+    log.info(f'PUT /scenarios/{scenarioId} worker task received...')
+    return await controller.handle_scenario_upload(scenarioId, file)
 
 
 @router.get(

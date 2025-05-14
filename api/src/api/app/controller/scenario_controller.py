@@ -18,6 +18,7 @@ import os
 import re
 
 from app.utils.utility import _get_input_directory, _create_empty_directory
+from app import celery_app
 
 from app.models.error import Error
 from app.models.id import ID
@@ -152,6 +153,55 @@ class ScenarioController:
             datapoint_update_all_by_scenario(scenarioId, numpy.concatenate(res).tolist())
         return ID(id=scenarioId)
 
+    async def handle_scenario_upload(
+        self,
+        scenarioId: StrictStr,
+        file: UploadFile,
+    ) -> ID:
+        """Prepare request data for the worker task."""
+        if not file or not file.filename.endswith('.zip'):
+            raise HTTPException(
+                status_code=422,
+                detail="No file uploaded with request or not a .zip file"
+            )
+        # Move file into input dir
+        try:
+            fname: str = file.filename
+            dir: str = os.path.join("/api", "input", scenarioId)
+            # create directory for files
+            if not os.path.exists(dir):
+                try:
+                    os.makedirs(dir)
+                except OSError as error:
+                    print('Exception when trying to save upload file:')
+                    print(error)
+                    raise HTTPException(
+                        status_code=500,
+                        detail="Error while handling uploaded file. See logs for more info."
+                    )
+            else:
+                # if folder exists, job may still be in progress
+                raise HTTPException(
+                    status_code=409,
+                    detail=f"Files for {scenarioId} already exist on the server and a worker may be processing them right now."
+                )
+            # write uploaded file into input dir
+            async with aiofiles.open(os.path.join(dir, fname), 'wb') as out_file:
+                # while loop for chunked write
+                # TODO: benchmark chunk sizes, currently load wile whole (30~40mb)
+                while content := await file.read():
+                    await out_file.write(content)
+        except HTTPException as error:
+            raise error
+        finally:
+            # close the temporary UploadFile (this discards the file from memory or disk)
+            await file.close()
+        # launch task with scenarioId (input folder name)
+        task = celery_app.send_task(
+            name="tasks.test_worker",
+            args=[dir]
+        )
+        return ID(task.id)
 
     async def _read_zip_file(
         self,
