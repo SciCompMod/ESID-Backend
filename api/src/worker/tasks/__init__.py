@@ -1,1 +1,4 @@
-from tasks import test_worker
+from tasks import (
+  test_worker,
+  import_scenario
+)
