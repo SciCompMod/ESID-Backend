@@ -4,13 +4,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 
-celery_app = Celery(
-    broker=config.CELERY_BROKER_URL,
-    backend=config.CELERY_RESULT_BACKEND,
-    broker_connection_max_retries=30,
-    include=["tasks"],
-)
-celery_app.config_from_object("celery_app_config")
+celery_app = Celery()
+celery_app.config_from_object('celery_config')
 
 
 def create_app():
