@@ -143,6 +143,7 @@ async def import_scenario_data(
     log.info(f'PUT /scenarios/{scenarioId} received...')
     return await controller.import_scenario_data(scenarioId, file)
 
+
 @router.put(
     "/scenarios/{scenarioId}/worker",
     responses={
@@ -178,6 +179,7 @@ async def list_scenarios(
 ) -> List[ReducedScenario]:
     """List all available scenarios."""
     return await controller.list_scenarios()
+
 
 # a toy endpoint to test authorization
 @router.post(

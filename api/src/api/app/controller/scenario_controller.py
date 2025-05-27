@@ -153,17 +153,21 @@ class ScenarioController:
             datapoint_update_all_by_scenario(scenarioId, numpy.concatenate(res).tolist())
         return ID(id=scenarioId)
 
+    # New function for the worker endpoint
     async def handle_scenario_upload(
         self,
         scenarioId: StrictStr,
         file: UploadFile,
     ) -> ID:
         """Prepare request data for the worker task."""
+        # Check if uploaded file is a .zip
         if not file or not file.filename.endswith('.zip'):
             raise HTTPException(
                 status_code=422,
                 detail="No file uploaded with request or not a .zip file"
             )
+        # Check if scenarioId exists (Exception is thrown otherwise)
+        # scenario_get_by_id(scenarioId)
         # Move file into input dir
         try:
             fname: str = file.filename
@@ -198,10 +202,11 @@ class ScenarioController:
             await file.close()
         # launch task with scenarioId (input folder name)
         task = celery_app.send_task(
-            name="tasks.test_worker",
-            args=[dir]
+            "tasks.import_scenario",
+            kwargs={'scenarioId': scenarioId},
+            countdown=30
         )
-        return ID(task.id)
+        return ID(id=task.id)
 
     async def _read_zip_file(
         self,

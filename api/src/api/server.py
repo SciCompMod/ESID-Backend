@@ -23,6 +23,7 @@ from app.apis.models_api import router as ModelsApiRouter
 from app.apis.nodes_api import router as NodesApiRouter
 from app.apis.parameter_definitions_api import router as ParameterDefinitionsApiRouter
 from app.apis.scenarios_api import router as ScenariosApiRouter
+from app.apis.worker_api import router as WorkerApiRouter
 
 app = FastAPI(
     title="Pandemos",
@@ -45,30 +46,4 @@ app.include_router(ModelsApiRouter)
 app.include_router(NodesApiRouter)
 app.include_router(ParameterDefinitionsApiRouter)
 app.include_router(ScenariosApiRouter)
-
-workerlog = logging.getLogger('API.Worker')
-logging.basicConfig(level=logging.INFO)
-
-@app.post(
-    "/test_celery/{task}",
-    tags=["Worker"],
-)
-def send_message(
-    task: Literal[
-        "tasks.test_worker",
-        "tasks.scenario_upload"
-    ],
-    payload: dict
-    ):
-    task = celery_app.send_task(
-        task,
-        args=[],
-        kwargs=payload,
-    )
-    workerlog.info(task.id)
-    # res = AsyncResult(task.id, app=celery_app).get()
-    return {
-        'payload': payload,
-        'taskid': task.id,
-        # 'result': res,
-        }
+app.include_router(WorkerApiRouter)

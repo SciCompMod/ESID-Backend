@@ -1,23 +1,10 @@
 import logging
 
 from celery import Celery
-from core import config
-from dotenv import load_dotenv
 
-load_dotenv()
 
-celery_app = Celery(
-    broker=config.CELERY_BROKER_URL,
-    backend=config.CELERY_RESULT_BACKEND,
-    broker_connection_max_retries=30,
-    include=["tasks"],
-)
-celery_app.config_from_object("celery_app_config")
-
-c_logger = logging.getLogger("celery")
-
-c_logger.setLevel(logging.INFO)
-
+celery_app = Celery()
+celery_app.config_from_object('celery_config')
 
 def _create_logger():
     logger = logging.getLogger(__name__)
