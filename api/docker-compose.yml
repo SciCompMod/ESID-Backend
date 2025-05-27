@@ -1,8 +1,6 @@
 services:
   worker:
-    build:
-      context: ./src/worker
-      dockerfile: Dockerfile
+    build: ./src/worker
     restart: always
     networks:
       - backnet
@@ -10,6 +8,7 @@ services:
       - redis
     volumes:
       - ./src/worker:/worker
+      - ${VOLUME_DIR}/input:/worker/input
     env_file:
       - .docker-env
   api:
