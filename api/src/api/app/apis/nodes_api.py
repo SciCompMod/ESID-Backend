@@ -24,7 +24,6 @@ from app.models.id import ID
 from app.models.node import Node
 from app.models.node_list import NodeList, NodeListWithNodes
 from app.models.reduced_info import ReducedInfo
-from security_api import get_token_bearerAuth
 
 from app.controller.nodes_controller import NodeController
 
@@ -41,10 +40,7 @@ controller = NodeController()
     response_model_by_alias=True,
 )
 async def create_node(
-    node: Node = Body(None, description=""),
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
+    node: Node = Body(None, description="")
 ) -> ID:
     """Create a new node."""
     return await controller.create_node(node)
@@ -59,10 +55,7 @@ async def create_node(
     response_model_by_alias=True,
 )
 async def create_node_list(
-    node_list: NodeList = Body(None, description=""),
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
+    node_list: NodeList = Body(None, description="")
 ) -> ID:
     """Create a new node list."""
     return await controller.create_node_list(node_list)
@@ -78,10 +71,7 @@ async def create_node_list(
     response_model_by_alias=True,
 )
 async def delete_node(
-    nodeId: StrictStr = Path(..., description=""),
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
+    nodeId: StrictStr = Path(..., description="")
 ) -> None:
     """Delete a node."""
     return await controller.delete_node(nodeId)
@@ -97,10 +87,7 @@ async def delete_node(
     response_model_by_alias=True,
 )
 async def delete_node_list(
-    nodeListId: StrictStr = Path(..., description=""),
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
+    nodeListId: StrictStr = Path(..., description="")
 ) -> None:
     """Delete the specified node list."""
     return await controller.delete_node_list(nodeListId)
@@ -115,10 +102,7 @@ async def delete_node_list(
     response_model_by_alias=True,
 )
 async def get_node_list(
-    nodeListId: StrictStr = Path(..., description=""),
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
+    nodeListId: StrictStr = Path(..., description="")
 ) -> NodeListWithNodes:
     """Get specified node list."""
     return await controller.get_node_list(nodeListId)
@@ -132,11 +116,7 @@ async def get_node_list(
     tags=["Nodes"],
     response_model_by_alias=True,
 )
-async def list_node_lists(
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
-) -> List[ReducedInfo]:
+async def list_node_lists() -> List[ReducedInfo]:
     """List defined node lists."""
     return await controller.list_node_lists()
 
@@ -149,10 +129,6 @@ async def list_node_lists(
     tags=["Nodes"],
     response_model_by_alias=True,
 )
-async def list_nodes(
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
-) -> List[Node]:
+async def list_nodes() -> List[Node]:
     """List all available nodes."""
     return await controller.list_nodes()

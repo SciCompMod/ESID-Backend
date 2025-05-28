@@ -8,7 +8,6 @@ from fastapi import HTTPException
 from app.models.error import Error
 from app.models.id import ID
 from app.models.intervention_template import InterventionTemplate
-from security_api import get_token_bearerAuth
 
 from app.db.tasks import intervention_template_create, intervention_template_delete, intervention_template_get_all
 

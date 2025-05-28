@@ -10,7 +10,6 @@ from app.models.id import ID
 from app.models.node import Node
 from app.models.node_list import NodeList, NodeListWithNodes
 from app.models.reduced_info import ReducedInfo
-from security_api import get_token_bearerAuth
 
 from app.db.tasks import node_create, node_get_all, node_delete, nodelist_create, nodelist_get_by_id, nodelist_get_all, nodelist_delete
 

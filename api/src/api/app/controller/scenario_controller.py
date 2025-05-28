@@ -29,7 +29,6 @@ from app.models.group import Group
 from app.models.compartment import Compartment
 from app.models.node_list import NodeList
 from app.models.node import Node
-from security_api import get_token_bearerAuth
 
 from app.db.tasks import (
     scenario_create,
