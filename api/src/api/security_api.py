@@ -29,7 +29,8 @@ async def validate_realm(x_realm: str) -> str:
             )
     return x_realm
 
-async def validate_bearer(authorization: str):
+async def validate_bearer(authorization: str) -> str:
+    """Validate the authorization scheme. Returns the Bearer token or raises HTTPException (401)"""
     scheme, param = get_authorization_scheme_param(authorization)
     if scheme == "":
         raise HTTPException(
