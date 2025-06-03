@@ -20,7 +20,8 @@ class NotAuthorizedException(HTTPException):
     def __init__(self):
         super().__init__(status_code=HTTP_403_FORBIDDEN, detail="Not authorized")
 
-async def validate_realm(x_realm: str):
+async def validate_realm(x_realm: str) -> str:
+    """Validate the realm. Returns the realm or raises HTTPException (401)"""
     if x_realm == "":
         raise HTTPException(
             status_code=HTTP_401_UNAUTHORIZED, 
