@@ -32,6 +32,7 @@ controller = ParameterController()
 
 @router.post(
     "/parameterdefinitions",
+    status_code=201,
     responses={
         201: {"model": ID, "description": "Created parameter definition."},
     },

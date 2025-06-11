@@ -31,6 +31,7 @@ controller = GroupsController()
 
 @router.post(
     "/groups",
+    status_code=201,
     responses={
         201: {"model": ID, "description": "Created group."},
     },

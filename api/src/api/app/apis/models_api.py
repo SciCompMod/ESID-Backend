@@ -32,8 +32,9 @@ controller = ModelController()
 
 @router.post(
     "/models",
+    status_code=201,
     responses={
-        200: {"model": ID, "description": "Created new model."},
+        201: {"model": ID, "description": "Created new model."},
     },
     tags=["Models"],
     response_model_by_alias=True,

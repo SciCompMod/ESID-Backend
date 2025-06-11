@@ -30,6 +30,7 @@ controller = InterventionsController()
 
 @router.post(
     "/interventions/templates",
+    status_code=201,
     responses={
         201: {"model": ID, "description": "Intervention created."},
     },

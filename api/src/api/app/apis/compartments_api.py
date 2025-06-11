@@ -31,6 +31,7 @@ controller = CompartmentController()
 
 @router.post(
     "/compartments",
+    status_code=201,
     responses={
         201: {"model": ID, "description": "Created compartment."},
     },

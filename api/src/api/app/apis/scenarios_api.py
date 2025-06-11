@@ -44,6 +44,7 @@ logging.basicConfig(level=logging.INFO)
 
 @router.post(
     "/scenarios",
+    status_code=201,
     responses={
         201: {"model": ID, "description": "Created new scenario."},
     },

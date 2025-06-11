@@ -34,6 +34,7 @@ controller = NodeController()
 
 @router.post(
     "/nodes",
+    status_code=201,
     responses={
         201: {"model": ID, "description": "node created"},
     },
@@ -52,6 +53,7 @@ async def create_node(
 
 @router.post(
     "/nodelists",
+    status_code=201,
     responses={
         201: {"model": ID, "description": "Created node list."},
     },
