@@ -252,11 +252,11 @@ class ScenarioController:
                     # validate days
                     if not is_dates_validated:
                         # Scenario duration according to DB
-                        idelta = (infos.scenario.end_date - infos.scenario.start_date).days
-                        if len(file[node][group]) != idelta:
+                        days_simulated = (infos.scenario.end_date - infos.scenario.start_date).days + 1
+                        if len(file[node][group]) != days_simulated:
                             raise Exception({
                                 'percentile': percentile,
-                                'dateMismatch': f'Scenario duration is {idelta} days but file contains {len(file[node][group])} datapoints'
+                                'dateMismatch': f'Scenario duration is {days_simulated} days but file contains {len(file[node][group])} datapoints'
                             })
                         is_dates_validated = True
 

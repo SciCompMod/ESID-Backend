@@ -1,0 +1,20 @@
+# ! PLEASE NOTE THAT THIS IS ONLY FOR INTERNAL USE AND THE FILE IS UPLOADED ON GITHUB FOR CONVENIENCE  
+
+stages:
+  - docker
+
+build_docker_image:
+  stage: docker
+  tags:
+    - shell
+  script:
+    - echo "Building docker images ..."
+    - echo "Building api:"
+    - docker image build -t $ARTIFACT_STORE/esid/backend-api:latest api/src/api
+    - echo "Building worker:"
+    - docker image build -t $ARTIFACT_STORE/esid/backend-worker:latest api/src/worker
+    - echo "Building docker images successful"
+    - echo "Pushing to artifacts store ..."
+    - echo $ARTIFACTORY_TOKEN | docker login $ARTIFACT_STORE -u $ARTIFACTORY_USER --password-stdin
+    - docker push $ARTIFACT_STORE/esid/backend-api:latest
+    - docker push $ARTIFACT_STORE/esid/backend-worker:latest

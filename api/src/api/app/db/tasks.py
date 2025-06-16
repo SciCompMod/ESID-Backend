@@ -634,15 +634,13 @@ def datapoint_update_all_by_scenario(
     scenarioId: StrictStr,
     datapoints: List[Infectiondata]
 ) -> None:
-    # SQLAlchemy Statement to delete all old records
-    # stmt = delete(db.ScenarioDatapoint).where(db.ScenarioDatapoint.scenarioId == scenarioId)
-    checkExisting = select(db.ScenarioDatapoint).where(db.ScenarioDatapoint.scenarioId == scenarioId)
     query = select(db.Scenario).where(db.Scenario.id == scenarioId)
     with next(get_session()) as session:
         # Delete old datapoints
-        result = session.exec(checkExisting).first()
-        if (result):
-            raise HTTPException(status_code=409, detail=f"There are already existing datapoints for the scenario {scenarioId}")
+        session.exec(
+            # SQLAlchemy Statement to delete all records without loading all found entries into memory
+            delete(db.ScenarioDatapoint).where(db.ScenarioDatapoint.scenarioId == scenarioId)
+        )
         # Add new datapoints
         session.add_all([db.ScenarioDatapoint(
             scenarioId=scenarioId,
