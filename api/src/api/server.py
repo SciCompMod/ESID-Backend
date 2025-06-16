@@ -13,7 +13,7 @@ from celery.result import AsyncResult
 import logging
 
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 
 from fastapi.middleware.cors import CORSMiddleware
 from app.apis.compartments_api import router as CompartmentsApiRouter
@@ -23,11 +23,11 @@ from app.apis.models_api import router as ModelsApiRouter
 from app.apis.nodes_api import router as NodesApiRouter
 from app.apis.parameter_definitions_api import router as ParameterDefinitionsApiRouter
 from app.apis.scenarios_api import router as ScenariosApiRouter
-
+from app.middlewares.authentication_middleware import AuthenticationMiddleware
 app = FastAPI(
     title="Pandemos",
     description="API for visualization of Infection Models",
-    version="1",
+    version="1"
 )
 
 app.add_middleware(
@@ -37,6 +37,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(AuthenticationMiddleware)
 
 app.include_router(CompartmentsApiRouter)
 app.include_router(GroupsApiRouter)

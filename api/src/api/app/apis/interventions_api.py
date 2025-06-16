@@ -21,7 +21,6 @@ from app.models.extra_models import TokenModel  # noqa: F401
 from app.models.error import Error
 from app.models.id import ID
 from app.models.intervention_template import InterventionTemplate
-from security_api import get_token_bearerAuth
 
 from app.controller.interventions_controller import InterventionsController
 
@@ -37,10 +36,7 @@ controller = InterventionsController()
     response_model_by_alias=True,
 )
 async def create_intervention_template(
-    intervention_template: InterventionTemplate = Body(None, description=""),
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
+    intervention_template: InterventionTemplate = Body(None, description="")
 ) -> ID:
     """Creates a new intervention template to be used in implementations."""
     return await controller.create_intervention_template(intervention_template)
@@ -56,10 +52,7 @@ async def create_intervention_template(
     response_model_by_alias=True,
 )
 async def delete_intervention_template(
-    interventionTemplateId: StrictStr = Path(..., description=""),
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
+    interventionTemplateId: StrictStr = Path(..., description="")
 ) -> None:
     """Delete an intervention template."""
     return await controller.delete_intervention_template(interventionTemplateId)
@@ -73,10 +66,6 @@ async def delete_intervention_template(
     tags=["Interventions"],
     response_model_by_alias=True,
 )
-async def list_intervention_templates(
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
-) -> List[InterventionTemplate]:
+async def list_intervention_templates() -> List[InterventionTemplate]:
     """List available Intervention templates that can be implemented."""
     return await controller.list_intervention_templates()

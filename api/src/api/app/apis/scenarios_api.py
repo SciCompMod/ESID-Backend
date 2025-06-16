@@ -1,29 +1,21 @@
 # coding: utf-8
 
 import logging
-from typing import Dict, List  # noqa: F401
+from typing import List  # noqa: F401
 from datetime import date
-from pydantic import Field, StrictBytes, StrictFloat, StrictInt, StrictStr
-from typing import Any, Dict, List, Optional, Tuple, Union
+from pydantic import Field, StrictStr
+from typing import List, Optional
 from typing_extensions import Annotated
 from fastapi import (  # noqa: F401
     APIRouter,
     Body,
-    Cookie,
-    Depends,
     File,
-    Form,
-    Header,
-    HTTPException,
     Path,
     Query,
-    Response,
-    Security,
-    status,
+    Request,
     UploadFile,
 )
 
-from app.models.extra_models import TokenModel  # noqa: F401
 from app.models.error import Error
 from app.models.id import ID
 from app.models.infectiondata import Infectiondata
@@ -32,8 +24,6 @@ from app.models.scenario import Scenario
 
 from app.controller.scenario_controller import ScenarioController
 
-from security_api import get_token_bearerAuth, verify_lha_user
-from services.auth import User
 
 router = APIRouter()
 controller = ScenarioController()
@@ -51,10 +41,7 @@ logging.basicConfig(level=logging.INFO)
     response_model_by_alias=True,
 )
 async def create_scenario(
-    scenario: Scenario = Body(None, description=""),
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
+    scenario: Scenario = Body(None, description="")
 ) -> ID:
     """Create a new scenario to be simulated."""
     return await controller.create_scenario(scenario)
@@ -70,10 +57,7 @@ async def create_scenario(
     response_model_by_alias=True,
 )
 async def delete_scenario(
-    scenarioId: StrictStr = Path(..., description=""),
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
+    scenarioId: StrictStr = Path(..., description="")
 ) -> None:
     """Delete the Scenario and its data"""
     return await controller.delete_scenario(scenarioId)
@@ -97,9 +81,6 @@ async def get_infection_data(
     # TODO deepObject not supported by fastapi yet, wait for https://github.com/fastapi/fastapi/pull/9867 or do custom string based solution ¯\_(ツ)_/¯
     groups: Annotated[Optional[StrictStr], Field(description="Comma separated list of groups requesting data for")] = Query(None, description="List of groups requesting data for", alias="groups"),
     percentiles: Annotated[Optional[StrictStr], Field(description="Comma separated list of requested percentiles of the data")] = Query(None, description="Requested percentiles of the data", alias="percentiles"),
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
 ) -> List[Infectiondata]:
     """Get scenario&#39;s infection data based on specified filters."""
     return await controller.get_infection_data(scenarioId, nodes, start_date, end_date, compartments, groups, percentiles)
@@ -114,10 +95,7 @@ async def get_infection_data(
     response_model_by_alias=True,
 )
 async def get_scenario(
-    scenarioId: StrictStr = Path(..., description=""),
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
+    scenarioId: StrictStr = Path(..., description="")
 ) -> Scenario:
     """Get information about the specified scenario."""
     log.info(f'GET /scenarios/{scenarioId} received...')
@@ -135,10 +113,7 @@ async def get_scenario(
 )
 async def import_scenario_data(
     scenarioId: StrictStr = Path(..., description="UUID of the scenario"),
-    file: UploadFile = File(None, description="zipped HDF5 files of the simulation results"),
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
+    file: UploadFile = File(None, description="zipped HDF5 files of the simulation results")
 ) -> ID:
     """Supply simulation data for a scenario."""
     log.info(f'PUT /scenarios/{scenarioId} received...')
@@ -153,11 +128,7 @@ async def import_scenario_data(
     tags=["Scenarios"],
     response_model_by_alias=True,
 )
-async def list_scenarios(
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
-) -> List[ReducedScenario]:
+async def list_scenarios() -> List[ReducedScenario]:
     """List all available scenarios."""
     return await controller.list_scenarios()
 
@@ -169,6 +140,7 @@ async def list_scenarios(
     },
     tags=["Authentication"],
 )
-async def create_protected_scenario(user: User = Depends(verify_lha_user)) -> str:
+async def create_protected_scenario(request: Request) -> str:
     """Display authenticated user."""
-    return f'Authenticated user: {user}'
+    return f'Authenticated user: {request.state.user}'
+

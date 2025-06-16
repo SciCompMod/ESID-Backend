@@ -2,20 +2,14 @@
 
 from fastapi import Header
 from fastapi import Depends  # noqa: F401
-from fastapi.security import (  # noqa: F401
-    HTTPAuthorizationCredentials,
-    HTTPBearer,
-)
 from jwt import PyJWKClient
 import jwt  # noqa: F401
-
-from app.models.extra_models import TokenModel
 
 from fastapi import Depends, HTTPException
 from fastapi.security.utils import get_authorization_scheme_param
 
-from services.auth import VerifyToken, User
-from core.config import REQUIRESAUTH
+from app.models.user_detail import UserDetail
+from core.config import IDP_ROOT_URL
 from starlette.status import HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN
 
 from functools import partial
@@ -26,35 +20,55 @@ class NotAuthorizedException(HTTPException):
     def __init__(self):
         super().__init__(status_code=HTTP_403_FORBIDDEN, detail="Not authorized")
 
-async def realm_extractor(x_realm: str = Header("X-Realm")):
-    """Extract realm information from request header"""
+class AuthenticationException(HTTPException):
+    """Exception for unauthorized access (e.g. when user does not have required role)"""
+    def __init__(self, msg: str = "Authentication error"):
+        super().__init__(status_code=HTTP_401_UNAUTHORIZED, detail=msg)
+
+class BearerTokenException(HTTPException):
+    """Exception for invalid Bearer token"""
+    def __init__(self):
+        super().__init__(status_code=HTTP_401_UNAUTHORIZED, detail="Invalid Bearer token", headers={"WWW-Authenticate": "Bearer"})
+
+async def get_realm(x_realm: str) -> str:
+    """
+    Validate the realm. Returns the realm or raises HTTPException (401)\n
+    Note: This is a standard function that CANNOT be used by FastAPI's dependency injection as described here:
+    https://fastapi.tiangolo.com/tutorial/dependencies/\n
+    Use realm_extractor for extracting realm from X-Realm header via dependency injection\n
+    """
     if x_realm == "":
-        raise HTTPException(
-            status_code=HTTP_401_UNAUTHORIZED, 
-            detail="X-Realm header not specified"
-            )
+        raise AuthenticationException("X-Realm header not specified")
     return x_realm
 
-async def bearer_extractor(authorization: str = Header("Authorization")):
-    """Extract bearer token from request header"""
+async def get_bearer(authorization: str) -> str:
+    """
+    Validate the bearer token in Authorization header. Returns the Bearer token or raises HTTPException (401)\n
+    Note: This is a standard function that CANNOT be used by FastAPI's dependency injection as described here:
+    https://fastapi.tiangolo.com/tutorial/dependencies/\n
+    Use bearer_extractor for validating and extracting the token via dependency injection\n
+    """
     scheme, param = get_authorization_scheme_param(authorization)
+    if scheme == "":
+        raise BearerTokenException()
     if scheme.lower() != "bearer":
-        raise HTTPException(
-                status_code=HTTP_401_UNAUTHORIZED,
-                detail="Token is not Bearer",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
+        raise BearerTokenException()
     return param
 
-async def verify_token(
-        access_token = Depends(bearer_extractor),
-        x_realm: str = Depends(realm_extractor)) -> User:
-    """Verify token and extract user information"""
+async def get_user(
+        access_token: str,
+        x_realm: str) -> UserDetail:
+    """Verify and extract user information.\n
+    Returns a UserDetail object if successful, raises HTTPException (401) if token or X-Realm header is not given or invalid\n
+    Note: This is a standard function that CANNOT be used by FastAPI's dependency injection as described here:
+    https://fastapi.tiangolo.com/tutorial/dependencies/\n
+    Use user_detail_extractor for validating and extracting the token via dependency injection\n
+    """
 
     # every lha has its own realm and users are associated with a specific realm (stored in X-Realm header)
     # the signing key is different across realms, to decode we need to specify the certificate endpoint for PyJWKClient
     # and PyJWKClient will fetch the signing key for us
-    url = f"https://lokiam.de/realms/{x_realm}/protocol/openid-connect/certs"
+    url = f"{IDP_ROOT_URL}/realms/{x_realm}/protocol/openid-connect/certs"
     jwks_client = PyJWKClient(url)
 
     try:
@@ -69,7 +83,7 @@ async def verify_token(
         )
 
         # construct user object
-        username = payload["sub"]
+        userId = payload["sub"]
         client = payload["azp"]
         email = payload["email"]
 
@@ -79,45 +93,62 @@ async def verify_token(
         except KeyError:
             roles = []
         
-        # username is required
-        if username is None:
-            raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail="Username not specified")
+        # userId is required
+        if userId is None:
+            raise AuthenticationException("User Id not specified")
     
-        return User(username, email, roles)
+        return UserDetail(userId, email, roles)
     except jwt.exceptions.InvalidTokenError:
-        raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail="Invalid token")
+        raise AuthenticationException("Invalid token")
 
-def verify_user_with_role(role: str, user: User = Depends(verify_token)):
-    """Verify if user has specified role"""
+
+async def realm_extractor(x_realm: str = Header("X-Realm")):
+    """
+    Dependency injection way to extract realm information from X-Realm header\n
+    Use it in your endpoints like this:\n
+    def foo(x_realm: str = Depends(realm_extractor))
+    """
+    return get_realm(x_realm)
+
+async def bearer_extractor(authorization: str = Header("Authorization")):
+    """
+    Dependency injection way to extract and validate bearer token from Authorization header\n
+    Use it in your endpoints like this:\n
+    def foo(authorization: str = Depends(bearer_extractor))
+    """
+    return get_bearer(authorization)
+
+async def user_detail_extractor(
+        access_token: str = Depends(bearer_extractor),
+        x_realm: str = Depends(realm_extractor)) -> UserDetail:
+    """
+    Dependency injection way to get user detail\n
+    Returns a UserDetail object if successful, raises HTTPException (401) if token or X-Realm header is not given or invalid\n
+    Use it in your endpoints like this:\n
+    def foo(user: UserDetail = Depends(user_detail_extractor))
+    """
+    return get_user(access_token, x_realm)
+    
+
+
+def user_role_filter(role: str, user: UserDetail = Depends(user_detail_extractor)):
+    """
+    Dependency injection way to verify if user has specified role
+    Returns a UserDetail object if successful,\n
+    raises HTTPException (401) if token or X-Realm header is not given or invalid,\n
+    raises HTTPException (403) if user does not have the specified role\n
+    Note: You CANNOT use this directly as a dependency.\n
+    You need to create a partial function for each role you want to verify\n
+    Check the example below for lha-user role\n
+    """
     if role not in user.role:
         raise NotAuthorizedException()
     return user
 
-# Verify if user has lha-user role
-# Similar dependencies can be created for other roles
-# e.g. verify_lha_admin = partial(verify_user_with_role, "lha-admin")
-#      in endpoints: def foo(user: User = Depends(verify_lha_admin))
-verify_lha_user = partial(verify_user_with_role, "lha-user")
-
-# deprecated: this is a temporary setup
-# now we use verify_token to verify the bearer token (JWT)
-bearer_auth = HTTPBearer()
-async def get_token_bearerAuth(credentials: HTTPAuthorizationCredentials = Depends(bearer_auth)) -> TokenModel:
-    """
-    Check and retrieve authentication information from custom bearer token.
-
-    :param credentials Credentials provided by Authorization header
-    :type credentials: HTTPAuthorizationCredentials
-    :return: Decoded token information or None if token is invalid
-    :rtype: TokenModel | None
-    """
-    if  REQUIRESAUTH:
-        # print(type(credentials))
-        # print(credentials)
-        if not credentials:
-            raise HTTPException(status_code=401, detail="Not authorized or invalid credentials")
-        result = VerifyToken(credentials.credentials).verify()
-        # print(result)
-        if result.get("status"):
-            raise HTTPException(status_code=401, detail="Not authorized or invalid credentials")
-        
+"""
+Dependency injection way to verify if an user has lha-user role
+Similar dependencies can be created for other roles
+e.g. verify_lha_admin = partial(verify_user_with_role, "lha-admin")
+then in endpoints: def foo(user: UserDetail = Depends(verify_lha_admin))
+"""
+lha_user_filter = partial(user_role_filter, "lha-user")
