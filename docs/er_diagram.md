@@ -4,13 +4,13 @@
 erDiagram
     Scenario {
         string id PK
-        string name "*"
+        string name "\*"
         string description
-        string startDate "*"
-        string endDate "*"
-        Model modelId FK "* UUID of the used model"
-        NodeList nodeListId FK "* UUID of the Nodelist used in the scenario"
-        ParameterValue[] modelParameters FK "* List of Parameter UUIDs & their values for each Group UUID"
+        string startDate "\*"
+        string endDate "\*"
+        Model modelId FK "\* UUID of the used model"
+        NodeList nodeListId FK "\* UUID of the Nodelist used in the scenario"
+        ParameterValue[] modelParameters FK "\* List of Parameter UUIDs & their values for each Group UUID"
         InterventionImplementation[] linkedInterventions FK "List of InterventionTemplate UUIDs and the implementation values"
         string timestampSubmitted
         string timestampSimulated
@@ -24,24 +24,24 @@ erDiagram
 
     Model {
         string id PK
-        string name "*"
+        string name "\*"
         string description
-        Compartment[] compartments FK "* UUIDs of compartments the model has"
-        Group[] groups FK "* UUIDs of groups the model has"
-        ParameterDefinition[] parameterDefinitions FK "* UUIDs of parameters available with the model"
+        Compartment[] compartments FK "\* UUIDs of compartments the model has"
+        Group[] groups FK "\* UUIDs of groups the model has"
+        ParameterDefinition[] parameterDefinitions FK "\* UUIDs of parameters available with the model"
     }
 
     _ParameterValue_ {
         Scenario scenarioId PK "UUID of the scenario"
         ParameterDefinition definitionId PK "UUID of the definition"
-        ParameterValueEntry[] values "*"
+        ParameterValueEntry[] values "\*"
     }
 
     _ParameterValueEntry_ {
         string parameterId PK "UUID of the ParameterValue this belongs to"
         string groupId PK "UUID of the group this value is for"
-        number valueMin "*"
-        number valueMax "*"
+        number valueMin "\*"
+        number valueMax "\*"
     }
 
     _ParameterValue_ ||--|{ _ParameterValueEntry_: ""
@@ -50,15 +50,15 @@ erDiagram
 
     ParameterDefinition {
         string id PK
-        string name "*"
+        string name "\*"
         string description
     }
 
     NodeList{
         string id PK
-        string name "*"
+        string name "\*"
         string description
-        Node[] nodeIds FK "*"
+        Node[] nodeIds FK "\*"
     }
 
     NodeList ||--|{ _NodeListNodeLink_: ""
@@ -66,8 +66,8 @@ erDiagram
 
     Node {
         string id PK
-        string nuts "*"
-        string name "*"
+        string nuts "\*"
+        string name "\*"
     }
 
     _NodeListNodeLink_{
@@ -87,22 +87,22 @@ erDiagram
 
     InterventionTemplate {
         string id PK
-        string name "*"
+        string name "\*"
         string description
         string[] tags "tags used for search & filtering (CSV)"
     }
 
     Group {
         string id PK
-        string name "*"
+        string name "\*"
         string description
-        string category "*"
+        string category "\*"
     }
 
     Compartment {
         
         string id PK
-        string name "*"
+        string name "\*"
         string description
         string tags "tags used for aggregation (CSV)"
     }
@@ -143,3 +143,4 @@ erDiagram
     ScenarioDatapoint }|--|| Group: ""
     ScenarioDatapoint }|--|| Compartment: ""
 ```
+_\* Required when creating an entry_
