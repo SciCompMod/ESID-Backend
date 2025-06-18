@@ -1,5 +1,5 @@
-# pandemos-interface
-Source code repository for pandemos APIs.
+# Setup
+Instruction on how to set up the backend itself.
 
 ## Deployment
 ### Setup the Project
@@ -47,6 +47,8 @@ Goto http://localhost:8000/
 API docs can be found at:
 http://localhost:8000/docs
 
+> [!NOTE]
+> You can connect the API to your ESID frontend by setting the `VITE_API_URL` to your url in the `.env`-file of your [ESID](https://github.com/DLR-SC/ESID) instance.
 
 # Developer Pre-requisites
 ## Project Setup
