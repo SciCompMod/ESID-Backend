@@ -4,8 +4,9 @@ from starlette.datastructures import Secret
 
 config = Config(".env")
 
-PROJECT_NAME = "Pandemos Interface"
-VERSION = "0.0.1"
+PROJECT_NAME = "ESID Backend Interface"
+VERSION = "1.1.0"
+API_PATH_PREFIX = config("API_PATH_PREFIX", cast=str, default="")
 
 SECRET_KEY = config("SECRET_KEY", cast=Secret, default="CHANGEME")
 
@@ -26,21 +27,5 @@ DATABASE_URL = config(
     default=f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_SERVER}:{POSTGRES_PORT}/{POSTGRES_DB}",
 )
 
-#Auth0
-
-# DOMAIN = config("DOMAIN", cast=str, default="your.domain.com")
-# API_AUDIENCE = config("API_AUDIENCE", cast=str, default="your.audience.com")
-# ISSUER = config("ISSUER", cast=str, default="https://your.domain.com")
-# ALGORITHMS = config("ALGORITHMS", cast=str, default="RS256")
-
-# DOMAIN = config("DOMAIN", cast=str, default="shell-sep-dev.eu.auth0.com")
-# API_AUDIENCE = config("API_AUDIENCE", cast=str, default="https://sep-backend.coacapp.de")
-# ISSUER = config("ISSUER", cast=str, default="https://shell-sep-dev.eu.auth0.com/")
-# ALGORITHMS = config("ALGORITHMS", cast=str, default="RS256")
-
-DOMAIN = config("DOMAIN", cast=str, default="pandemos.eu.auth0.com")
-API_AUDIENCE = config("API_AUDIENCE", cast=str, default="pandemos-api")
-ISSUER = config("ISSUER", cast=str, default="https://pandemos.eu.auth0.com/")
-ALGORITHMS = config("ALGORITHMS", cast=str, default="RS256")
-
-REQUIRESAUTH = config('REQUIRESAUTH',cast=bool ,default=False)
+# OAuth2 settings
+IDP_ROOT_URL = config("IDP_ROOT_URL", cast=str, default="https://dev.lokiam.de")

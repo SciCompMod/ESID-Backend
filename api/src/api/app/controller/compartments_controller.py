@@ -8,7 +8,6 @@ from fastapi import HTTPException
 from app.models.error import Error
 from app.models.compartment import Compartment
 from app.models.id import ID
-from security_api import get_token_bearerAuth
 
 from app.db.tasks import compartment_create, compartment_delete, compartment_get_all
 

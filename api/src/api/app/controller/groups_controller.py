@@ -8,7 +8,6 @@ from fastapi import HTTPException
 from app.models.error import Error
 from app.models.group import Group
 from app.models.id import ID
-from security_api import get_token_bearerAuth
 
 from app.db.tasks import group_create, group_delete_by_id, group_get_all, group_get_all_categories
 

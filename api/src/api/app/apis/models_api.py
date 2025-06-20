@@ -23,7 +23,6 @@ from app.models.error import Error
 from app.models.id import ID
 from app.models.model import Model
 from app.models.reduced_info import ReducedInfo
-from security_api import get_token_bearerAuth
 
 from app.controller.models_controller import ModelController
 
@@ -40,10 +39,7 @@ controller = ModelController()
     response_model_by_alias=True,
 )
 async def create_model(
-    model: Model = Body(None, description=""),
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
+    model: Model = Body(None, description="")
 ) -> ID:
     """Create a new simulation model."""
     return await controller.create_model(model)
@@ -59,10 +55,7 @@ async def create_model(
     response_model_by_alias=True,
 )
 async def delete_model(
-    modelId: StrictStr = Path(..., description=""),
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
+    modelId: StrictStr = Path(..., description="")
 ) -> None:
     """Delete a model if it is not referenced in any scenarios."""
     return await controller.delete_model(modelId)
@@ -77,10 +70,7 @@ async def delete_model(
     response_model_by_alias=True,
 )
 async def get_model(
-    modelId: StrictStr = Path(..., description=""),
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
+    modelId: StrictStr = Path(..., description="")
 ) -> Model:
     """Get specific model information."""
     return await controller.get_model(modelId)
@@ -94,10 +84,6 @@ async def get_model(
     tags=["Models"],
     response_model_by_alias=True,
 )
-async def list_models(
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
-) -> List[ReducedInfo]:
+async def list_models() -> List[ReducedInfo]:
     """List all available simulation models."""
     return await controller.list_models()

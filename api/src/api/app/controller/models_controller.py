@@ -9,7 +9,6 @@ from app.models.error import Error
 from app.models.id import ID
 from app.models.model import Model
 from app.models.reduced_info import ReducedInfo
-from security_api import get_token_bearerAuth
 
 from app.db.tasks import model_create, model_delete, model_get_by_id, model_get_all
 

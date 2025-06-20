@@ -22,7 +22,6 @@ from app.models.extra_models import TokenModel  # noqa: F401
 from app.models.error import Error
 from app.models.id import ID
 from app.models.parameter_definition import ParameterDefinition
-from security_api import get_token_bearerAuth
 
 from app.controller.parameterdefinitions_controller import ParameterController
 
@@ -40,10 +39,7 @@ controller = ParameterController()
     response_model_by_alias=True,
 )
 async def create_parameter_definition(
-    parameter_definition: ParameterDefinition = Body(None, description=""),
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
+    parameter_definition: ParameterDefinition = Body(None, description="")
 ) -> ID:
     """Create a new parameter definition."""
     return await controller.create_parameter_definition(parameter_definition)
@@ -59,10 +55,7 @@ async def create_parameter_definition(
     response_model_by_alias=True,
 )
 async def delete_parameter_definition(
-    parameterId: StrictStr = Path(..., description=""),
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
+    parameterId: StrictStr = Path(..., description="")
 ) -> None:
     """Delete a parameter definition."""
     return await controller.delete_parameter_definition(parameterId)
@@ -76,11 +69,7 @@ async def delete_parameter_definition(
     tags=["ParameterDefinitions"],
     response_model_by_alias=True,
 )
-async def list_parameter_definitions(
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
-) -> List[ParameterDefinition]:
+async def list_parameter_definitions() -> List[ParameterDefinition]:
     """List all existing Parameter definitions."""
     return await controller.list_parameter_definitions()
 
@@ -93,10 +82,7 @@ async def list_parameter_definitions(
     response_model_by_alias=True,
 )
 async def get_parameter_definition(
-    parameterId: StrictStr = Path(..., description=""),
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
+    parameterId: StrictStr = Path(..., description="")
 ) -> ParameterDefinition:
     """Get specific Parameter definitions."""
     return await controller.get_parameter_definition(parameterId)

@@ -22,7 +22,6 @@ from app.models.extra_models import TokenModel  # noqa: F401
 from app.models.error import Error
 from app.models.id import ID
 from app.models.compartment import Compartment
-from security_api import get_token_bearerAuth
 
 from app.controller.compartments_controller import CompartmentController
 
@@ -39,10 +38,7 @@ controller = CompartmentController()
     response_model_by_alias=True,
 )
 async def create_compartment(
-    compartment: Compartment = Body(None, description=""),
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
+    compartment: Compartment = Body(None, description="")
 ) -> ID:
     """Create a new compartment."""
     return await controller.create_compartment(compartment)
@@ -58,10 +54,7 @@ async def create_compartment(
     response_model_by_alias=True,
 )
 async def delete_compartment(
-    compartmentId: StrictStr = Path(..., description=""),
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
+    compartmentId: StrictStr = Path(..., description="")
 ) -> None:
     """Delete specific compartment."""
     return await controller.delete_compartment(compartmentId)
@@ -75,10 +68,6 @@ async def delete_compartment(
     tags=["Compartments"],
     response_model_by_alias=True,
 )
-async def list_compartments(
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
-) -> List[Compartment]:
+async def list_compartments() -> List[Compartment]:
     """List all existing compartments."""
     return await controller.list_compartments()

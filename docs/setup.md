@@ -1,5 +1,5 @@
-# pandemos-interface
-Source code repository for pandemos APIs.
+# Setup
+Instruction on how to set up the backend itself.
 
 ## Deployment
 ### Setup the Project
@@ -7,38 +7,48 @@ Source code repository for pandemos APIs.
 ```
 git clone git@github.com:DLR-SC/ESID-Backend.git
 ```
+
 2. Go to `api` directory.
-3. Create `docker-env` and run docker compose:
+```
+cd api/
+```
+
+3. Create `docker-env` and modify the file as needed.
 ```
 cp .docker-env.template .docker-env
 ```
-```
-docker compose --env-file .docker-env up --build -d
-```
-4. Perform database migrations (Create tables - on initial run)
-    
-* Generate code for migration
 
+4. run docker compose:
+```
+docker compose up --build -d
+```
+> [!NOTE]  
+> In older docker compose versions you may need to provide the .env file because the file is not recognized in the `docker-compose.yml`  
+> In this case add `--env-file .docker-env`:  
+> ```
+> docker compose --env-file .docker-env up --build -d
+> ```
+> The other commands in theory need the env reference too, but should work without despite any warnings.
+
+5. Perform database migrations (Create tables - on initial run)   
+- Generate code for migration:
 ```
 docker compose exec api alembic revision --autogenerate -m "Create all tables"
 ```
-
-* Execute the migration
-
+- Execute the migration
 ```
 docker compose exec api alembic upgrade head
 ```
 
-> [!NOTE]  
-> In older docker compose versions you may need to provide the .env file in each command (3 & 4) because the file is not recognized in the docker-compose.yml  
-> In this case add `--env-file .docker-env` directly after `docker compose` and before the rest of the commands
 
 ## API
-Goto http://localhost:8000
+Goto http://localhost:8000/
 
 API docs can be found at:
 http://localhost:8000/docs
 
+> [!NOTE]
+> You can connect the API to your ESID frontend by setting the `VITE_API_URL` to your url in the `.env`-file of your [ESID](https://github.com/DLR-SC/ESID) instance.
 
 # Developer Pre-requisites
 ## Project Setup
@@ -48,6 +58,8 @@ Follow steps 1-3 from Deployment - Setup the Project.
 You can use `docker compose logs -f` to get a feed of the container logs.
 
 `docker compose logs -f api db` to only see logs for the api & db containers.
+
+You can attach to the containers to check their runtime environment with `docker exec -it <container-name> bash`.
 
 watchgod will automatically restart the docker-ized Application with each code change.
 
