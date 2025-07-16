@@ -412,7 +412,7 @@ def parameter_definition_delete(id: StrictStr) -> None:
 
 
 ## Scenarios ##
-def scenario_create(scenario: Scenario, userId: Optional[str], orgId: Optional[str]) -> ID:
+def scenario_create(scenario: Scenario) -> ID:
     scenario_obj = db.Scenario(
         name=scenario.name,
         description=scenario.description,
@@ -423,8 +423,6 @@ def scenario_create(scenario: Scenario, userId: Optional[str], orgId: Optional[s
         percentiles=','.join([str(perc) for perc in scenario.percentiles]) if scenario.percentiles else '50',
         timestampSubmitted=datetime.now(),
         timestampSimulated=None,
-        userId=userId,
-        orgId=orgId
     )
     with next(get_session()) as session:
         nested_dict = lambda: defaultdict(nested_dict)

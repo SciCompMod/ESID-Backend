@@ -22,7 +22,6 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
                 # async def get_user(request: Request):
                 #     return request.state.user
                 request.state.user = user
-                request.state.realm = realm
 
                 # (Optional) role check can be added
                 # if ['admin'] not in user.role:
