@@ -27,7 +27,9 @@ class Scenario(SQLModel, table=True):
 
     timestampSubmitted: Optional[datetime] = Field(default=None, nullable=True)
     timestampSimulated: Optional[datetime] = Field(default=None, nullable=True)
-
+    
+    userId: Optional[str] = Field(default=None, nullable=True) # Created by user
+    orgId: Optional[str] = Field(default=None, nullable=True) # Created by user's LHA/Organization
 
 class ParameterDefinition(SQLModel, table=True):
     id: Optional[uuid.UUID] = Field(default_factory=uuid.uuid4, primary_key=True, nullable=False)
