@@ -45,10 +45,10 @@ from app.db.tasks import (
 )
 
 class LookupObject:
-    scenario: Scenario = None
-    model: Model = None
-    groups: List[Group] = []
-    compartments: List[Compartment] = []
+    scenario: Optional[Scenario]
+    model: Optional[Model]
+    groups: List[Group]
+    compartments: List[Compartment]
     nodes: List[Node]
 
 CompartmentNames = {
@@ -119,7 +119,7 @@ class ScenarioController:
         file: UploadFile,
     ) -> ID:
         """Supply simulation data for a scenario."""
-        if not file or not file.filename.endswith('.zip'):
+        if not file or file.filename is None or not file.filename.endswith('.zip'):
             raise HTTPException(
                 status_code=422,
                 detail="No file uploaded with request or not a .zip file"
@@ -149,7 +149,7 @@ class ScenarioController:
             )
         else:
             # Flatten and send to DB
-            datapoint_update_all_by_scenario(scenarioId, numpy.concatenate(res).tolist())
+            datapoint_update_all_by_scenario(scenarioId, numpy.concatenate(res).tolist()) # type: ignore
         return ID(id=scenarioId)
 
     # New function for the worker endpoint
@@ -160,7 +160,7 @@ class ScenarioController:
     ) -> ID:
         """Prepare request data for the worker task."""
         # Check if uploaded file is a .zip
-        if not file or not file.filename.endswith('.zip'):
+        if not file or file.filename is None or not file.filename.endswith('.zip'):
             raise HTTPException(
                 status_code=422,
                 detail="No file uploaded with request or not a .zip file"
@@ -174,7 +174,8 @@ class ScenarioController:
             # create directory for files
             if not os.path.exists(dir):
                 try:
-                    os.makedirs(dir)
+                    os.umask(0)
+                    os.makedirs(dir, 0o777)
                 except OSError as error:
                     print('Exception when trying to save upload file:')
                     print(error)
@@ -189,7 +190,16 @@ class ScenarioController:
                     detail=f"Files for {scenarioId} already exist on the server and a worker may be processing them right now."
                 )
             # write uploaded file into input dir
-            async with aiofiles.open(os.path.join(dir, fname), 'wb') as out_file:
+            opener = os.open(
+                path=os.path.join(dir, fname),
+                flags=(
+                    os.O_WRONLY
+                    | os.O_CREAT
+                    | os.O_TRUNC
+                ),
+                mode= 0o777
+            )
+            async with aiofiles.open(opener, 'wb') as out_file:
                 # while loop for chunked write
                 # TODO: benchmark chunk sizes, currently load wile whole (30~40mb)
                 while content := await file.read():
@@ -203,7 +213,6 @@ class ScenarioController:
         task = celery_app.send_task(
             "tasks.import_scenario",
             kwargs={'scenarioId': scenarioId},
-            countdown=30
         )
         return ID(id=task.id)
 

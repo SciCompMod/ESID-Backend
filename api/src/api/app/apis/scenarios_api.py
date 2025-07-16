@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import logging
+import json
 from typing import List  # noqa: F401
 from datetime import date
 from pydantic import Field, StrictStr
@@ -130,10 +131,7 @@ async def import_scenario_data(
 )
 async def import_scenario_data_by_worker(
     scenarioId: StrictStr = Path(..., description="UUID of scenario"),
-    file: UploadFile = File(None, description="zipped HDF5 files of the simulation results"),
-    token_bearerAuth: TokenModel = Security(
-        get_token_bearerAuth
-    ),
+    file: UploadFile = File(None, description="zipped HDF5 files of the simulation results")
 ) -> ID:
     """Upload simulation data for a scenario."""
     log.info(f'PUT /scenarios/{scenarioId} worker task received...')
@@ -161,7 +159,7 @@ async def list_scenarios() -> List[ReducedScenario]:
     },
     tags=["Authentication"],
 )
-async def create_protected_scenario(request: Request) -> str:
+async def return_user(request: Request) -> str:
     """Display authenticated user."""
     return f'Authenticated user: {request.state.user}'
 

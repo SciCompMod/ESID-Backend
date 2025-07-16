@@ -1,8 +1,10 @@
 # coding: utf-8
 
+import json
 import logging
 from typing import Dict, List  # noqa: F401
 from datetime import date
+from uuid import UUID
 from pydantic import Field, StrictBytes, StrictFloat, StrictInt, StrictStr
 from typing import Any, Dict, List, Optional, Tuple, Union
 from typing_extensions import Annotated
@@ -34,8 +36,6 @@ from app.models.scenario import Scenario
 
 from app.controller.scenario_controller import ScenarioController
 
-from security_api import get_token_bearerAuth, verify_lha_user
-from services.auth import User
 
 router = APIRouter()
 controller = ScenarioController()
@@ -43,22 +43,28 @@ controller = ScenarioController()
 log = logging.getLogger('API.Worker')
 logging.basicConfig(level=logging.INFO)
 
+class CustomEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, UUID):
+            # if the obj is uuid, we simply return the value of uuid
+            return o.hex
+        if isinstance(o, date):
+            return o.isoformat()
+        return json.JSONEncoder.default(self, o)
+
 @router.get(
     "/worker/task/{taskId}",
     tags=["Worker"]
 )
 async def get_task_info(
-  taskId: StrictStr = Path(..., description="UUID of the task"),
-  token_bearerAuth: TokenModel = Security(
-    get_token_bearerAuth
-  ),
+  taskId: StrictStr = Path(..., description="UUID of the task")
 ) -> JSONResponse:
   """Get info on a task"""
   result = AsyncResult(taskId, app=celery_app)
   return JSONResponse(
     content={
-      'status': result.status,
-      'result': result.result
+      'status': json.loads(json.dumps(result.status, cls=CustomEncoder)),
+      'result': json.loads(json.dumps(result.result, cls=CustomEncoder))
     },
     status_code=200
   )
