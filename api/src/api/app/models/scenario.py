@@ -49,6 +49,9 @@ class Scenario(BaseModel):
     timestamp_simulated: Optional[datetime] = Field(default=None, alias="timestampSimulated", description="Timestamp when the scenario was finished simulating and data is available")
     __properties: ClassVar[List[str]] = ["id", "name", "description", "startDate", "endDate", "modelId", "modelParameters", "nodeListId", "linkedInterventions", "percentiles", "timestampSubmitted", "timestampSimulated"]
 
+    creator_user_id: Optional[str] = None
+    creator_org_id: Optional[str] = None
+
     model_config = {
         "populate_by_name": True,
         "validate_assignment": True,

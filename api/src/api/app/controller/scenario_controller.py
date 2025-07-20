@@ -61,14 +61,12 @@ class ScenarioController:
     
     async def create_scenario(
         self,
-        scenario: Optional[Scenario],
-        userId: Optional[str],
-        orgId: Optional[str]
+        scenario: Optional[Scenario]
     ) -> ID:
         """Create a new scenario to be simulated."""
         if not scenario:
             raise HTTPException(status_code=500, detail="No scenario provided")
-        return scenario_create(scenario, userId, orgId)
+        return scenario_create(scenario)
 
 
     async def delete_scenario(
