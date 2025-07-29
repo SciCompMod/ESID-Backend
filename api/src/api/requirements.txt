@@ -19,3 +19,4 @@ aiofiles==23.1.0
 numpy==1.26.4
 pandas==1.5.3
 h5py==3.10.0
+minio==7.2.15

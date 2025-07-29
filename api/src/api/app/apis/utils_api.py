@@ -35,4 +35,4 @@ async def validate_and_forward_shared_case_data(
 ) -> None:
     """Share Case Data with ESID."""
     log.info(f'POST /utils/caseshare received...')
-    return await controller.handle_case_data(file)
+    return await controller.handle_case_data_validation_upload(file)

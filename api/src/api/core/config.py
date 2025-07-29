@@ -1,6 +1,6 @@
 from databases import DatabaseURL
 from starlette.config import Config
-from starlette.datastructures import Secret
+from starlette.datastructures import Secret, URL
 
 config = Config(".env")
 
@@ -29,3 +29,8 @@ DATABASE_URL = config(
 
 # OAuth2 settings
 IDP_ROOT_URL = config("IDP_ROOT_URL", cast=str, default="https://dev.lokiam.de")
+
+# Forward of uploaded case file settings
+UPLOAD_FORWARD_ENDPOINT = config("UPLOAD_FORWARD_ENDPOINT", cast=URL)
+UPLOAD_FORWARD_ACCESS_KEY = config("UPLOAD_FORWARD_ACCESS_KEY", cast=Secret)
+UPLOAD_FORWARD_SECRET_KEY = config("UPLOAD_FORWARD_SECRET_KEY", cast=Secret)

@@ -9,7 +9,7 @@ from security_api import get_user, get_bearer, get_realm
 class AuthenticationMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
         # authenticate all methods except GET and OPTIONS
-        protected_methods = ['POST', 'PUT', 'DELETE']
+        protected_methods = [] #['POST', 'PUT', 'DELETE']
         if request.method in protected_methods:
             try:
                 # try to verify token and extract user information
