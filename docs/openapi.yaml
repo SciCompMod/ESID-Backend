@@ -1,2507 +1,2459 @@
 {
   "openapi": "3.1.0",
-  "info": {
-    "title": "ESID Backend Interface",
-    "version": "1.1.0"
-  },
-  "paths": {
-    "/compartments": {
-      "get": {
-        "tags": [
-          "Compartments"
-        ],
-        "summary": "List Compartments",
-        "description": "List all existing compartments.",
-        "operationId": "list_compartments_compartments_get",
-        "responses": {
-          "200": {
-            "description": "Returned the list of compartments.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/Compartment"
+  "info": { "title": "ESID Backend Interface", "version": "2.0.0" },
+  "paths":
+    {
+      "/compartments":
+        {
+          "get":
+            {
+              "tags": ["Compartments"],
+              "summary": "List Compartments",
+              "description": "List all existing compartments.",
+              "operationId": "list_compartments_compartments_get",
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Returned the list of compartments.",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "items":
+                                    {
+                                      "$ref": "#/components/schemas/Compartment",
+                                    },
+                                  "type": "array",
+                                  "title": "Response 200 List Compartments Compartments Get",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+          "post":
+            {
+              "tags": ["Compartments"],
+              "summary": "Create Compartment",
+              "description": "Create a new compartment.",
+              "operationId": "create_compartment_compartments_post",
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/Compartment",
+                              "description": "",
+                            },
+                        },
+                    },
+                },
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Successful Response",
+                      "content":
+                        {
+                          "application/json":
+                            { "schema": { "$ref": "#/components/schemas/ID" } },
+                        },
+                    },
+                  "201":
+                    {
+                      "description": "Created compartment.",
+                      "content":
+                        {
+                          "application/json":
+                            { "schema": { "$ref": "#/components/schemas/ID" } },
+                        },
+                    },
+                  "422":
+                    {
+                      "description": "Validation Error",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/HTTPValidationError",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+      "/compartments/{compartmentId}":
+        {
+          "delete":
+            {
+              "tags": ["Compartments"],
+              "summary": "Delete Compartment",
+              "description": "Delete specific compartment.",
+              "operationId": "delete_compartment_compartments__compartmentId__delete",
+              "parameters":
+                [
+                  {
+                    "name": "compartmentId",
+                    "in": "path",
+                    "required": true,
+                    "schema":
+                      {
+                        "type": "string",
+                        "description": "",
+                        "title": "Compartmentid",
+                      },
                   },
-                  "type": "array",
-                  "title": "Response 200 List Compartments Compartments Get"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Compartments"
-        ],
-        "summary": "Create Compartment",
-        "description": "Create a new compartment.",
-        "operationId": "create_compartment_compartments_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Compartment",
-                "description": ""
-              }
-            }
-          }
+                ],
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Deleted compartment.",
+                      "content": { "application/json": { "schema": {} } },
+                    },
+                  "409":
+                    {
+                      "description": "Preconditions not met. Error contains reason. May have additional properties referenced in error.",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                { "$ref": "#/components/schemas/Error" },
+                            },
+                        },
+                    },
+                  "422":
+                    {
+                      "description": "Validation Error",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/HTTPValidationError",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ID"
-                }
-              }
-            }
-          },
-          "201": {
-            "description": "Created compartment.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ID"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/compartments/{compartmentId}": {
-      "delete": {
-        "tags": [
-          "Compartments"
-        ],
-        "summary": "Delete Compartment",
-        "description": "Delete specific compartment.",
-        "operationId": "delete_compartment_compartments__compartmentId__delete",
-        "parameters": [
-          {
-            "name": "compartmentId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "description": "",
-              "title": "Compartmentid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Deleted compartment.",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "409": {
-            "description": "Preconditions not met. Error contains reason. May have additional properties referenced in error.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/groups": {
-      "get": {
-        "tags": [
-          "Groups"
-        ],
-        "summary": "List Groups",
-        "description": "List all (stratification) groups.",
-        "operationId": "list_groups_groups_get",
-        "responses": {
-          "200": {
-            "description": "Returned list of existing groups",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/Group"
+      "/groups":
+        {
+          "get":
+            {
+              "tags": ["Groups"],
+              "summary": "List Groups",
+              "description": "List all (stratification) groups.",
+              "operationId": "list_groups_groups_get",
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Returned list of existing groups",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "items":
+                                    { "$ref": "#/components/schemas/Group" },
+                                  "type": "array",
+                                  "title": "Response 200 List Groups Groups Get",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+          "post":
+            {
+              "tags": ["Groups"],
+              "summary": "Create Group",
+              "description": "Create a new (stratification) group. All groups with the same category are mutually exclusive.",
+              "operationId": "create_group_groups_post",
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/Group",
+                              "description": "",
+                            },
+                        },
+                    },
+                },
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Successful Response",
+                      "content":
+                        {
+                          "application/json":
+                            { "schema": { "$ref": "#/components/schemas/ID" } },
+                        },
+                    },
+                  "201":
+                    {
+                      "description": "Created group.",
+                      "content":
+                        {
+                          "application/json":
+                            { "schema": { "$ref": "#/components/schemas/ID" } },
+                        },
+                    },
+                  "422":
+                    {
+                      "description": "Validation Error",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/HTTPValidationError",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+      "/groups/{groupId}":
+        {
+          "delete":
+            {
+              "tags": ["Groups"],
+              "summary": "Delete Group",
+              "description": "Delete the specified group.",
+              "operationId": "delete_group_groups__groupId__delete",
+              "parameters":
+                [
+                  {
+                    "name": "groupId",
+                    "in": "path",
+                    "required": true,
+                    "schema":
+                      {
+                        "type": "string",
+                        "description": "",
+                        "title": "Groupid",
+                      },
                   },
-                  "type": "array",
-                  "title": "Response 200 List Groups Groups Get"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Groups"
-        ],
-        "summary": "Create Group",
-        "description": "Create a new (stratification) group. All groups with the same category are mutually exclusive.",
-        "operationId": "create_group_groups_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Group",
-                "description": ""
-              }
-            }
-          }
+                ],
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Group deleted.",
+                      "content": { "application/json": { "schema": {} } },
+                    },
+                  "409":
+                    {
+                      "description": "Preconditions not met. Error contains reason. May have additional properties referenced in error.",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                { "$ref": "#/components/schemas/Error" },
+                            },
+                        },
+                    },
+                  "422":
+                    {
+                      "description": "Validation Error",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/HTTPValidationError",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ID"
-                }
-              }
-            }
-          },
-          "201": {
-            "description": "Created group.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ID"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/groups/{groupId}": {
-      "delete": {
-        "tags": [
-          "Groups"
-        ],
-        "summary": "Delete Group",
-        "description": "Delete the specified group.",
-        "operationId": "delete_group_groups__groupId__delete",
-        "parameters": [
-          {
-            "name": "groupId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "description": "",
-              "title": "Groupid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Group deleted.",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "409": {
-            "description": "Preconditions not met. Error contains reason. May have additional properties referenced in error.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/groups/categories/": {
-      "get": {
-        "tags": [
-          "Groups"
-        ],
-        "summary": "List Categories",
-        "description": "List all existing categories.",
-        "operationId": "list_categories_groups_categories__get",
-        "responses": {
-          "200": {
-            "description": "Returned list of existing categories.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "type": "string"
+      "/groups/categories/":
+        {
+          "get":
+            {
+              "tags": ["Groups"],
+              "summary": "List Categories",
+              "description": "List all existing categories.",
+              "operationId": "list_categories_groups_categories__get",
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Returned list of existing categories.",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "items": { "type": "string" },
+                                  "type": "array",
+                                  "title": "Response 200 List Categories Groups Categories  Get",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+      "/interventions/templates":
+        {
+          "get":
+            {
+              "tags": ["Interventions"],
+              "summary": "List Intervention Templates",
+              "description": "List available Intervention templates that can be implemented.",
+              "operationId": "list_intervention_templates_interventions_templates_get",
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Returned the list of available templates.",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "items":
+                                    {
+                                      "$ref": "#/components/schemas/InterventionTemplate",
+                                    },
+                                  "type": "array",
+                                  "title": "Response 200 List Intervention Templates Interventions Templates Get",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+          "post":
+            {
+              "tags": ["Interventions"],
+              "summary": "Create Intervention Template",
+              "description": "Creates a new intervention template to be used in implementations.",
+              "operationId": "create_intervention_template_interventions_templates_post",
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/InterventionTemplate",
+                              "description": "",
+                            },
+                        },
+                    },
+                },
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Successful Response",
+                      "content":
+                        {
+                          "application/json":
+                            { "schema": { "$ref": "#/components/schemas/ID" } },
+                        },
+                    },
+                  "201":
+                    {
+                      "description": "Intervention created.",
+                      "content":
+                        {
+                          "application/json":
+                            { "schema": { "$ref": "#/components/schemas/ID" } },
+                        },
+                    },
+                  "422":
+                    {
+                      "description": "Validation Error",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/HTTPValidationError",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+      "/interventions/templates/{interventionTemplateId}":
+        {
+          "delete":
+            {
+              "tags": ["Interventions"],
+              "summary": "Delete Intervention Template",
+              "description": "Delete an intervention template.",
+              "operationId": "delete_intervention_template_interventions_templates__interventionTemplateId__delete",
+              "parameters":
+                [
+                  {
+                    "name": "interventionTemplateId",
+                    "in": "path",
+                    "required": true,
+                    "schema":
+                      {
+                        "type": "string",
+                        "description": "",
+                        "title": "Interventiontemplateid",
+                      },
                   },
-                  "type": "array",
-                  "title": "Response 200 List Categories Groups Categories  Get"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/interventions/templates": {
-      "get": {
-        "tags": [
-          "Interventions"
-        ],
-        "summary": "List Intervention Templates",
-        "description": "List available Intervention templates that can be implemented.",
-        "operationId": "list_intervention_templates_interventions_templates_get",
-        "responses": {
-          "200": {
-            "description": "Returned the list of available templates.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/InterventionTemplate"
+                ],
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Deleted template.",
+                      "content": { "application/json": { "schema": {} } },
+                    },
+                  "409":
+                    {
+                      "description": "Preconditions not met. Error contains reason. May have additional properties referenced in error.",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                { "$ref": "#/components/schemas/Error" },
+                            },
+                        },
+                    },
+                  "422":
+                    {
+                      "description": "Validation Error",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/HTTPValidationError",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+      "/models":
+        {
+          "get":
+            {
+              "tags": ["Models"],
+              "summary": "List Models",
+              "description": "List all available simulation models.",
+              "operationId": "list_models_models_get",
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Returned list of models.",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "items":
+                                    {
+                                      "$ref": "#/components/schemas/ReducedInfo",
+                                    },
+                                  "type": "array",
+                                  "title": "Response 200 List Models Models Get",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+          "post":
+            {
+              "tags": ["Models"],
+              "summary": "Create Model",
+              "description": "Create a new simulation model.",
+              "operationId": "create_model_models_post",
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/Model",
+                              "description": "",
+                            },
+                        },
+                    },
+                },
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Created new model.",
+                      "content":
+                        {
+                          "application/json":
+                            { "schema": { "$ref": "#/components/schemas/ID" } },
+                        },
+                    },
+                  "422":
+                    {
+                      "description": "Validation Error",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/HTTPValidationError",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+      "/models/{modelId}":
+        {
+          "delete":
+            {
+              "tags": ["Models"],
+              "summary": "Delete Model",
+              "description": "Delete a model if it is not referenced in any scenarios.",
+              "operationId": "delete_model_models__modelId__delete",
+              "parameters":
+                [
+                  {
+                    "name": "modelId",
+                    "in": "path",
+                    "required": true,
+                    "schema":
+                      {
+                        "type": "string",
+                        "description": "",
+                        "title": "Modelid",
+                      },
                   },
-                  "type": "array",
-                  "title": "Response 200 List Intervention Templates Interventions Templates Get"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Interventions"
-        ],
-        "summary": "Create Intervention Template",
-        "description": "Creates a new intervention template to be used in implementations.",
-        "operationId": "create_intervention_template_interventions_templates_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/InterventionTemplate",
-                "description": ""
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ID"
-                }
-              }
-            }
-          },
-          "201": {
-            "description": "Intervention created.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ID"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/interventions/templates/{interventionTemplateId}": {
-      "delete": {
-        "tags": [
-          "Interventions"
-        ],
-        "summary": "Delete Intervention Template",
-        "description": "Delete an intervention template.",
-        "operationId": "delete_intervention_template_interventions_templates__interventionTemplateId__delete",
-        "parameters": [
-          {
-            "name": "interventionTemplateId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "description": "",
-              "title": "Interventiontemplateid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Deleted template.",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "409": {
-            "description": "Preconditions not met. Error contains reason. May have additional properties referenced in error.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/models": {
-      "get": {
-        "tags": [
-          "Models"
-        ],
-        "summary": "List Models",
-        "description": "List all available simulation models.",
-        "operationId": "list_models_models_get",
-        "responses": {
-          "200": {
-            "description": "Returned list of models.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/ReducedInfo"
+                ],
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Model deleted.",
+                      "content": { "application/json": { "schema": {} } },
+                    },
+                  "409":
+                    {
+                      "description": "Preconditions not met. Error contains reason. May have additional properties referenced in error.",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                { "$ref": "#/components/schemas/Error" },
+                            },
+                        },
+                    },
+                  "422":
+                    {
+                      "description": "Validation Error",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/HTTPValidationError",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+          "get":
+            {
+              "tags": ["Models"],
+              "summary": "Get Model",
+              "description": "Get specific model information.",
+              "operationId": "get_model_models__modelId__get",
+              "parameters":
+                [
+                  {
+                    "name": "modelId",
+                    "in": "path",
+                    "required": true,
+                    "schema":
+                      {
+                        "type": "string",
+                        "description": "",
+                        "title": "Modelid",
+                      },
                   },
-                  "type": "array",
-                  "title": "Response 200 List Models Models Get"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Models"
-        ],
-        "summary": "Create Model",
-        "description": "Create a new simulation model.",
-        "operationId": "create_model_models_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Model",
-                "description": ""
-              }
-            }
-          }
+                ],
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Returned the list of Models.",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                { "$ref": "#/components/schemas/Model" },
+                            },
+                        },
+                    },
+                  "422":
+                    {
+                      "description": "Validation Error",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/HTTPValidationError",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         },
-        "responses": {
-          "200": {
-            "description": "Created new model.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ID"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/models/{modelId}": {
-      "delete": {
-        "tags": [
-          "Models"
-        ],
-        "summary": "Delete Model",
-        "description": "Delete a model if it is not referenced in any scenarios.",
-        "operationId": "delete_model_models__modelId__delete",
-        "parameters": [
-          {
-            "name": "modelId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "description": "",
-              "title": "Modelid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Model deleted.",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "409": {
-            "description": "Preconditions not met. Error contains reason. May have additional properties referenced in error.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "tags": [
-          "Models"
-        ],
-        "summary": "Get Model",
-        "description": "Get specific model information.",
-        "operationId": "get_model_models__modelId__get",
-        "parameters": [
-          {
-            "name": "modelId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "description": "",
-              "title": "Modelid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Returned the list of Models.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Model"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/nodes": {
-      "get": {
-        "tags": [
-          "Nodes"
-        ],
-        "summary": "List Nodes",
-        "description": "List all available nodes.",
-        "operationId": "list_nodes_nodes_get",
-        "responses": {
-          "200": {
-            "description": "Returned list of nodes",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/Node"
+      "/nodes":
+        {
+          "get":
+            {
+              "tags": ["Nodes"],
+              "summary": "List Nodes",
+              "description": "List all available nodes.",
+              "operationId": "list_nodes_nodes_get",
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Returned list of nodes",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "items":
+                                    { "$ref": "#/components/schemas/Node" },
+                                  "type": "array",
+                                  "title": "Response 200 List Nodes Nodes Get",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+          "post":
+            {
+              "tags": ["Nodes"],
+              "summary": "Create Node",
+              "description": "Create a new node.",
+              "operationId": "create_node_nodes_post",
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/Node",
+                              "description": "",
+                            },
+                        },
+                    },
+                },
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Successful Response",
+                      "content":
+                        {
+                          "application/json":
+                            { "schema": { "$ref": "#/components/schemas/ID" } },
+                        },
+                    },
+                  "201":
+                    {
+                      "description": "node created",
+                      "content":
+                        {
+                          "application/json":
+                            { "schema": { "$ref": "#/components/schemas/ID" } },
+                        },
+                    },
+                  "422":
+                    {
+                      "description": "Validation Error",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/HTTPValidationError",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+      "/nodelists":
+        {
+          "get":
+            {
+              "tags": ["Nodes"],
+              "summary": "List Node Lists",
+              "description": "List defined node lists.",
+              "operationId": "list_node_lists_nodelists_get",
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Returned all defined node lists",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "items":
+                                    {
+                                      "$ref": "#/components/schemas/ReducedInfo",
+                                    },
+                                  "type": "array",
+                                  "title": "Response 200 List Node Lists Nodelists Get",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+          "post":
+            {
+              "tags": ["Nodes"],
+              "summary": "Create Node List",
+              "description": "Create a new node list.",
+              "operationId": "create_node_list_nodelists_post",
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/NodeList",
+                              "description": "",
+                            },
+                        },
+                    },
+                },
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Successful Response",
+                      "content":
+                        {
+                          "application/json":
+                            { "schema": { "$ref": "#/components/schemas/ID" } },
+                        },
+                    },
+                  "201":
+                    {
+                      "description": "Created node list.",
+                      "content":
+                        {
+                          "application/json":
+                            { "schema": { "$ref": "#/components/schemas/ID" } },
+                        },
+                    },
+                  "422":
+                    {
+                      "description": "Validation Error",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/HTTPValidationError",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+      "/nodes/{nodeId}":
+        {
+          "delete":
+            {
+              "tags": ["Nodes"],
+              "summary": "Delete Node",
+              "description": "Delete a node.",
+              "operationId": "delete_node_nodes__nodeId__delete",
+              "parameters":
+                [
+                  {
+                    "name": "nodeId",
+                    "in": "path",
+                    "required": true,
+                    "schema":
+                      {
+                        "type": "string",
+                        "description": "",
+                        "title": "Nodeid",
+                      },
                   },
-                  "type": "array",
-                  "title": "Response 200 List Nodes Nodes Get"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Nodes"
-        ],
-        "summary": "Create Node",
-        "description": "Create a new node.",
-        "operationId": "create_node_nodes_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Node",
-                "description": ""
-              }
-            }
-          }
+                ],
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Deleted node.",
+                      "content": { "application/json": { "schema": {} } },
+                    },
+                  "409":
+                    {
+                      "description": "Preconditions not met. Error contains reason. May have additional properties referenced in error.",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                { "$ref": "#/components/schemas/Error" },
+                            },
+                        },
+                    },
+                  "422":
+                    {
+                      "description": "Validation Error",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/HTTPValidationError",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ID"
-                }
-              }
-            }
-          },
-          "201": {
-            "description": "node created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ID"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/nodelists": {
-      "get": {
-        "tags": [
-          "Nodes"
-        ],
-        "summary": "List Node Lists",
-        "description": "List defined node lists.",
-        "operationId": "list_node_lists_nodelists_get",
-        "responses": {
-          "200": {
-            "description": "Returned all defined node lists",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/ReducedInfo"
+      "/nodelists/{nodeListId}":
+        {
+          "delete":
+            {
+              "tags": ["Nodes"],
+              "summary": "Delete Node List",
+              "description": "Delete the specified node list.",
+              "operationId": "delete_node_list_nodelists__nodeListId__delete",
+              "parameters":
+                [
+                  {
+                    "name": "nodeListId",
+                    "in": "path",
+                    "required": true,
+                    "schema":
+                      {
+                        "type": "string",
+                        "description": "",
+                        "title": "Nodelistid",
+                      },
                   },
-                  "type": "array",
-                  "title": "Response 200 List Node Lists Nodelists Get"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Nodes"
-        ],
-        "summary": "Create Node List",
-        "description": "Create a new node list.",
-        "operationId": "create_node_list_nodelists_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NodeList",
-                "description": ""
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ID"
-                }
-              }
-            }
-          },
-          "201": {
-            "description": "Created node list.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ID"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/nodes/{nodeId}": {
-      "delete": {
-        "tags": [
-          "Nodes"
-        ],
-        "summary": "Delete Node",
-        "description": "Delete a node.",
-        "operationId": "delete_node_nodes__nodeId__delete",
-        "parameters": [
-          {
-            "name": "nodeId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "description": "",
-              "title": "Nodeid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Deleted node.",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "409": {
-            "description": "Preconditions not met. Error contains reason. May have additional properties referenced in error.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/nodelists/{nodeListId}": {
-      "delete": {
-        "tags": [
-          "Nodes"
-        ],
-        "summary": "Delete Node List",
-        "description": "Delete the specified node list.",
-        "operationId": "delete_node_list_nodelists__nodeListId__delete",
-        "parameters": [
-          {
-            "name": "nodeListId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "description": "",
-              "title": "Nodelistid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Deleted node list.",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "409": {
-            "description": "Preconditions not met. Error contains reason. May have additional properties referenced in error.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "tags": [
-          "Nodes"
-        ],
-        "summary": "Get Node List",
-        "description": "Get specified node list.",
-        "operationId": "get_node_list_nodelists__nodeListId__get",
-        "parameters": [
-          {
-            "name": "nodeListId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "description": "",
-              "title": "Nodelistid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Returned the node list.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NodeListWithNodes"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/parameterdefinitions": {
-      "get": {
-        "tags": [
-          "ParameterDefinitions"
-        ],
-        "summary": "List Parameter Definitions",
-        "description": "List all existing Parameter definitions.",
-        "operationId": "list_parameter_definitions_parameterdefinitions_get",
-        "responses": {
-          "200": {
-            "description": "Returned list of parameter definitions.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/ParameterDefinition"
+                ],
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Deleted node list.",
+                      "content": { "application/json": { "schema": {} } },
+                    },
+                  "409":
+                    {
+                      "description": "Preconditions not met. Error contains reason. May have additional properties referenced in error.",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                { "$ref": "#/components/schemas/Error" },
+                            },
+                        },
+                    },
+                  "422":
+                    {
+                      "description": "Validation Error",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/HTTPValidationError",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+          "get":
+            {
+              "tags": ["Nodes"],
+              "summary": "Get Node List",
+              "description": "Get specified node list.",
+              "operationId": "get_node_list_nodelists__nodeListId__get",
+              "parameters":
+                [
+                  {
+                    "name": "nodeListId",
+                    "in": "path",
+                    "required": true,
+                    "schema":
+                      {
+                        "type": "string",
+                        "description": "",
+                        "title": "Nodelistid",
+                      },
                   },
-                  "type": "array",
-                  "title": "Response 200 List Parameter Definitions Parameterdefinitions Get"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "ParameterDefinitions"
-        ],
-        "summary": "Create Parameter Definition",
-        "description": "Create a new parameter definition.",
-        "operationId": "create_parameter_definition_parameterdefinitions_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ParameterDefinition",
-                "description": ""
-              }
-            }
-          }
+                ],
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Returned the node list.",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/NodeListWithNodes",
+                                },
+                            },
+                        },
+                    },
+                  "422":
+                    {
+                      "description": "Validation Error",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/HTTPValidationError",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ID"
-                }
-              }
-            }
-          },
-          "201": {
-            "description": "Created parameter definition.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ID"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/parameterdefinitions/{parameterId}": {
-      "delete": {
-        "tags": [
-          "ParameterDefinitions"
-        ],
-        "summary": "Delete Parameter Definition",
-        "description": "Delete a parameter definition.",
-        "operationId": "delete_parameter_definition_parameterdefinitions__parameterId__delete",
-        "parameters": [
-          {
-            "name": "parameterId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "description": "",
-              "title": "Parameterid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Deleted parameter definition.",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "409": {
-            "description": "Preconditions not met. Error contains reason. May have additional properties referenced in error.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "tags": [
-          "ParameterDefinitions"
-        ],
-        "summary": "Get Parameter Definition",
-        "description": "Get specific Parameter definitions.",
-        "operationId": "get_parameter_definition_parameterdefinitions__parameterId__get",
-        "parameters": [
-          {
-            "name": "parameterId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "description": "",
-              "title": "Parameterid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Returned specific of parameter definitions.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ParameterDefinition"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/scenarios": {
-      "get": {
-        "tags": [
-          "Scenarios"
-        ],
-        "summary": "List Scenarios",
-        "description": "List all available scenarios.",
-        "operationId": "list_scenarios_scenarios_get",
-        "responses": {
-          "200": {
-            "description": "Returned list of scenario IDs.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/ReducedScenario"
+      "/parameterdefinitions":
+        {
+          "get":
+            {
+              "tags": ["ParameterDefinitions"],
+              "summary": "List Parameter Definitions",
+              "description": "List all existing Parameter definitions.",
+              "operationId": "list_parameter_definitions_parameterdefinitions_get",
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Returned list of parameter definitions.",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "items":
+                                    {
+                                      "$ref": "#/components/schemas/ParameterDefinition",
+                                    },
+                                  "type": "array",
+                                  "title": "Response 200 List Parameter Definitions Parameterdefinitions Get",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+          "post":
+            {
+              "tags": ["ParameterDefinitions"],
+              "summary": "Create Parameter Definition",
+              "description": "Create a new parameter definition.",
+              "operationId": "create_parameter_definition_parameterdefinitions_post",
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/ParameterDefinition",
+                              "description": "",
+                            },
+                        },
+                    },
+                },
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Successful Response",
+                      "content":
+                        {
+                          "application/json":
+                            { "schema": { "$ref": "#/components/schemas/ID" } },
+                        },
+                    },
+                  "201":
+                    {
+                      "description": "Created parameter definition.",
+                      "content":
+                        {
+                          "application/json":
+                            { "schema": { "$ref": "#/components/schemas/ID" } },
+                        },
+                    },
+                  "422":
+                    {
+                      "description": "Validation Error",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/HTTPValidationError",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+      "/parameterdefinitions/{parameterId}":
+        {
+          "delete":
+            {
+              "tags": ["ParameterDefinitions"],
+              "summary": "Delete Parameter Definition",
+              "description": "Delete a parameter definition.",
+              "operationId": "delete_parameter_definition_parameterdefinitions__parameterId__delete",
+              "parameters":
+                [
+                  {
+                    "name": "parameterId",
+                    "in": "path",
+                    "required": true,
+                    "schema":
+                      {
+                        "type": "string",
+                        "description": "",
+                        "title": "Parameterid",
+                      },
                   },
-                  "type": "array",
-                  "title": "Response 200 List Scenarios Scenarios Get"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Scenarios"
-        ],
-        "summary": "Create Scenario",
-        "description": "Create a new scenario to be simulated.",
-        "operationId": "create_scenario_scenarios_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Scenario-Input",
-                "description": ""
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ID"
-                }
-              }
-            }
-          },
-          "201": {
-            "description": "Created new scenario.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ID"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/scenarios/{scenarioId}": {
-      "delete": {
-        "tags": [
-          "Scenarios"
-        ],
-        "summary": "Delete Scenario",
-        "description": "Delete the Scenario and its data",
-        "operationId": "delete_scenario_scenarios__scenarioId__delete",
-        "parameters": [
-          {
-            "name": "scenarioId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "description": "",
-              "title": "Scenarioid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Deleted scenario.",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "409": {
-            "description": "Preconditions not met. Error contains reason. May have additional properties referenced in error.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "tags": [
-          "Scenarios"
-        ],
-        "summary": "Get Scenario",
-        "description": "Get information about the specified scenario.",
-        "operationId": "get_scenario_scenarios__scenarioId__get",
-        "parameters": [
-          {
-            "name": "scenarioId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "description": "",
-              "title": "Scenarioid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Returned scenario.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Scenario-Output"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Scenarios"
-        ],
-        "summary": "Import Scenario Data",
-        "description": "Supply simulation data for a scenario.",
-        "operationId": "import_scenario_data_scenarios__scenarioId__put",
-        "parameters": [
-          {
-            "name": "scenarioId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "description": "UUID of the scenario",
-              "title": "Scenarioid"
-            },
-            "description": "UUID of the scenario"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "$ref": "#/components/schemas/Body_import_scenario_data_scenarios__scenarioId__put"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ID"
-                }
-              }
-            }
-          },
-          "201": {
-            "description": "Added data to scenario.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ID"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/scenarios/{scenarioId}/infectiondata": {
-      "get": {
-        "tags": [
-          "Scenarios"
-        ],
-        "summary": "Get Infection Data",
-        "description": "Get scenario&#39;s infection data based on specified filters.",
-        "operationId": "get_infection_data_scenarios__scenarioId__infectiondata_get",
-        "parameters": [
-          {
-            "name": "scenarioId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "description": "",
-              "title": "Scenarioid"
-            }
-          },
-          {
-            "name": "nodes",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
+                ],
+              "responses":
                 {
-                  "type": "string"
+                  "200":
+                    {
+                      "description": "Deleted parameter definition.",
+                      "content": { "application/json": { "schema": {} } },
+                    },
+                  "409":
+                    {
+                      "description": "Preconditions not met. Error contains reason. May have additional properties referenced in error.",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                { "$ref": "#/components/schemas/Error" },
+                            },
+                        },
+                    },
+                  "422":
+                    {
+                      "description": "Validation Error",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/HTTPValidationError",
+                                },
+                            },
+                        },
+                    },
                 },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "Comma separated list of NodeIds or NUTS",
-              "title": "Nodes"
             },
-            "description": "Comma separated list of NodeIds or NUTS"
-          },
-          {
-            "name": "startDate",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "format": "date"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "Start date of requested data",
-              "title": "Startdate"
-            },
-            "description": "Start date of requested data"
-          },
-          {
-            "name": "endDate",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "format": "date"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "End date of requested data",
-              "title": "Enddate"
-            },
-            "description": "End date of requested data"
-          },
-          {
-            "name": "compartments",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "Comma separated list of Compartment IDs",
-              "title": "Compartments"
-            },
-            "description": "Comma separated list of Compartment IDs"
-          },
-          {
-            "name": "groups",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "List of groups requesting data for",
-              "title": "Groups"
-            },
-            "description": "List of groups requesting data for"
-          },
-          {
-            "name": "percentiles",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "Requested percentiles of the data",
-              "title": "Percentiles"
-            },
-            "description": "Requested percentiles of the data"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Returned data matching filters. Unnecessary fields are omitted.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Infectiondata"
+          "get":
+            {
+              "tags": ["ParameterDefinitions"],
+              "summary": "Get Parameter Definition",
+              "description": "Get specific Parameter definitions.",
+              "operationId": "get_parameter_definition_parameterdefinitions__parameterId__get",
+              "parameters":
+                [
+                  {
+                    "name": "parameterId",
+                    "in": "path",
+                    "required": true,
+                    "schema":
+                      {
+                        "type": "string",
+                        "description": "",
+                        "title": "Parameterid",
+                      },
                   },
-                  "title": "Response 200 Get Infection Data Scenarios  Scenarioid  Infectiondata Get"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
+                ],
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Returned specific of parameter definitions.",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/ParameterDefinition",
+                                },
+                            },
+                        },
+                    },
+                  "422":
+                    {
+                      "description": "Validation Error",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/HTTPValidationError",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+      "/scenarios":
+        {
+          "get":
+            {
+              "tags": ["Scenarios"],
+              "summary": "List Scenarios",
+              "description": "List all available scenarios.",
+              "operationId": "list_scenarios_scenarios_get",
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Returned list of scenario IDs.",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "items":
+                                    {
+                                      "$ref": "#/components/schemas/ReducedScenario",
+                                    },
+                                  "type": "array",
+                                  "title": "Response 200 List Scenarios Scenarios Get",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+          "post":
+            {
+              "tags": ["Scenarios"],
+              "summary": "Create Scenario",
+              "description": "Create a new scenario to be simulated.",
+              "operationId": "create_scenario_scenarios_post",
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/Scenario-Input",
+                              "description": "",
+                            },
+                        },
+                    },
+                },
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Successful Response",
+                      "content":
+                        {
+                          "application/json":
+                            { "schema": { "$ref": "#/components/schemas/ID" } },
+                        },
+                    },
+                  "201":
+                    {
+                      "description": "Created new scenario.",
+                      "content":
+                        {
+                          "application/json":
+                            { "schema": { "$ref": "#/components/schemas/ID" } },
+                        },
+                    },
+                  "422":
+                    {
+                      "description": "Validation Error",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/HTTPValidationError",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+      "/scenarios/{scenarioId}":
+        {
+          "delete":
+            {
+              "tags": ["Scenarios"],
+              "summary": "Delete Scenario",
+              "description": "Delete the Scenario and its data",
+              "operationId": "delete_scenario_scenarios__scenarioId__delete",
+              "parameters":
+                [
+                  {
+                    "name": "scenarioId",
+                    "in": "path",
+                    "required": true,
+                    "schema":
+                      {
+                        "type": "string",
+                        "description": "",
+                        "title": "Scenarioid",
+                      },
+                  },
+                ],
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Deleted scenario.",
+                      "content": { "application/json": { "schema": {} } },
+                    },
+                  "409":
+                    {
+                      "description": "Preconditions not met. Error contains reason. May have additional properties referenced in error.",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                { "$ref": "#/components/schemas/Error" },
+                            },
+                        },
+                    },
+                  "422":
+                    {
+                      "description": "Validation Error",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/HTTPValidationError",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+          "get":
+            {
+              "tags": ["Scenarios"],
+              "summary": "Get Scenario",
+              "description": "Get information about the specified scenario.",
+              "operationId": "get_scenario_scenarios__scenarioId__get",
+              "parameters":
+                [
+                  {
+                    "name": "scenarioId",
+                    "in": "path",
+                    "required": true,
+                    "schema":
+                      {
+                        "type": "string",
+                        "description": "",
+                        "title": "Scenarioid",
+                      },
+                  },
+                ],
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Returned scenario.",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/Scenario-Output",
+                                },
+                            },
+                        },
+                    },
+                  "422":
+                    {
+                      "description": "Validation Error",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/HTTPValidationError",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+          "put":
+            {
+              "tags": ["Scenarios"],
+              "summary": "Import Scenario Data",
+              "description": "Supply simulation data for a scenario.",
+              "operationId": "import_scenario_data_scenarios__scenarioId__put",
+              "parameters":
+                [
+                  {
+                    "name": "scenarioId",
+                    "in": "path",
+                    "required": true,
+                    "schema":
+                      {
+                        "type": "string",
+                        "description": "UUID of the scenario",
+                        "title": "Scenarioid",
+                      },
+                    "description": "UUID of the scenario",
+                  },
+                ],
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "multipart/form-data":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/Body_import_scenario_data_scenarios__scenarioId__put",
+                            },
+                        },
+                    },
+                },
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Successful Response",
+                      "content":
+                        {
+                          "application/json":
+                            { "schema": { "$ref": "#/components/schemas/ID" } },
+                        },
+                    },
+                  "201":
+                    {
+                      "description": "Added data to scenario.",
+                      "content":
+                        {
+                          "application/json":
+                            { "schema": { "$ref": "#/components/schemas/ID" } },
+                        },
+                    },
+                  "422":
+                    {
+                      "description": "Validation Error",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/HTTPValidationError",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+      "/scenarios/{scenarioId}/infectiondata":
+        {
+          "get":
+            {
+              "tags": ["Scenarios"],
+              "summary": "Get Infection Data",
+              "description": "Get scenario&#39;s infection data based on specified filters.",
+              "operationId": "get_infection_data_scenarios__scenarioId__infectiondata_get",
+              "parameters":
+                [
+                  {
+                    "name": "scenarioId",
+                    "in": "path",
+                    "required": true,
+                    "schema":
+                      {
+                        "type": "string",
+                        "description": "",
+                        "title": "Scenarioid",
+                      },
+                  },
+                  {
+                    "name": "nodes",
+                    "in": "query",
+                    "required": false,
+                    "schema":
+                      {
+                        "anyOf": [{ "type": "string" }, { "type": "null" }],
+                        "description": "Comma separated list of NodeIds or NUTS",
+                        "title": "Nodes",
+                      },
+                    "description": "Comma separated list of NodeIds or NUTS",
+                  },
+                  {
+                    "name": "startDate",
+                    "in": "query",
+                    "required": false,
+                    "schema":
+                      {
+                        "anyOf":
+                          [
+                            { "type": "string", "format": "date" },
+                            { "type": "null" },
+                          ],
+                        "description": "Start date of requested data",
+                        "title": "Startdate",
+                      },
+                    "description": "Start date of requested data",
+                  },
+                  {
+                    "name": "endDate",
+                    "in": "query",
+                    "required": false,
+                    "schema":
+                      {
+                        "anyOf":
+                          [
+                            { "type": "string", "format": "date" },
+                            { "type": "null" },
+                          ],
+                        "description": "End date of requested data",
+                        "title": "Enddate",
+                      },
+                    "description": "End date of requested data",
+                  },
+                  {
+                    "name": "compartments",
+                    "in": "query",
+                    "required": false,
+                    "schema":
+                      {
+                        "anyOf": [{ "type": "string" }, { "type": "null" }],
+                        "description": "Comma separated list of Compartment IDs",
+                        "title": "Compartments",
+                      },
+                    "description": "Comma separated list of Compartment IDs",
+                  },
+                  {
+                    "name": "groups",
+                    "in": "query",
+                    "required": false,
+                    "schema":
+                      {
+                        "anyOf": [{ "type": "string" }, { "type": "null" }],
+                        "description": "List of groups requesting data for",
+                        "title": "Groups",
+                      },
+                    "description": "List of groups requesting data for",
+                  },
+                  {
+                    "name": "percentiles",
+                    "in": "query",
+                    "required": false,
+                    "schema":
+                      {
+                        "anyOf": [{ "type": "string" }, { "type": "null" }],
+                        "description": "Requested percentiles of the data",
+                        "title": "Percentiles",
+                      },
+                    "description": "Requested percentiles of the data",
+                  },
+                ],
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Returned data matching filters. Unnecessary fields are omitted.",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "type": "array",
+                                  "items":
+                                    {
+                                      "$ref": "#/components/schemas/Infectiondata",
+                                    },
+                                  "title": "Response 200 Get Infection Data Scenarios  Scenarioid  Infectiondata Get",
+                                },
+                            },
+                        },
+                    },
+                  "422":
+                    {
+                      "description": "Validation Error",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/HTTPValidationError",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+      "/auth/test":
+        {
+          "post":
+            {
+              "tags": ["Authentication"],
+              "summary": "Return User",
+              "description": "Display authenticated user.",
+              "operationId": "return_user_auth_test_post",
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Return authenticated user.",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "type": "string",
+                                  "title": "Response Return User Auth Test Post",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
     },
-    "/auth/test": {
-      "post": {
-        "tags": [
-          "Authentication"
-        ],
-        "summary": "Create Protected Scenario",
-        "description": "Display authenticated user.",
-        "operationId": "create_protected_scenario_auth_test_post",
-        "responses": {
-          "200": {
-            "description": "Return authenticated user.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string",
-                  "title": "Response Create Protected Scenario Auth Test Post"
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  },
-  "components": {
-    "schemas": {
-      "Body_import_scenario_data_scenarios__scenarioId__put": {
-        "properties": {
-          "file": {
-            "type": "string",
-            "format": "binary",
-            "title": "File",
-            "description": "zipped HDF5 files of the simulation results"
-          }
-        },
-        "type": "object",
-        "title": "Body_import_scenario_data_scenarios__scenarioId__put"
-      },
-      "Compartment": {
-        "properties": {
-          "id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Id"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name",
-            "description": "Display Name of the object"
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description",
-            "description": "(Tooltip) Description of the object"
-          },
-          "tags": {
-            "anyOf": [
-              {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Tags",
-            "description": "Tags attached to this object"
-          }
-        },
-        "type": "object",
-        "required": [
-          "name"
-        ],
-        "title": "Compartment",
-        "description": "Compartment",
-        "example": {
-          "description": "optional description",
-          "name": "compartment name",
-          "tags": [
-            "optional",
-            "tags"
-          ]
-        }
-      },
-      "Error": {
-        "properties": {
-          "detail": {
-            "type": "string",
-            "title": "Detail"
-          }
-        },
-        "type": "object",
-        "required": [
-          "detail"
-        ],
-        "title": "Error",
-        "description": "Error"
-      },
-      "Group": {
-        "properties": {
-          "id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Id"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name",
-            "description": "Display Name of the object"
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description",
-            "description": "(Tooltip) Description of the object"
-          },
-          "category": {
-            "type": "string",
-            "title": "Category",
-            "description": "Category this group belongs to. Groups with the same category are grouped together e.g. in filter UIs"
-          }
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "category"
-        ],
-        "title": "Group",
-        "description": "Group"
-      },
-      "HTTPValidationError": {
-        "properties": {
-          "detail": {
-            "items": {
-              "$ref": "#/components/schemas/ValidationError"
-            },
-            "type": "array",
-            "title": "Detail"
-          }
-        },
-        "type": "object",
-        "title": "HTTPValidationError"
-      },
-      "ID": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "title": "Id"
-          }
-        },
-        "type": "object",
-        "title": "ID",
-        "description": "ID"
-      },
-      "Infectiondata": {
-        "properties": {
-          "date": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Date"
-          },
-          "node": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Node"
-          },
-          "group": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Group"
-          },
-          "compartment": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Compartment"
-          },
-          "aggregation": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Aggregation"
-          },
-          "percentile": {
-            "type": "integer",
-            "title": "Percentile"
-          },
-          "value": {
-            "type": "number",
-            "title": "Value"
-          }
-        },
-        "type": "object",
-        "required": [
-          "percentile",
-          "value"
-        ],
-        "title": "Infectiondata",
-        "description": "Infectiondata"
-      },
-      "InterventionImplementation": {
-        "properties": {
-          "interventionId": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Interventionid"
-          },
-          "startDate": {
-            "type": "string",
-            "format": "date",
-            "title": "Startdate"
-          },
-          "endDate": {
-            "type": "string",
-            "format": "date",
-            "title": "Enddate"
-          },
-          "coefficient": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "integer"
-              }
-            ],
-            "title": "Coefficient"
-          }
-        },
-        "type": "object",
-        "required": [
-          "startDate",
-          "endDate",
-          "coefficient"
-        ],
-        "title": "InterventionImplementation",
-        "description": "InterventionImplementation"
-      },
-      "InterventionTemplate": {
-        "properties": {
-          "id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Id"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name",
-            "description": "Display Name of the object"
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description",
-            "description": "(Tooltip) Description of the object"
-          },
-          "tags": {
-            "anyOf": [
-              {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Tags",
-            "description": "Tags attached to this object"
-          }
-        },
-        "type": "object",
-        "required": [
-          "name"
-        ],
-        "title": "InterventionTemplate",
-        "description": "InterventionTemplate"
-      },
-      "Model": {
-        "properties": {
-          "id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Id"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name",
-            "description": "Display Name of the object"
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description",
-            "description": "(Tooltip) Description of the object"
-          },
-          "compartments": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Compartments"
-          },
-          "groups": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Groups"
-          },
-          "parameterDefinitions": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Parameterdefinitions"
-          }
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "compartments",
-          "groups",
-          "parameterDefinitions"
-        ],
-        "title": "Model",
-        "description": "Model"
-      },
-      "Node": {
-        "properties": {
-          "id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Id"
-          },
-          "nuts": {
-            "type": "string",
-            "title": "Nuts",
-            "description": "NUTS identifier of the node (district)"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name",
-            "description": "Display name of the node (district)"
-          }
-        },
-        "type": "object",
-        "required": [
-          "nuts",
-          "name"
-        ],
-        "title": "Node",
-        "description": "Node"
-      },
-      "NodeList": {
-        "properties": {
-          "id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Id"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name",
-            "description": "Display Name of the object"
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description",
-            "description": "(Tooltip) Description of the object"
-          },
-          "nodeIds": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Nodeids"
-          }
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "nodeIds"
-        ],
-        "title": "NodeList",
-        "description": "NodeList"
-      },
-      "NodeListWithNodes": {
-        "properties": {
-          "id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Id"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name",
-            "description": "Display Name of the object"
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description",
-            "description": "(Tooltip) Description of the object"
-          },
-          "nodeIds": {
-            "items": {
-              "$ref": "#/components/schemas/Node"
-            },
-            "type": "array",
-            "title": "Nodeids"
-          }
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "nodeIds"
-        ],
-        "title": "NodeListWithNodes"
-      },
-      "ParameterDefinition": {
-        "properties": {
-          "id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Id"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name",
-            "description": "Display Name of the object"
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description",
-            "description": "(Tooltip) Description of the object"
-          }
-        },
-        "type": "object",
-        "required": [
-          "name"
-        ],
-        "title": "ParameterDefinition",
-        "description": "ParameterDefinition"
-      },
-      "ParameterValue": {
-        "properties": {
-          "parameterId": {
-            "type": "string",
-            "title": "Parameterid",
-            "description": "UUID of the parameter (key)"
-          },
-          "values": {
-            "items": {
-              "$ref": "#/components/schemas/ParameterValueEntry"
-            },
-            "type": "array",
-            "title": "Values",
-            "description": "List of values for each group (values)"
-          }
-        },
-        "type": "object",
-        "required": [
-          "parameterId",
-          "values"
-        ],
-        "title": "ParameterValue",
-        "description": "ParameterValue"
-      },
-      "ParameterValueEntry": {
-        "properties": {
-          "groupId": {
-            "type": "string",
-            "title": "Groupid",
-            "description": "UUID of the group this value set is for"
-          },
-          "valueMin": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "integer"
-              }
-            ],
-            "title": "Valuemin",
-            "description": "Floor of the parameter value (inclusive)"
-          },
-          "valueMax": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "integer"
-              }
-            ],
-            "title": "Valuemax",
-            "description": "Ceiling of the parameter value (inclusive)"
-          }
-        },
-        "type": "object",
-        "required": [
-          "groupId",
-          "valueMin",
-          "valueMax"
-        ],
-        "title": "ParameterValueEntry",
-        "description": "ParameterValueEntry"
-      },
-      "ReducedInfo": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "title": "Id"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name",
-            "description": "Display Name of the object"
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description",
-            "description": "(Tooltip) Description of the object"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "name"
-        ],
-        "title": "ReducedInfo",
-        "description": "ReducedInfo"
-      },
-      "ReducedScenario": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "title": "Id"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name",
-            "description": "Display Name of the object"
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description",
-            "description": "(Tooltip) Description of the object"
-          },
-          "startDate": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Startdate",
-            "description": "First date of the scenario"
-          },
-          "endDate": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Enddate",
-            "description": "Last date of the scenario"
-          },
-          "percentiles": {
-            "anyOf": [
-              {
-                "items": {
-                  "type": "integer"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Percentiles",
-            "description": "List of available percentiles for this scenario"
-          },
-          "timestampSubmitted": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Timestampsubmitted",
-            "description": "Timestamp when the scenario was added/created"
-          },
-          "timestampSimulated": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Timestampsimulated",
-            "description": "Timestamp when the scenario was finished simulating and data is available"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "name"
-        ],
-        "title": "ReducedScenario",
-        "description": "ReducedScenario"
-      },
-      "Scenario-Input": {
-        "properties": {
-          "id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Id"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name",
-            "description": "Display Name of the object"
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description",
-            "description": "(Tooltip) Description of the object"
-          },
-          "startDate": {
-            "type": "string",
-            "format": "date",
-            "title": "Startdate",
-            "description": "First date of the scenario"
-          },
-          "endDate": {
-            "type": "string",
-            "format": "date",
-            "title": "Enddate",
-            "description": "Last date of the scenario"
-          },
-          "modelId": {
-            "type": "string",
-            "title": "Modelid",
-            "description": "UUID of the model this scenario belongs to"
-          },
-          "modelParameters": {
-            "items": {
-              "$ref": "#/components/schemas/ParameterValue"
-            },
-            "type": "array",
-            "title": "Modelparameters",
-            "description": "List of (available) model parameters (UUIDs & values)"
-          },
-          "nodeListId": {
-            "type": "string",
-            "title": "Nodelistid",
-            "description": "UUID of the node list (districts etc.) of this scenario"
-          },
-          "linkedInterventions": {
-            "anyOf": [
-              {
-                "items": {
-                  "$ref": "#/components/schemas/InterventionImplementation"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Linkedinterventions",
-            "description": "List of intervention implementations used in this scenario"
-          },
-          "percentiles": {
-            "anyOf": [
-              {
-                "items": {
-                  "type": "integer"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Percentiles",
-            "description": "List of available percentiles for this scenario",
-            "default": [
-              50
-            ]
-          },
-          "timestampSubmitted": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Timestampsubmitted",
-            "description": "Timestamp when the scenario was added/created"
-          },
-          "timestampSimulated": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Timestampsimulated",
-            "description": "Timestamp when the scenario was finished simulating and data is available"
-          }
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "startDate",
-          "endDate",
-          "modelId",
-          "modelParameters",
-          "nodeListId"
-        ],
-        "title": "Scenario",
-        "description": "Scenario"
-      },
-      "Scenario-Output": {
-        "properties": {
-          "id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Id"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name",
-            "description": "Display Name of the object"
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description",
-            "description": "(Tooltip) Description of the object"
-          },
-          "startDate": {
-            "type": "string",
-            "format": "date",
-            "title": "Startdate",
-            "description": "First date of the scenario"
-          },
-          "endDate": {
-            "type": "string",
-            "format": "date",
-            "title": "Enddate",
-            "description": "Last date of the scenario"
-          },
-          "modelId": {
-            "type": "string",
-            "title": "Modelid",
-            "description": "UUID of the model this scenario belongs to"
-          },
-          "modelParameters": {
-            "items": {
-              "$ref": "#/components/schemas/ParameterValue"
-            },
-            "type": "array",
-            "title": "Modelparameters",
-            "description": "List of (available) model parameters (UUIDs & values)"
-          },
-          "nodeListId": {
-            "type": "string",
-            "title": "Nodelistid",
-            "description": "UUID of the node list (districts etc.) of this scenario"
-          },
-          "linkedInterventions": {
-            "anyOf": [
-              {
-                "items": {
-                  "$ref": "#/components/schemas/InterventionImplementation"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Linkedinterventions",
-            "description": "List of intervention implementations used in this scenario"
-          },
-          "percentiles": {
-            "anyOf": [
-              {
-                "items": {
-                  "type": "integer"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Percentiles",
-            "description": "List of available percentiles for this scenario",
-            "default": [
-              50
-            ]
-          },
-          "timestampSubmitted": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Timestampsubmitted",
-            "description": "Timestamp when the scenario was added/created"
-          },
-          "timestampSimulated": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Timestampsimulated",
-            "description": "Timestamp when the scenario was finished simulating and data is available"
-          }
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "startDate",
-          "endDate",
-          "modelId",
-          "modelParameters",
-          "nodeListId"
-        ],
-        "title": "Scenario",
-        "description": "Scenario"
-      },
-      "ValidationError": {
-        "properties": {
-          "loc": {
-            "items": {
-              "anyOf": [
+  "components":
+    {
+      "schemas":
+        {
+          "Body_import_scenario_data_scenarios__scenarioId__put":
+            {
+              "properties":
                 {
-                  "type": "string"
+                  "file":
+                    {
+                      "type": "string",
+                      "format": "binary",
+                      "title": "File",
+                      "description": "zipped HDF5 files of the simulation results",
+                    },
                 },
-                {
-                  "type": "integer"
-                }
-              ]
+              "type": "object",
+              "title": "Body_import_scenario_data_scenarios__scenarioId__put",
             },
-            "type": "array",
-            "title": "Location"
-          },
-          "msg": {
-            "type": "string",
-            "title": "Message"
-          },
-          "type": {
-            "type": "string",
-            "title": "Error Type"
-          }
+          "Compartment":
+            {
+              "properties":
+                {
+                  "id":
+                    {
+                      "anyOf": [{ "type": "string" }, { "type": "null" }],
+                      "title": "Id",
+                    },
+                  "name":
+                    {
+                      "type": "string",
+                      "title": "Name",
+                      "description": "Display Name of the object",
+                    },
+                  "description":
+                    {
+                      "anyOf": [{ "type": "string" }, { "type": "null" }],
+                      "title": "Description",
+                      "description": "(Tooltip) Description of the object",
+                    },
+                  "tags":
+                    {
+                      "anyOf":
+                        [
+                          { "items": { "type": "string" }, "type": "array" },
+                          { "type": "null" },
+                        ],
+                      "title": "Tags",
+                      "description": "Tags attached to this object",
+                    },
+                },
+              "type": "object",
+              "required": ["name"],
+              "title": "Compartment",
+              "description": "Compartment",
+              "example":
+                {
+                  "description": "optional description",
+                  "name": "compartment name",
+                  "tags": ["optional", "tags"],
+                },
+            },
+          "Error":
+            {
+              "properties":
+                { "detail": { "type": "string", "title": "Detail" } },
+              "type": "object",
+              "required": ["detail"],
+              "title": "Error",
+              "description": "Error",
+            },
+          "Group":
+            {
+              "properties":
+                {
+                  "id":
+                    {
+                      "anyOf": [{ "type": "string" }, { "type": "null" }],
+                      "title": "Id",
+                    },
+                  "name":
+                    {
+                      "type": "string",
+                      "title": "Name",
+                      "description": "Display Name of the object",
+                    },
+                  "description":
+                    {
+                      "anyOf": [{ "type": "string" }, { "type": "null" }],
+                      "title": "Description",
+                      "description": "(Tooltip) Description of the object",
+                    },
+                  "category":
+                    {
+                      "type": "string",
+                      "title": "Category",
+                      "description": "Category this group belongs to. Groups with the same category are grouped together e.g. in filter UIs",
+                    },
+                },
+              "type": "object",
+              "required": ["name", "category"],
+              "title": "Group",
+              "description": "Group",
+            },
+          "HTTPValidationError":
+            {
+              "properties":
+                {
+                  "detail":
+                    {
+                      "items":
+                        { "$ref": "#/components/schemas/ValidationError" },
+                      "type": "array",
+                      "title": "Detail",
+                    },
+                },
+              "type": "object",
+              "title": "HTTPValidationError",
+            },
+          "ID":
+            {
+              "properties": { "id": { "type": "string", "title": "Id" } },
+              "type": "object",
+              "title": "ID",
+              "description": "ID",
+            },
+          "Infectiondata":
+            {
+              "properties":
+                {
+                  "date":
+                    {
+                      "anyOf":
+                        [
+                          { "type": "string", "format": "date" },
+                          { "type": "null" },
+                        ],
+                      "title": "Date",
+                    },
+                  "node":
+                    {
+                      "anyOf": [{ "type": "string" }, { "type": "null" }],
+                      "title": "Node",
+                    },
+                  "group":
+                    {
+                      "anyOf": [{ "type": "string" }, { "type": "null" }],
+                      "title": "Group",
+                    },
+                  "compartment":
+                    {
+                      "anyOf": [{ "type": "string" }, { "type": "null" }],
+                      "title": "Compartment",
+                    },
+                  "aggregation":
+                    {
+                      "anyOf": [{ "type": "string" }, { "type": "null" }],
+                      "title": "Aggregation",
+                    },
+                  "percentile": { "type": "integer", "title": "Percentile" },
+                  "value": { "type": "number", "title": "Value" },
+                },
+              "type": "object",
+              "required": ["percentile", "value"],
+              "title": "Infectiondata",
+              "description": "Infectiondata",
+            },
+          "InterventionImplementation":
+            {
+              "properties":
+                {
+                  "interventionId":
+                    {
+                      "anyOf": [{ "type": "string" }, { "type": "null" }],
+                      "title": "Interventionid",
+                    },
+                  "startDate":
+                    {
+                      "type": "string",
+                      "format": "date",
+                      "title": "Startdate",
+                    },
+                  "endDate":
+                    { "type": "string", "format": "date", "title": "Enddate" },
+                  "coefficient":
+                    {
+                      "anyOf": [{ "type": "number" }, { "type": "integer" }],
+                      "title": "Coefficient",
+                    },
+                },
+              "type": "object",
+              "required": ["startDate", "endDate", "coefficient"],
+              "title": "InterventionImplementation",
+              "description": "InterventionImplementation",
+            },
+          "InterventionTemplate":
+            {
+              "properties":
+                {
+                  "id":
+                    {
+                      "anyOf": [{ "type": "string" }, { "type": "null" }],
+                      "title": "Id",
+                    },
+                  "name":
+                    {
+                      "type": "string",
+                      "title": "Name",
+                      "description": "Display Name of the object",
+                    },
+                  "description":
+                    {
+                      "anyOf": [{ "type": "string" }, { "type": "null" }],
+                      "title": "Description",
+                      "description": "(Tooltip) Description of the object",
+                    },
+                  "tags":
+                    {
+                      "anyOf":
+                        [
+                          { "items": { "type": "string" }, "type": "array" },
+                          { "type": "null" },
+                        ],
+                      "title": "Tags",
+                      "description": "Tags attached to this object",
+                    },
+                },
+              "type": "object",
+              "required": ["name"],
+              "title": "InterventionTemplate",
+              "description": "InterventionTemplate",
+            },
+          "Model":
+            {
+              "properties":
+                {
+                  "id":
+                    {
+                      "anyOf": [{ "type": "string" }, { "type": "null" }],
+                      "title": "Id",
+                    },
+                  "name":
+                    {
+                      "type": "string",
+                      "title": "Name",
+                      "description": "Display Name of the object",
+                    },
+                  "description":
+                    {
+                      "anyOf": [{ "type": "string" }, { "type": "null" }],
+                      "title": "Description",
+                      "description": "(Tooltip) Description of the object",
+                    },
+                  "compartments":
+                    {
+                      "items": { "type": "string" },
+                      "type": "array",
+                      "title": "Compartments",
+                    },
+                  "groups":
+                    {
+                      "items": { "type": "string" },
+                      "type": "array",
+                      "title": "Groups",
+                    },
+                  "parameterDefinitions":
+                    {
+                      "items": { "type": "string" },
+                      "type": "array",
+                      "title": "Parameterdefinitions",
+                    },
+                },
+              "type": "object",
+              "required":
+                ["name", "compartments", "groups", "parameterDefinitions"],
+              "title": "Model",
+              "description": "Model",
+            },
+          "Node":
+            {
+              "properties":
+                {
+                  "id":
+                    {
+                      "anyOf": [{ "type": "string" }, { "type": "null" }],
+                      "title": "Id",
+                    },
+                  "nuts":
+                    {
+                      "type": "string",
+                      "title": "Nuts",
+                      "description": "NUTS identifier of the node (district)",
+                    },
+                  "name":
+                    {
+                      "type": "string",
+                      "title": "Name",
+                      "description": "Display name of the node (district)",
+                    },
+                },
+              "type": "object",
+              "required": ["nuts", "name"],
+              "title": "Node",
+              "description": "Node",
+            },
+          "NodeList":
+            {
+              "properties":
+                {
+                  "id":
+                    {
+                      "anyOf": [{ "type": "string" }, { "type": "null" }],
+                      "title": "Id",
+                    },
+                  "name":
+                    {
+                      "type": "string",
+                      "title": "Name",
+                      "description": "Display Name of the object",
+                    },
+                  "description":
+                    {
+                      "anyOf": [{ "type": "string" }, { "type": "null" }],
+                      "title": "Description",
+                      "description": "(Tooltip) Description of the object",
+                    },
+                  "nodeIds":
+                    {
+                      "items": { "type": "string" },
+                      "type": "array",
+                      "title": "Nodeids",
+                    },
+                },
+              "type": "object",
+              "required": ["name", "nodeIds"],
+              "title": "NodeList",
+              "description": "NodeList",
+            },
+          "NodeListWithNodes":
+            {
+              "properties":
+                {
+                  "id":
+                    {
+                      "anyOf": [{ "type": "string" }, { "type": "null" }],
+                      "title": "Id",
+                    },
+                  "name":
+                    {
+                      "type": "string",
+                      "title": "Name",
+                      "description": "Display Name of the object",
+                    },
+                  "description":
+                    {
+                      "anyOf": [{ "type": "string" }, { "type": "null" }],
+                      "title": "Description",
+                      "description": "(Tooltip) Description of the object",
+                    },
+                  "nodeIds":
+                    {
+                      "items": { "$ref": "#/components/schemas/Node" },
+                      "type": "array",
+                      "title": "Nodeids",
+                    },
+                },
+              "type": "object",
+              "required": ["name", "nodeIds"],
+              "title": "NodeListWithNodes",
+            },
+          "ParameterDefinition":
+            {
+              "properties":
+                {
+                  "id":
+                    {
+                      "anyOf": [{ "type": "string" }, { "type": "null" }],
+                      "title": "Id",
+                    },
+                  "name":
+                    {
+                      "type": "string",
+                      "title": "Name",
+                      "description": "Display Name of the object",
+                    },
+                  "description":
+                    {
+                      "anyOf": [{ "type": "string" }, { "type": "null" }],
+                      "title": "Description",
+                      "description": "(Tooltip) Description of the object",
+                    },
+                },
+              "type": "object",
+              "required": ["name"],
+              "title": "ParameterDefinition",
+              "description": "ParameterDefinition",
+            },
+          "ParameterValue":
+            {
+              "properties":
+                {
+                  "parameterId":
+                    {
+                      "type": "string",
+                      "title": "Parameterid",
+                      "description": "UUID of the parameter (key)",
+                    },
+                  "values":
+                    {
+                      "items":
+                        { "$ref": "#/components/schemas/ParameterValueEntry" },
+                      "type": "array",
+                      "title": "Values",
+                      "description": "List of values for each group (values)",
+                    },
+                },
+              "type": "object",
+              "required": ["parameterId", "values"],
+              "title": "ParameterValue",
+              "description": "ParameterValue",
+            },
+          "ParameterValueEntry":
+            {
+              "properties":
+                {
+                  "groupId":
+                    {
+                      "type": "string",
+                      "title": "Groupid",
+                      "description": "UUID of the group this value set is for",
+                    },
+                  "valueMin":
+                    {
+                      "anyOf": [{ "type": "number" }, { "type": "integer" }],
+                      "title": "Valuemin",
+                      "description": "Floor of the parameter value (inclusive)",
+                    },
+                  "valueMax":
+                    {
+                      "anyOf": [{ "type": "number" }, { "type": "integer" }],
+                      "title": "Valuemax",
+                      "description": "Ceiling of the parameter value (inclusive)",
+                    },
+                },
+              "type": "object",
+              "required": ["groupId", "valueMin", "valueMax"],
+              "title": "ParameterValueEntry",
+              "description": "ParameterValueEntry",
+            },
+          "ReducedInfo":
+            {
+              "properties":
+                {
+                  "id": { "type": "string", "title": "Id" },
+                  "name":
+                    {
+                      "type": "string",
+                      "title": "Name",
+                      "description": "Display Name of the object",
+                    },
+                  "description":
+                    {
+                      "anyOf": [{ "type": "string" }, { "type": "null" }],
+                      "title": "Description",
+                      "description": "(Tooltip) Description of the object",
+                    },
+                },
+              "type": "object",
+              "required": ["id", "name"],
+              "title": "ReducedInfo",
+              "description": "ReducedInfo",
+            },
+          "ReducedScenario":
+            {
+              "properties":
+                {
+                  "id": { "type": "string", "title": "Id" },
+                  "name":
+                    {
+                      "type": "string",
+                      "title": "Name",
+                      "description": "Display Name of the object",
+                    },
+                  "description":
+                    {
+                      "anyOf": [{ "type": "string" }, { "type": "null" }],
+                      "title": "Description",
+                      "description": "(Tooltip) Description of the object",
+                    },
+                  "startDate":
+                    {
+                      "anyOf":
+                        [
+                          { "type": "string", "format": "date" },
+                          { "type": "null" },
+                        ],
+                      "title": "Startdate",
+                      "description": "First date of the scenario",
+                    },
+                  "endDate":
+                    {
+                      "anyOf":
+                        [
+                          { "type": "string", "format": "date" },
+                          { "type": "null" },
+                        ],
+                      "title": "Enddate",
+                      "description": "Last date of the scenario",
+                    },
+                  "percentiles":
+                    {
+                      "anyOf":
+                        [
+                          { "items": { "type": "integer" }, "type": "array" },
+                          { "type": "null" },
+                        ],
+                      "title": "Percentiles",
+                      "description": "List of available percentiles for this scenario",
+                    },
+                  "timestampSubmitted":
+                    {
+                      "anyOf":
+                        [
+                          { "type": "string", "format": "date-time" },
+                          { "type": "null" },
+                        ],
+                      "title": "Timestampsubmitted",
+                      "description": "Timestamp when the scenario was added/created",
+                    },
+                  "timestampSimulated":
+                    {
+                      "anyOf":
+                        [
+                          { "type": "string", "format": "date-time" },
+                          { "type": "null" },
+                        ],
+                      "title": "Timestampsimulated",
+                      "description": "Timestamp when the scenario was finished simulating and data is available",
+                    },
+                },
+              "type": "object",
+              "required": ["id", "name"],
+              "title": "ReducedScenario",
+              "description": "ReducedScenario",
+            },
+          "Scenario-Input":
+            {
+              "properties":
+                {
+                  "id":
+                    {
+                      "anyOf": [{ "type": "string" }, { "type": "null" }],
+                      "title": "Id",
+                    },
+                  "name":
+                    {
+                      "type": "string",
+                      "title": "Name",
+                      "description": "Display Name of the object",
+                    },
+                  "description":
+                    {
+                      "anyOf": [{ "type": "string" }, { "type": "null" }],
+                      "title": "Description",
+                      "description": "(Tooltip) Description of the object",
+                    },
+                  "startDate":
+                    {
+                      "type": "string",
+                      "format": "date",
+                      "title": "Startdate",
+                      "description": "First date of the scenario",
+                    },
+                  "endDate":
+                    {
+                      "type": "string",
+                      "format": "date",
+                      "title": "Enddate",
+                      "description": "Last date of the scenario",
+                    },
+                  "modelId":
+                    {
+                      "type": "string",
+                      "title": "Modelid",
+                      "description": "UUID of the model this scenario belongs to",
+                    },
+                  "modelParameters":
+                    {
+                      "items":
+                        { "$ref": "#/components/schemas/ParameterValue" },
+                      "type": "array",
+                      "title": "Modelparameters",
+                      "description": "List of (available) model parameters (UUIDs & values)",
+                    },
+                  "nodeListId":
+                    {
+                      "type": "string",
+                      "title": "Nodelistid",
+                      "description": "UUID of the node list (districts etc.) of this scenario",
+                    },
+                  "linkedInterventions":
+                    {
+                      "anyOf":
+                        [
+                          {
+                            "items":
+                              {
+                                "$ref": "#/components/schemas/InterventionImplementation",
+                              },
+                            "type": "array",
+                          },
+                          { "type": "null" },
+                        ],
+                      "title": "Linkedinterventions",
+                      "description": "List of intervention implementations used in this scenario",
+                    },
+                  "percentiles":
+                    {
+                      "anyOf":
+                        [
+                          { "items": { "type": "integer" }, "type": "array" },
+                          { "type": "null" },
+                        ],
+                      "title": "Percentiles",
+                      "description": "List of available percentiles for this scenario",
+                      "default": [50],
+                    },
+                  "timestampSubmitted":
+                    {
+                      "anyOf":
+                        [
+                          { "type": "string", "format": "date-time" },
+                          { "type": "null" },
+                        ],
+                      "title": "Timestampsubmitted",
+                      "description": "Timestamp when the scenario was added/created",
+                    },
+                  "timestampSimulated":
+                    {
+                      "anyOf":
+                        [
+                          { "type": "string", "format": "date-time" },
+                          { "type": "null" },
+                        ],
+                      "title": "Timestampsimulated",
+                      "description": "Timestamp when the scenario was finished simulating and data is available",
+                    },
+                  "creatorUserId":
+                    {
+                      "anyOf": [{ "type": "string" }, { "type": "null" }],
+                      "title": "Creatoruserid",
+                      "description": "ID of the user who submitted the scenario",
+                    },
+                  "creatorOrgId":
+                    {
+                      "anyOf": [{ "type": "string" }, { "type": "null" }],
+                      "title": "Creatororgid",
+                      "description": "ID of the organization the submitting user belongs to",
+                    },
+                },
+              "type": "object",
+              "required":
+                [
+                  "name",
+                  "startDate",
+                  "endDate",
+                  "modelId",
+                  "modelParameters",
+                  "nodeListId",
+                ],
+              "title": "Scenario",
+              "description": "Scenario",
+            },
+          "Scenario-Output":
+            {
+              "properties":
+                {
+                  "id":
+                    {
+                      "anyOf": [{ "type": "string" }, { "type": "null" }],
+                      "title": "Id",
+                    },
+                  "name":
+                    {
+                      "type": "string",
+                      "title": "Name",
+                      "description": "Display Name of the object",
+                    },
+                  "description":
+                    {
+                      "anyOf": [{ "type": "string" }, { "type": "null" }],
+                      "title": "Description",
+                      "description": "(Tooltip) Description of the object",
+                    },
+                  "startDate":
+                    {
+                      "type": "string",
+                      "format": "date",
+                      "title": "Startdate",
+                      "description": "First date of the scenario",
+                    },
+                  "endDate":
+                    {
+                      "type": "string",
+                      "format": "date",
+                      "title": "Enddate",
+                      "description": "Last date of the scenario",
+                    },
+                  "modelId":
+                    {
+                      "type": "string",
+                      "title": "Modelid",
+                      "description": "UUID of the model this scenario belongs to",
+                    },
+                  "modelParameters":
+                    {
+                      "items":
+                        { "$ref": "#/components/schemas/ParameterValue" },
+                      "type": "array",
+                      "title": "Modelparameters",
+                      "description": "List of (available) model parameters (UUIDs & values)",
+                    },
+                  "nodeListId":
+                    {
+                      "type": "string",
+                      "title": "Nodelistid",
+                      "description": "UUID of the node list (districts etc.) of this scenario",
+                    },
+                  "linkedInterventions":
+                    {
+                      "anyOf":
+                        [
+                          {
+                            "items":
+                              {
+                                "$ref": "#/components/schemas/InterventionImplementation",
+                              },
+                            "type": "array",
+                          },
+                          { "type": "null" },
+                        ],
+                      "title": "Linkedinterventions",
+                      "description": "List of intervention implementations used in this scenario",
+                    },
+                  "percentiles":
+                    {
+                      "anyOf":
+                        [
+                          { "items": { "type": "integer" }, "type": "array" },
+                          { "type": "null" },
+                        ],
+                      "title": "Percentiles",
+                      "description": "List of available percentiles for this scenario",
+                      "default": [50],
+                    },
+                  "timestampSubmitted":
+                    {
+                      "anyOf":
+                        [
+                          { "type": "string", "format": "date-time" },
+                          { "type": "null" },
+                        ],
+                      "title": "Timestampsubmitted",
+                      "description": "Timestamp when the scenario was added/created",
+                    },
+                  "timestampSimulated":
+                    {
+                      "anyOf":
+                        [
+                          { "type": "string", "format": "date-time" },
+                          { "type": "null" },
+                        ],
+                      "title": "Timestampsimulated",
+                      "description": "Timestamp when the scenario was finished simulating and data is available",
+                    },
+                  "creatorUserId":
+                    {
+                      "anyOf": [{ "type": "string" }, { "type": "null" }],
+                      "title": "Creatoruserid",
+                      "description": "ID of the user who submitted the scenario",
+                    },
+                  "creatorOrgId":
+                    {
+                      "anyOf": [{ "type": "string" }, { "type": "null" }],
+                      "title": "Creatororgid",
+                      "description": "ID of the organization the submitting user belongs to",
+                    },
+                },
+              "type": "object",
+              "required":
+                [
+                  "name",
+                  "startDate",
+                  "endDate",
+                  "modelId",
+                  "modelParameters",
+                  "nodeListId",
+                ],
+              "title": "Scenario",
+              "description": "Scenario",
+            },
+          "ValidationError":
+            {
+              "properties":
+                {
+                  "loc":
+                    {
+                      "items":
+                        {
+                          "anyOf":
+                            [{ "type": "string" }, { "type": "integer" }],
+                        },
+                      "type": "array",
+                      "title": "Location",
+                    },
+                  "msg": { "type": "string", "title": "Message" },
+                  "type": { "type": "string", "title": "Error Type" },
+                },
+              "type": "object",
+              "required": ["loc", "msg", "type"],
+              "title": "ValidationError",
+            },
         },
-        "type": "object",
-        "required": [
-          "loc",
-          "msg",
-          "type"
-        ],
-        "title": "ValidationError"
-      }
-    }
-  }
+    },
 }
