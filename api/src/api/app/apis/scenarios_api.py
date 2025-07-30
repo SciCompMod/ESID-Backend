@@ -41,10 +41,18 @@ logging.basicConfig(level=logging.INFO)
     response_model_by_alias=True,
 )
 async def create_scenario(
+    request: Request,
     scenario: Scenario = Body(None, description="")
 ) -> ID:
     """Create a new scenario to be simulated."""
-    return await controller.create_scenario(scenario)
+
+    # Tag creator info
+    scenario.creator_user_id = request.state.user.userId if request.state.user else None
+    scenario.creator_org_id = request.state.realm if request.state.realm else None
+    
+    return await controller.create_scenario(
+        scenario
+    )
 
 
 @router.delete(

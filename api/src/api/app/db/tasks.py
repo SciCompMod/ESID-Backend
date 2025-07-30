@@ -423,6 +423,8 @@ def scenario_create(scenario: Scenario) -> ID:
         percentiles=','.join([str(perc) for perc in scenario.percentiles]) if scenario.percentiles else '50',
         timestampSubmitted=datetime.now(),
         timestampSimulated=None,
+        creatorUserId=scenario.creator_user_id,
+        creatorOrgId=scenario.creator_org_id
     )
     with next(get_session()) as session:
         nested_dict = lambda: defaultdict(nested_dict)
@@ -536,6 +538,8 @@ def scenario_get_by_id(id: StrictStr) -> Scenario:
         percentiles=[int(perc) for perc in scenario.percentiles.split(',')] if scenario.percentiles else [50],
         timestampSubmitted=scenario.timestampSubmitted,
         timestampSimulated=scenario.timestampSimulated,
+        creator_user_id=str(scenario.creatorUserId),
+        creator_org_id=scenario.creatorOrgId
     )
 
 def scenario_get_all() -> List[ReducedScenario]:
