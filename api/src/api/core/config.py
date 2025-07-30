@@ -5,7 +5,7 @@ from starlette.datastructures import Secret
 config = Config(".env")
 
 PROJECT_NAME = "ESID Backend Interface"
-VERSION = "1.1.0"
+VERSION = "2.0.0"
 API_PATH_PREFIX = config("API_PATH_PREFIX", cast=str, default="")
 
 SECRET_KEY = config("SECRET_KEY", cast=Secret, default="CHANGEME")

@@ -148,7 +148,7 @@ async def list_scenarios() -> List[ReducedScenario]:
     },
     tags=["Authentication"],
 )
-async def create_protected_scenario(request: Request) -> str:
+async def return_user(request: Request) -> str:
     """Display authenticated user."""
     return f'Authenticated user: {request.state.user}'
 
