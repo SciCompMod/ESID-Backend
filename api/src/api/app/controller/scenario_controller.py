@@ -61,7 +61,7 @@ class ScenarioController:
     
     async def create_scenario(
         self,
-        scenario: Optional[Scenario],
+        scenario: Optional[Scenario]
     ) -> ID:
         """Create a new scenario to be simulated."""
         if not scenario:

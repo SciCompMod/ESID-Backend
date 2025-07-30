@@ -47,8 +47,9 @@ class Scenario(BaseModel):
     percentiles: Optional[List[StrictInt]] = Field(default=[50], description="List of available percentiles for this scenario", alias="percentiles")
     timestamp_submitted: Optional[datetime] = Field(default=None, alias="timestampSubmitted", description="Timestamp when the scenario was added/created")
     timestamp_simulated: Optional[datetime] = Field(default=None, alias="timestampSimulated", description="Timestamp when the scenario was finished simulating and data is available")
-    __properties: ClassVar[List[str]] = ["id", "name", "description", "startDate", "endDate", "modelId", "modelParameters", "nodeListId", "linkedInterventions", "percentiles", "timestampSubmitted", "timestampSimulated"]
-
+    creator_user_id: Optional[str] = Field(default=None, alias="creatorUserId", description="ID of the user who submitted the scenario")
+    creator_org_id: Optional[str] = Field(default=None, alias="creatorOrgId", description="ID of the organization the submitting user belongs to")
+    __properties: ClassVar[List[str]] = ["id", "name", "description", "startDate", "endDate", "modelId", "modelParameters", "nodeListId", "linkedInterventions", "percentiles", "timestampSubmitted", "timestampSimulated", "creatorUserId", "creatorOrgId"]
     model_config = {
         "populate_by_name": True,
         "validate_assignment": True,
