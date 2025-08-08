@@ -4,12 +4,14 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from security_api import get_user, get_bearer, get_realm
 
+from app.models.user_detail import UserDetail
+
 # authentication middleware that filters requests before they reach the endpoints
 # so far it only checks if the user is authenticated for POST, PUT, DELETE methods
 class AuthenticationMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
         # authenticate all methods except GET and OPTIONS
-        protected_methods = [] #['POST', 'PUT', 'DELETE']
+        protected_methods = ['POST', 'PUT', 'DELETE']
         if request.method in protected_methods:
             try:
                 # try to verify token and extract user information

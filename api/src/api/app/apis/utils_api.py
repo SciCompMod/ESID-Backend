@@ -31,8 +31,9 @@ logging.basicConfig(level=logging.INFO)
     tags=["Utils"],
 )
 async def validate_and_forward_shared_case_data(
+    request: Request,
     file: UploadFile = File(None, description="csv file of case data to share with ESID")
 ) -> None:
     """Share Case Data with ESID."""
     log.info(f'POST /utils/caseshare received...')
-    return await controller.handle_case_data_validation_upload(file)
+    return await controller.handle_case_data_validation_upload(file, request.state)
