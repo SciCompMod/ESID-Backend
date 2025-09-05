@@ -84,14 +84,15 @@ class UtilsController:
                 bucket_name='private-lha-data',
                 object_name=object_path_in_bucket,
                 data=file.file,
-                length=size
+                length=size,
+                metadata=meta
             )
             log.info(f'created: {result.object_name}, etag: {result.etag}, version: {result.version_id}')
         except Exception as ex:
             log.warning(f'Unable to upload file: {ex}')
             raise HTTPException(
                 status_code=500,
-                detail='An error occurred during file upload. Ceck the logs or contact an administrator.'
+                detail='An error occurred during file upload. Check the logs or contact an administrator.'
             )
 
         return None
