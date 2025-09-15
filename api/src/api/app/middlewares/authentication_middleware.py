@@ -4,8 +4,6 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from security_api import get_user, get_bearer, get_realm
 
-from app.models.user_detail import UserDetail
-
 # authentication middleware that filters requests before they reach the endpoints
 # so far it only checks if the user is authenticated for POST, PUT, DELETE methods
 class AuthenticationMiddleware(BaseHTTPMiddleware):

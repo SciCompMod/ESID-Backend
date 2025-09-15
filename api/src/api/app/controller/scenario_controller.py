@@ -44,8 +44,8 @@ from app.db.tasks import (
 )
 
 class LookupObject:
-    scenario: Scenario|None = None
-    model: Model|None = None
+    scenario: Scenario = None
+    model: Model = None
     groups: List[Group] = []
     compartments: List[Compartment] = []
     nodes: List[Node]
@@ -118,7 +118,7 @@ class ScenarioController:
         file: UploadFile,
     ) -> ID:
         """Supply simulation data for a scenario."""
-        if not file or not file.filename or not file.filename.endswith('.zip'):
+        if not file or not file.filename.endswith('.zip'):
             raise HTTPException(
                 status_code=422,
                 detail="No file uploaded with request or not a .zip file"
