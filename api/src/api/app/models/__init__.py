@@ -17,3 +17,4 @@ from .reduced_info import ReducedInfo
 from .reduced_scenario import ReducedScenario
 from .scenario import Scenario
 from .tagged import Tagged
+from .user_detail import UserDetail
