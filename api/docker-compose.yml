@@ -37,9 +37,9 @@ services:
       - backnet
   db:
     restart: always
-    image: postgres:latest
+    image: postgres:18
     volumes:
-      - ${VOLUME_DIR}/postgres_data:/var/lib/postgresql/data/
+      - ${VOLUME_DIR}/postgres_data:/var/lib/postgresql
     env_file:
       - .docker-env
     networks:
