@@ -661,3 +661,19 @@ def datapoint_update_all_by_scenario(
         session.add(scenario)
         session.commit()
     return
+
+
+def scenario_update_description(
+    scenarioId: StrictStr,
+    description: StrictStr
+) -> ID:
+    query = select(db.Scenario).where(db.Scenario.id == scenarioId)
+    with next(get_session()) as session:
+        scenario: db.Scenario = session.exec(query).one_or_none()
+        if not scenario:
+            raise HTTPException(status_code=404, detail='A scenario with this ID does not exist')
+
+        scenario.description = description
+        session.add(scenario)
+        session.commit()
+    return ID(id=scenarioId)
