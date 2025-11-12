@@ -30,6 +30,7 @@ class UtilsController:
         """Validate the upladed file and forward it"""
         # Check if actually a csv file
         if not file or not file.filename or not file.filename.lower().endswith('.csv'):
+            log.warning(f'No CSV file')
             raise HTTPException(
                 status_code=400,
                 detail='No CSV file sent'
@@ -37,6 +38,7 @@ class UtilsController:
         # Check mime type
         valid_content_types = ['text/csv', 'application/vnd.ms-excel']
         if file.content_type not in valid_content_types:
+            log.warning(f"File has the wrong content type. Accepts {valid_content_types} but got '{file.content_type}'")
             raise HTTPException(
                 status_code=400,
                 detail=f"File has the wrong content type. Accepts {valid_content_types} but got '{file.content_type}'"
@@ -45,6 +47,7 @@ class UtilsController:
         line = file.file.readline().decode(encoding='utf-8')
         num_cols = len(line.split(';'))  # This assumes ';' is always used as separator
         if num_cols != 76:  # This is also assumes the file always hass this magic number of columns
+            log.warning(f"File has the wrong amount of columns. Needs 76 but has '{num_cols}'")
             raise HTTPException(
                 status_code=400,
                 detail=f"File has the wrong amount of columns. Needs 76 but has '{num_cols}'"
@@ -94,7 +97,7 @@ class UtilsController:
                 status_code=500,
                 detail='An error occurred during file upload. Check the logs or contact an administrator.'
             )
-
+        log.info('POST /utils/caseshare success')
         return None
 
 @lru_cache
