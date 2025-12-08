@@ -56,7 +56,7 @@ class UtilsController:
         # Validation successful, upload to minio bucket
         lha_id: str = request_state.realm
         # Get lha display name
-        lha_name = next((realm['displayName'] for realm in get_realms() if realm['realm'] == lha_id), '')
+        lha_name = next((realm['displayName'] for realm in get_realms() if realm['realm'] == lha_id), 'LHA ID not found or IDP API unreachable')
         uploader: UserDetail = request_state.user
 
         meta = {
@@ -107,7 +107,8 @@ def get_realms() -> List[Any]:
     """
     result_realms = requests.get(f'{str(config.IDP_API_URL)}/realms')
     if result_realms.status_code != 200:
-        raise HTTPException(status_code=500, detail='IDP API unreachable to request realms')
+        log.warning('IDP API unreachable to request realms')
+        return []
     return result_realms.json()
 
 
