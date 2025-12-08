@@ -31,6 +31,8 @@ class Scenario(SQLModel, table=True):
     creatorUserId: Optional[uuid.UUID] = Field(default=None, nullable=True)
     creatorOrgId: Optional[str] = Field(default=None, nullable=True)
 
+    whitelist: Optional[str] = Field(default=None, nullable=True)
+
 class ParameterDefinition(SQLModel, table=True):
     id: Optional[uuid.UUID] = Field(default_factory=uuid.uuid4, primary_key=True, nullable=False)
     name: Optional[str] = Field(nullable=False)

@@ -542,8 +542,16 @@ def scenario_get_by_id(id: StrictStr) -> Scenario:
         creator_org_id=scenario.creatorOrgId
     )
 
-def scenario_get_all() -> List[ReducedScenario]:
+def scenario_get_all(simulatedFilter: bool | None) -> List[ReducedScenario]:
     query = select(db.Scenario)
+    # Check simulated filter and add where if filter is present
+    if simulatedFilter is None:
+        pass
+    elif simulatedFilter:
+        query = query.where(db.Scenario.timestampSimulated is not None)
+    else:
+        query = query.where(db.Scenario.timestampSimulated is None)
+
     with next(get_session()) as session:
         scenarios: List[db.Scenario] = session.exec(query).all()
     return [ReducedScenario(

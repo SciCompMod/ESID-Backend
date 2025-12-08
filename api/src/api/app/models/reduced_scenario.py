@@ -40,7 +40,8 @@ class ReducedScenario(BaseModel):
     percentiles: Optional[List[StrictInt]] = Field(default=None, alias="percentiles", description="List of available percentiles for this scenario")
     timestamp_submitted: Optional[datetime] = Field(default=None, alias="timestampSubmitted", description="Timestamp when the scenario was added/created")
     timestamp_simulated: Optional[datetime] = Field(default=None, alias="timestampSimulated", description="Timestamp when the scenario was finished simulating and data is available")
-    __properties: ClassVar[List[str]] = ["id", "name", "description", "startDate", "endDate", "timestamp_submitted", "timestamp_simulated"]
+    whitelist: Optional[List[StrictStr]] = Field(default=None, alias="whitelist", description="Whitelist of Organizations with access to this scenario")
+    __properties: ClassVar[List[str]] = ["id", "name", "description", "startDate", "endDate", "percentiles", "timestamp_submitted", "timestamp_simulated", "whitelist"]
 
     model_config = {
         "populate_by_name": True,
@@ -101,6 +102,7 @@ class ReducedScenario(BaseModel):
             "percentiles": obj.get("percentiles"),
             "timestamp_submitted": obj.get("timestamp_submitted"),
             "timestamp_simulated": obj.get("timestamp_simulated"),
+            "whitelist": obj.get("whitelist"),
         })
         return _obj
 

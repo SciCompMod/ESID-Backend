@@ -136,9 +136,11 @@ async def import_scenario_data(
     tags=["Scenarios"],
     response_model_by_alias=True,
 )
-async def list_scenarios() -> List[ReducedScenario]:
+async def list_scenarios(
+    simulatedFilter: Annotated[Optional[bool], Field(description="Filter for scenario query; None - no filter, return all scenarios, True - only return simulated, False - only return unsimulated")] = Query(None, description="Return only simulated scenarios; if False, only return unsimulated scenarios", alias="simulated")
+) -> List[ReducedScenario]:
     """List all available scenarios."""
-    return await controller.list_scenarios()
+    return await controller.list_scenarios(simulatedFilter)
 
 # a toy endpoint to test authorization
 @router.post(
