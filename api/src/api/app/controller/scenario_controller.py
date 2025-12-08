@@ -290,6 +290,6 @@ class ScenarioController:
         self,
         scenarioId: StrictStr,
         description: StrictStr,
-    ) -> ID:
+    ) -> ReducedScenario:
         """Update description of a scenario."""
         return scenario_update_description(scenarioId, description)

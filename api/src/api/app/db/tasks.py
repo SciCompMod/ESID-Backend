@@ -676,4 +676,14 @@ def scenario_update_description(
         scenario.description = description
         session.add(scenario)
         session.commit()
-    return ID(id=scenarioId)
+        session.refresh(scenario)
+    return ReducedScenario(
+        id=str(scenario.id),
+        name=scenario.name,
+        description=scenario.description,
+        startDate=scenario.startDate,
+        endDate=scenario.endDate,
+        percentiles=[int(perc) for perc in scenario.percentiles.split(',')],
+        timestampSubmitted=scenario.timestampSubmitted,
+        timestampSimulated=scenario.timestampSimulated,
+    )
