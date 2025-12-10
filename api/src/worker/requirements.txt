@@ -1,4 +1,4 @@
 celery==5.2.2
 python-dotenv==0.19.2
-redis==4.1.4
+redis==5.0.0
 starlette==0.17.1
