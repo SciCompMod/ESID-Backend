@@ -29,7 +29,7 @@ services:
       - "host.docker.internal:host-gateway"
   redis:
     restart: always
-    image: redis
+    image: redis:8
     volumes:
       - ${VOLUME_DIR}/redis_data:/var/lib/redis/data
     networks:
@@ -38,7 +38,7 @@ services:
       - 6379:6379
   db:
     restart: always
-    image: postgres:latest
+    image: postgres:17.7
     volumes:
       - ${VOLUME_DIR}/postgres_data:/var/lib/postgresql/data/
     env_file:

@@ -41,7 +41,8 @@ from app.db.tasks import (
     group_get_all,
     compartment_get_all,
     node_get_by_list,
-    datapoint_update_all_by_scenario
+    datapoint_update_all_by_scenario,
+    scenario_update_description
 )
 
 class LookupObject:
@@ -62,7 +63,7 @@ class ScenarioController:
     
     async def create_scenario(
         self,
-        scenario: Optional[Scenario],
+        scenario: Optional[Scenario]
     ) -> ID:
         """Create a new scenario to be simulated."""
         if not scenario:
@@ -348,3 +349,11 @@ class ScenarioController:
                                 value=value
                             ))
         return datapoints
+    
+    async def update_scenario_description(
+        self,
+        scenarioId: StrictStr,
+        description: StrictStr,
+    ) -> ReducedScenario:
+        """Update description of a scenario."""
+        return scenario_update_description(scenarioId, description)

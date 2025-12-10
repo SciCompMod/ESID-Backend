@@ -43,10 +43,18 @@ logging.basicConfig(level=logging.INFO)
     response_model_by_alias=True,
 )
 async def create_scenario(
+    request: Request,
     scenario: Scenario = Body(None, description="")
 ) -> ID:
     """Create a new scenario to be simulated."""
-    return await controller.create_scenario(scenario)
+
+    # Tag creator info
+    scenario.creator_user_id = request.state.user.userId if request.state.user else None
+    scenario.creator_org_id = request.state.realm if request.state.realm else None
+    
+    return await controller.create_scenario(
+        scenario
+    )
 
 
 @router.delete(
@@ -120,6 +128,21 @@ async def import_scenario_data(
     log.info(f'PUT /scenarios/{scenarioId} received...')
     return await controller.import_scenario_data(scenarioId, file)
 
+@router.put(
+    "/scenarios/{scenarioId}/description",
+    responses={
+        200: {"model": ReducedScenario, "description": "Updated description of scenario."},
+    },
+    tags=["Scenarios"],
+    response_model_by_alias=True,
+)
+async def update_scenario_description(
+    scenarioId: StrictStr = Path(..., description="UUID of the scenario"),
+    description: StrictStr  = Body(..., description="New description for the scenario")
+) -> ReducedScenario:
+    """Update description of a scenario."""
+    log.info(f'PUT /scenarios/{scenarioId} received...')
+    return await controller.update_scenario_description(scenarioId, description)
 
 @router.put(
     "/scenarios/{scenarioId}/worker",

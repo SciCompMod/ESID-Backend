@@ -423,6 +423,8 @@ def scenario_create(scenario: Scenario) -> ID:
         percentiles=','.join([str(perc) for perc in scenario.percentiles]) if scenario.percentiles else '50',
         timestampSubmitted=datetime.now(),
         timestampSimulated=None,
+        creatorUserId=scenario.creator_user_id,
+        creatorOrgId=scenario.creator_org_id
     )
     with next(get_session()) as session:
         nested_dict = lambda: defaultdict(nested_dict)
@@ -536,6 +538,8 @@ def scenario_get_by_id(id: StrictStr) -> Scenario:
         percentiles=[int(perc) for perc in scenario.percentiles.split(',')] if scenario.percentiles else [50],
         timestampSubmitted=scenario.timestampSubmitted,
         timestampSimulated=scenario.timestampSimulated,
+        creator_user_id=str(scenario.creatorUserId),
+        creator_org_id=scenario.creatorOrgId
     )
 
 def scenario_get_all() -> List[ReducedScenario]:
@@ -657,3 +661,29 @@ def datapoint_update_all_by_scenario(
         session.add(scenario)
         session.commit()
     return
+
+
+def scenario_update_description(
+    scenarioId: StrictStr,
+    description: StrictStr
+) -> ID:
+    query = select(db.Scenario).where(db.Scenario.id == scenarioId)
+    with next(get_session()) as session:
+        scenario: db.Scenario = session.exec(query).one_or_none()
+        if not scenario:
+            raise HTTPException(status_code=404, detail='A scenario with this ID does not exist')
+
+        scenario.description = description
+        session.add(scenario)
+        session.commit()
+        session.refresh(scenario)
+    return ReducedScenario(
+        id=str(scenario.id),
+        name=scenario.name,
+        description=scenario.description,
+        startDate=scenario.startDate,
+        endDate=scenario.endDate,
+        percentiles=[int(perc) for perc in scenario.percentiles.split(',')],
+        timestampSubmitted=scenario.timestampSubmitted,
+        timestampSimulated=scenario.timestampSimulated,
+    )
