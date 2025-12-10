@@ -20,6 +20,7 @@ from app.apis.models_api import router as ModelsApiRouter
 from app.apis.nodes_api import router as NodesApiRouter
 from app.apis.parameter_definitions_api import router as ParameterDefinitionsApiRouter
 from app.apis.scenarios_api import router as ScenariosApiRouter
+from app.apis.utils_api import router as UtilsApiRouter
 from app.middlewares.authentication_middleware import AuthenticationMiddleware
 
 app = FastAPI(
@@ -40,13 +41,14 @@ app.add_middleware(
 
 app.add_middleware(AuthenticationMiddleware)
 
+app.include_router(ScenariosApiRouter)
+app.include_router(ModelsApiRouter)
 app.include_router(CompartmentsApiRouter)
 app.include_router(GroupsApiRouter)
-app.include_router(InterventionsApiRouter)
-app.include_router(ModelsApiRouter)
-app.include_router(NodesApiRouter)
 app.include_router(ParameterDefinitionsApiRouter)
-app.include_router(ScenariosApiRouter)
+app.include_router(NodesApiRouter)
+app.include_router(InterventionsApiRouter)
+app.include_router(UtilsApiRouter)
 
 """
 @app.post("/test_celery/{message}")
