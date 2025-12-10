@@ -128,7 +128,7 @@ async def import_scenario_data(
     return await controller.import_scenario_data(scenarioId, file)
 
 @router.put(
-    "/scenarios/{scenarioId}",
+    "/scenarios/{scenarioId}/description",
     responses={
         200: {"model": ReducedScenario, "description": "Updated description of scenario."},
     },
