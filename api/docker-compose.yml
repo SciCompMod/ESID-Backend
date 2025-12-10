@@ -30,7 +30,7 @@ services:
       - "host.docker.internal:host-gateway"
   redis:
     restart: always
-    image: redis
+    image: redis:8
     volumes:
       - ${VOLUME_DIR}/redis_data:/var/lib/redis/data
     networks:
