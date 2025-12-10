@@ -1,6 +1,5 @@
-REDIS_PORT=6379
-CELERY_BROKER_URL=redis://redis:${REDIS_PORT}
-CELERY_RESULT_BACKEND=redis://redis:${REDIS_PORT}
+CELERY_BROKER_URL=redis://redis:6379
+CELERY_RESULT_BACKEND=redis://redis:6379
 worker_hijack_root_logger=False
 RUNTIME_ENV=docker
 SECRET_KEY=supersecret
