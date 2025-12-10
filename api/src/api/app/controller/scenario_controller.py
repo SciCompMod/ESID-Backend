@@ -86,9 +86,10 @@ class ScenarioController:
 
     async def list_scenarios(
         self,
+        simulatedFilter: bool | None,
     ) -> List[ReducedScenario]:
         """List all available scenarios."""
-        return scenario_get_all()
+        return scenario_get_all(simulatedFilter)
 
     async def get_infection_data(
         self,

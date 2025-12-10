@@ -49,7 +49,8 @@ class Scenario(BaseModel):
     timestamp_simulated: Optional[datetime] = Field(default=None, alias="timestampSimulated", description="Timestamp when the scenario was finished simulating and data is available")
     creator_user_id: Optional[str] = Field(default=None, alias="creatorUserId", description="ID of the user who submitted the scenario")
     creator_org_id: Optional[str] = Field(default=None, alias="creatorOrgId", description="ID of the organization the submitting user belongs to")
-    __properties: ClassVar[List[str]] = ["id", "name", "description", "startDate", "endDate", "modelId", "modelParameters", "nodeListId", "linkedInterventions", "percentiles", "timestampSubmitted", "timestampSimulated", "creatorUserId", "creatorOrgId"]
+    whitelist: Optional[List[StrictStr]] = Field(default=None, alias="whitelist", description="Whitelist of Organizations with access to this scenario")
+    __properties: ClassVar[List[str]] = ["id", "name", "description", "startDate", "endDate", "modelId", "modelParameters", "nodeListId", "linkedInterventions", "percentiles", "timestampSubmitted", "timestampSimulated", "creatorUserId", "creatorOrgId", "whitelist"]
     model_config = {
         "populate_by_name": True,
         "validate_assignment": True,
@@ -130,6 +131,7 @@ class Scenario(BaseModel):
             "linkedInterventions": [InterventionImplementation.from_dict(_item) for _item in obj.get("linkedInterventions")] if obj.get("linkedInterventions") is not None else None,
             "percentiles": obj.get("percentiles"),
             "timestampSubmitted": obj.get("timestampSubmitted"),
-            "timestampSimulated": obj.get("timestampSimulated")
+            "timestampSimulated": obj.get("timestampSimulated"),
+            "whitelist": obj.get("whitelist"),
         })
         return _obj
